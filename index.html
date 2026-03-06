@@ -1,11 +1,247 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Impact - Persoonlijke CO2 Voetafdruk</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #4CAF50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 375px;
+            background: white;
+            border-radius: 30px;
+            padding: 40px 20px 20px 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 5px;
+        }
+
+        .question-counter {
+            font-size: 14px;
+            color: #757575;
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #81C784;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1B5E20;
+            line-height: 1.4;
+        }
+
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .answer-button {
+            padding: 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            background: white;
+            color: #424242;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .answer-button:hover {
+            background: #F5F5F5;
+            border-color: #81C784;
+            transform: translateX(5px);
+        }
+
+        .answer-button.selected {
+            background: #66BB6A;
+            color: white;
+            border-color: #43A047;
+        }
+
+        .next-button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #66BB6A 0%, #43A047 100%);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .next-button:hover {
+            background: linear-gradient(135deg, #43A047 0%, #2E7D32 100%);
+            box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .next-button:active {
+            transform: translateY(0);
+        }
+
+        .completion-message {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #2E7D32;
+            padding: 40px 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>kaas</h1>
+    <div class="phone-container">
+        <div class="header">
+            <div class="title">Impact</div>
+            <div class="question-counter" id="counter"></div>
+        </div>
+
+        <div id="quiz-container">
+            <div class="question-card">
+                <div class="question-text" id="question"></div>
+            </div>
+
+            <div class="answers-container" id="answers-container"></div>
+
+            <button class="next-button" onclick="nextQuestion()">Volgende</button>
+        </div>
+
+        <div id="completion-container" style="display: none;">
+            <div class="completion-message">✓ Bedankt! Je antwoorden zijn opgeslagen.</div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Welke van deze gebieden wil je het liefst verbeteren?",
+                answers: ["Voeding", "Energie", "Transport", "Afval", "Anders"]
+            },
+            {
+                question: "Hoe vaak denk je momenteel na over je ecologische impact?",
+                answers: ["Nooit", "Soms", "Regelmatig", "Heel vaak"]
+            },
+            {
+                question: "Wat houdt je het meest tegen om duurzamer te leven?",
+                answers: ["Te duur", "Te ingewikkeld", "Kost te veel tijd", "Weet niet waar te beginnen"]
+            },
+            {
+                question: "Wat zou jou het meest motiveren om je footprint te verlagen?",
+                answers: ["Geld besparen", "Milieu helpen", "Competitie/gamification", "Persoonlijke doelen"]
+            },
+            {
+                question: "Hoe wil je je voortgang het liefst zien in de app?",
+                answers: ["Grafieken", "Score/percentage", "Dagelijkse tips", "Badges/achievements"]
+            },
+            {
+                question: "Wat is je leeftijdscategorie?",
+                answers: ["0-18 jaar", "18-40 jaar", "40-67 jaar", "67+ jaar"]
+            },
+            {
+                question: "Welk vervoermiddel gebruik je meestal naar werk/school?",
+                answers: ["Openbaar vervoer", "Auto", "Fiets", "Lopend", "Anders"]
+            },
+            {
+                question: "Hoe vaak vlieg je gemiddeld per jaar?",
+                answers: ["Nooit", "1 keer of minder", "1–2 keer", "3–4 keer", "5+ keer"]
+            },
+            {
+                question: "Hoe vaak eet je vlees per week?",
+                answers: ["Elke dag", "Bijna dagelijks", "Om de dag", "Zelden", "Nooit"]
+            },
+            {
+                question: "Hoe vaak koop je nieuwe kleding?",
+                answers: ["Wekelijks", "Maandelijks", "Elk seizoen", "Een paar keer per jaar", "Zelden"]
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedAnswers = [];
+
+        function displayQuestion() {
+            const question = questions[currentQuestion];
+            
+            document.getElementById("counter").textContent = 
+                `Vraag ${currentQuestion + 1} van ${questions.length}`;
+            
+            document.getElementById("question").textContent = question.question;
+            
+            const answersContainer = document.getElementById("answers-container");
+            answersContainer.innerHTML = "";
+            
+            question.answers.forEach((answer, index) => {
+                const button = document.createElement("button");
+                button.className = "answer-button";
+                button.textContent = answer;
+                button.onclick = () => selectAnswer(index, button);
+                answersContainer.appendChild(button);
+            });
+        }
+
+        function selectAnswer(index, buttonElement) {
+            document.querySelectorAll(".answer-button").forEach(btn => {
+                btn.classList.remove("selected");
+            });
+            
+            buttonElement.classList.add("selected");
+            selectedAnswers[currentQuestion] = index;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                displayQuestion();
+            } else {
+                showCompletion();
+            }
+        }
+
+        function showCompletion() {
+            document.getElementById("quiz-container").style.display = "none";
+            document.getElementById("completion-container").style.display = "block";
+            console.log("Geselecteerde antwoorden:", selectedAnswers);
+        }
+
+        displayQuestion();
+    </script>
 </body>
 </html>
