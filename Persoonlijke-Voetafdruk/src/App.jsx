@@ -1,36 +1,21 @@
-import { useState } from "react"
+import { Routes, Route, Navigate } from "react-router"
 import Welcome from "./pages/Welcome"
 import Questionnaire from "./pages/Questionnaire"
 import Result from "./pages/Result"
+import Home from "./pages/Home"
 import "./App.css"
 
 function App() {
-  const [screen, setScreen] = useState("welcome")
-  const [result, setResult] = useState(null)
-
-  const startQuestionnaire = () => {
-    setScreen("questions")
-  }
-
-  const handleResult = (answers) => {
-    setResult(answers)
-    setScreen("result")
-  }
-
   return (
-    <>
-      {screen === "welcome" && (
-        <Welcome onStart={startQuestionnaire} />
-      )}
+    <Routes>
+      <Route path="/" element={<Welcome />} />
+      <Route path="/vragen" element={<Questionnaire />} />
+      <Route path="/resultaat" element={<Result />} />
+      <Route path="/home" element={<Home />} />
 
-      {screen === "questions" && (
-        <Questionnaire setResult={handleResult} />
-      )}
-
-      {screen === "result" && (
-        <Result answers={result} />
-      )}
-    </>
+      {/* fallback */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 
