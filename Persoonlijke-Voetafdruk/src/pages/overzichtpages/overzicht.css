@@ -1,0 +1,97 @@
+.overzicht-page {
+  min-height: 100vh;
+  background: #1f1f1f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.overzicht-container {
+  width: 360px;
+  min-height: 640px;
+  background: linear-gradient(180deg, #4caf50 0%, #2e7d32 100%);
+  border-radius: 30px;
+  padding: 22px;
+  box-sizing: border-box;
+  color: white;
+}
+
+.overzicht-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0 0 18px;
+  color: white;
+  text-align: left;
+}
+
+.overzicht-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.overzicht-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: 14px 16px;
+  box-sizing: border-box;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.overzicht-card h2 {
+  font-size: 18px;
+  margin: 0 0 8px;
+  color: #ffffff;
+}
+
+.overzicht-card p {
+  font-size: 16px;
+  margin: 0;
+  color: #f3f3f3;
+  line-height: 1.4;
+}
+
+.overzicht-highlight {
+  border: 2px solid #1b5e20;
+  background: rgba(255, 255, 255, 0.18);
+  margin-bottom: 14px;
+}
+
+.clickable-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease, background 0.2s ease;
+}
+
+.clickable-card:hover {
+  transform: translateY(-2px);
+  opacity: 0.98;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.overzicht-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.overzicht-btn {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 999px;
+  background: white;
+  color: #1b5e20;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.overzicht-btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}

@@ -3,8 +3,10 @@ import { questions } from "../data/questions"
 import QuestionCard from "../components/QuestionCard"
 import ProgressBar from "../components/ProgressBar"
 import CategoryNav from "../components/CategoryNav"
+import { useNavigate } from "react-router-dom"
 
 function Questionnaire({ setResult }) {
+  const navigate = useNavigate()
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState([])
 
