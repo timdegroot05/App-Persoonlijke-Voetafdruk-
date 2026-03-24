@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 
 function Welcome() {
   const navigate = useNavigate()
@@ -16,12 +16,13 @@ function Welcome() {
         </p>
 
         <p className="welcome-subtext">
-          Beantwoord een paar korte vragen over voeding, transport en energie.
+          Beantwoord een paar korte vragen over voeding, transport en energie
+          voordat je verder in de app kan gaan.
         </p>
 
         <button
           className="start-btn"
-          onClick={() => navigate("/vragen")}
+          onClick={() => navigate("/questionnaire")}
         >
           Start test
         </button>

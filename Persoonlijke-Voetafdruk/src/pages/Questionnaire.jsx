@@ -5,7 +5,7 @@ import ProgressBar from "../components/ProgressBar"
 import CategoryNav from "../components/CategoryNav"
 import { useNavigate } from "react-router-dom"
 
-function Questionnaire({ setResult }) {
+function Questionnaire() {
   const navigate = useNavigate()
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState([])
@@ -21,7 +21,7 @@ function Questionnaire({ setResult }) {
       setCurrentQuestion(currentQuestion + 1)
     } else {
       localStorage.setItem("answers", JSON.stringify(newAnswers))
-      setResult(newAnswers)
+      navigate("/result")
     }
   }
 

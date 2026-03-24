@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { useNavigate } from "react-router"
+import { useNavigate } from "react-router-dom"
 import { calculateImpact } from "../utils/calculateImpact"
 import { questions } from "../data/questions"
 
@@ -32,9 +32,9 @@ function Result() {
 
       <button
         className="primary-button result-button"
-        onClick={() => navigate("/home")}
+        onClick={() => navigate("/overzicht")}
       >
-        Naar homepagina
+        Naar overzicht
       </button>
     </div>
   )
