@@ -1,34 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route } from "react-router-dom"
+import Welcome from "./pages/Welcome"
+import Questionnaire from "./pages/Questionnaire"
+import Result from "./pages/Result"
+import Overzicht from "./pages/overzichtpages/Overzicht"
+import DagelijkseUitstoot from "./pages/overzichtpages/DagelijkseUitstoot"
+import WekelijkseUitstoot from "./pages/WekelijkseUitstoot"
+import GemiddeldeWeek from "./pages/overzichtpages/GemiddeldeWeek"
+import GemiddeldeJaar from "./pages/overzichtpages/GemiddeldeJaar"
+import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie"
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more kaas kaas kaas kaas 
-      </p>
-    </>
+    <Routes>
+      <Route path="/" element={<Welcome />} />
+      <Route path="/questionnaire" element={<Questionnaire />} />
+      <Route path="/result" element={<Result />} />
+      <Route path="/overzicht" element={<Overzicht />} />
+      <Route path="/dagelijkse-uitstoot" element={<DagelijkseUitstoot />} />
+      <Route path="/wekelijkse-uitstoot" element={<WekelijkseUitstoot />} />
+      <Route path="/gemiddelde-week" element={<GemiddeldeWeek />} />
+      <Route path="/gemiddelde-jaar" element={<GemiddeldeJaar />} />
+      <Route path="/grootste-categorie" element={<GrootsteCategorie />} />
+    </Routes>
   )
 }
 
