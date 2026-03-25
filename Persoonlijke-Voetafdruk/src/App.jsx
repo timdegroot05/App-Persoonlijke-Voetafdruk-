@@ -2,29 +2,40 @@ import { Routes, Route } from "react-router-dom"
 import Welcome from "./pages/Welcome"
 import Questionnaire from "./pages/Questionnaire"
 import Result from "./pages/Result"
-import Overzicht from "./pages/overzichtpages/Overzicht"
-import DagelijkseUitstoot from "./pages/overzichtpages/DagelijkseUitstoot"
-import WekelijkseUitstoot from "./pages/WekelijkseUitstoot"
-import GemiddeldeWeek from "./pages/overzichtpages/GemiddeldeWeek"
-import GemiddeldeJaar from "./pages/overzichtpages/GemiddeldeJaar"
-import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie"
-import Home from "./pages/Home"
+import Activiteiten from "./pages/activiteiten"
+import "./App.css"
 
 function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Welcome />} />
-      <Route path="/questionnaire" element={<Questionnaire />} />
-      <Route path="/result" element={<Result />} />
-      <Route path="/overzicht" element={<Overzicht />} />
-      <Route path="/dagelijkse-uitstoot" element={<DagelijkseUitstoot />} />
-      <Route path="/wekelijkse-uitstoot" element={<WekelijkseUitstoot />} />
-      <Route path="/gemiddelde-week" element={<GemiddeldeWeek />} />
-      <Route path="/gemiddelde-jaar" element={<GemiddeldeJaar />} />
-      <Route path="/grootste-categorie" element={<GrootsteCategorie />} />
-      <Route path="/home" element={<Home />} />
-    </Routes>
-  )
-}
+  const [screen, setScreen] = useState("activities")
+  const [result, setResult] = useState(null)
+
+  const startQuestionnaire = () => {
+    setScreen("questions")
+  }
+
+  const handleResult = (answers) => {
+    setResult(answers)
+    setScreen("result")
+  }
+
+return (
+  <>
+    {screen === "welcome" && (
+      <Welcome onStart={startQuestionnaire} />
+    )}
+
+    {screen === "questions" && (
+      <Questionnaire setResult={handleResult} />
+    )}
+
+    {screen === "result" && (
+      <Result answers={result} />
+    )}
+
+    {screen === "activiteiten" && (
+      <Activiteiten setScreen={setScreen} />
+    )}
+  </>
+)
 
 export default App
