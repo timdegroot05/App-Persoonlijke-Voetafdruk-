@@ -1,6 +1,7 @@
 import { useMemo } from "react"
 import { calculateImpact } from "../utils/calculateImpact"
 import { questions } from "../data/questions"
+import "../App.css"
 
 function Home() {
   const savedAnswers = JSON.parse(localStorage.getItem("answers")) || []

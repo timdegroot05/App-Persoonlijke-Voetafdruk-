@@ -8,6 +8,7 @@ import WekelijkseUitstoot from "./pages/WekelijkseUitstoot"
 import GemiddeldeWeek from "./pages/overzichtpages/GemiddeldeWeek"
 import GemiddeldeJaar from "./pages/overzichtpages/GemiddeldeJaar"
 import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie"
+import Home from "./pages/Home"
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
       <Route path="/gemiddelde-week" element={<GemiddeldeWeek />} />
       <Route path="/gemiddelde-jaar" element={<GemiddeldeJaar />} />
       <Route path="/grootste-categorie" element={<GrootsteCategorie />} />
+      <Route path="/home" element={<Home />} />
     </Routes>
   )
 }
