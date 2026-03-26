@@ -4,6 +4,7 @@ import QuestionCard from "../components/QuestionCard"
 import ProgressBar from "../components/ProgressBar"
 import CategoryNav from "../components/CategoryNav"
 import { useNavigate } from "react-router-dom"
+import "../App.css"
 
 function Questionnaire() {
   const navigate = useNavigate()
