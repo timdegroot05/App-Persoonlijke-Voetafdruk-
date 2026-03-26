@@ -3,19 +3,22 @@
   background: #1f1f1f;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   padding: 20px;
   box-sizing: border-box;
 }
 
 .overzicht-container {
-  width: 360px;
+  width: min(360px, calc(100vw - 24px));
   min-height: 640px;
+  max-height: calc(100vh - 40px);
   background: linear-gradient(180deg, #4caf50 0%, #2e7d32 100%);
   border-radius: 30px;
   padding: 22px;
   box-sizing: border-box;
   color: white;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .overzicht-title {
