@@ -1,6 +1,8 @@
 import "./overzicht.css"
 import { useNavigate } from "react-router-dom"
+import { FiBarChart2 } from "react-icons/fi"
 import BottomNav from "../../components/BottomNav"
+import AppHeader from "../../components/AppHeader"
 
 function Overzicht() {
   const navigate = useNavigate()
@@ -8,7 +10,9 @@ function Overzicht() {
   return (
     <div className="overzicht-page">
       <div className="overzicht-container">
-        <h1 className="overzicht-title">Overzicht</h1>
+        <AppHeader title="Overzicht" icon={<FiBarChart2 />} />
+
+        <div className="overview-content">
 
         <div
           className="overzicht-card overzicht-highlight clickable-card"
@@ -50,6 +54,7 @@ function Overzicht() {
             <h2>Gemiddelde jaarlijkse uitstoot</h2>
             <p>3650 kg CO2</p>
           </div>
+        </div>
         </div>
 
         <BottomNav />

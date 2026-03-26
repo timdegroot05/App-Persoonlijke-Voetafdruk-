@@ -1,9 +1,11 @@
 import { useState } from "react"
+import { FiHelpCircle } from "react-icons/fi"
 import { questions } from "../data/questions"
 import QuestionCard from "../components/QuestionCard"
 import ProgressBar from "../components/ProgressBar"
 import CategoryNav from "../components/CategoryNav"
 import { useNavigate } from "react-router-dom"
+import AppHeader from "../components/AppHeader"
 import "../App.css"
 
 function Questionnaire() {
@@ -34,7 +36,12 @@ function Questionnaire() {
 
   return (
     <div className="app-container">
-      <h1 className="app-title">Impact</h1>
+      <AppHeader title="Vragenlijst" icon={<FiHelpCircle />} />
+
+      <div className="page-section questionnaire-intro">
+        <p className="section-label dark">Stap {currentQuestion + 1} van {questions.length}</p>
+        <h1 className="questionnaire-title">Vertel iets over jouw dagelijkse keuzes</h1>
+      </div>
 
       <CategoryNav category={currentCategory} />
 

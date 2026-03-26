@@ -1,32 +1,22 @@
 .overzicht-page {
-  min-height: 100vh;
-  background: #1f1f1f;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
-  box-sizing: border-box;
+  width: 100%;
 }
 
 .overzicht-container {
   width: min(360px, calc(100vw - 24px));
   min-height: 640px;
-  max-height: calc(100vh - 40px);
-  background: linear-gradient(180deg, #4caf50 0%, #2e7d32 100%);
+  max-height: calc(100vh - 32px);
+  background: #f4f4f1;
   border-radius: 30px;
-  padding: 22px;
+  padding: 0 0 24px;
   box-sizing: border-box;
-  color: white;
+  color: #1f2d20;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-.overzicht-title {
-  font-size: 36px;
-  font-weight: 700;
-  margin: 0 0 18px;
-  color: white;
-  text-align: left;
+.overview-content {
+  margin: 22px;
 }
 
 .overzicht-cards {
@@ -37,30 +27,35 @@
 
 .overzicht-card {
   width: 100%;
-  background: rgba(255, 255, 255, 0.14);
+  background: #f2f3ea;
   border-radius: 18px;
   padding: 14px 16px;
   box-sizing: border-box;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 24px rgba(31, 45, 32, 0.08);
 }
 
 .overzicht-card h2 {
   font-size: 18px;
   margin: 0 0 8px;
-  color: #ffffff;
+  color: #1f2d20;
 }
 
 .overzicht-card p {
   font-size: 16px;
   margin: 0;
-  color: #f3f3f3;
+  color: #506250;
   line-height: 1.4;
 }
 
 .overzicht-highlight {
-  border: 2px solid #1b5e20;
-  background: rgba(255, 255, 255, 0.18);
+  border: 2px solid #1f6b2a;
+  background: linear-gradient(180deg, #1f6b2a 0%, #174f20 100%);
   margin-bottom: 14px;
+}
+
+.overzicht-highlight h2,
+.overzicht-highlight p {
+  color: white;
 }
 
 .clickable-card {
@@ -71,7 +66,7 @@
 .clickable-card:hover {
   transform: translateY(-2px);
   opacity: 0.98;
-  background: rgba(255, 255, 255, 0.22);
+  background: #ecf3e7;
 }
 
 .overzicht-buttons {

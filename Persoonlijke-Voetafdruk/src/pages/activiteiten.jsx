@@ -1,15 +1,22 @@
 import { useNavigate } from "react-router-dom"
+import { FiActivity } from "react-icons/fi"
 import BottomNav from "../components/BottomNav"
+import AppHeader from "../components/AppHeader"
 
 function Activiteiten() {
   const navigate = useNavigate()
   return (
     <div className="activiteiten-page">
-      <header className="activiteiten-header">
-        <h1>Kies je impact vandaag</h1>
-        <p>Kleine acties, groot verschil 🌱</p>
-      </header>
-<section className="progress-box">
+      <AppHeader title="Acties" icon={<FiActivity />} />
+
+      <div className="page-section">
+        <header className="activiteiten-header">
+          <h1>Kies je impact vandaag</h1>
+          <p>Kleine acties, groot verschil 🌱</p>
+        </header>
+      </div>
+
+      <section className="progress-box page-section">
   <p>2 acties voltooid vandaag 🔥</p>
 
   <div className="progress-wrapper">
@@ -20,7 +27,7 @@ function Activiteiten() {
   </div>
 </section>
 
-      <section className="cards">
+      <section className="cards page-section">
         <div className="actie-card food">
           <h2>Voedsel</h2>
           <p>Plantaardig lekkers</p>
@@ -48,7 +55,7 @@ function Activiteiten() {
 
       <BottomNav />
     </div>
-  );
+  )
 }
 
-export default Activiteiten;
+export default Activiteiten

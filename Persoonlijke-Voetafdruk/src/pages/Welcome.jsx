@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
-
+import { FiArrowRight, FiBarChart2, FiCompass } from "react-icons/fi"
+import { LuLeaf } from "react-icons/lu"
 
 function Welcome() {
   const navigate = useNavigate()
@@ -7,7 +8,12 @@ function Welcome() {
   return (
     <div className="welcome-page">
       <div className="welcome-card">
-        <div className="welcome-logo">🌍</div>
+        <div className="welcome-hero">
+          <div className="welcome-logo">
+            <LuLeaf />
+          </div>
+          <div className="welcome-chip">Persoonlijke voetafdruk</div>
+        </div>
 
         <h1 className="welcome-title">Impact</h1>
 
@@ -21,11 +27,23 @@ function Welcome() {
           voordat je verder in de app kan gaan.
         </p>
 
+        <div className="welcome-highlights">
+          <div className="welcome-highlight">
+            <FiBarChart2 />
+            <span>Direct overzicht van je uitstoot</span>
+          </div>
+          <div className="welcome-highlight">
+            <FiCompass />
+            <span>Persoonlijke tips en acties</span>
+          </div>
+        </div>
+
         <button
           className="start-btn"
           onClick={() => navigate("/questionnaire")}
         >
           Start test
+          <FiArrowRight />
         </button>
       </div>
     </div>

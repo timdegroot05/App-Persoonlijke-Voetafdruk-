@@ -1,8 +1,11 @@
 import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
+import { HiOutlineCalculator } from "react-icons/hi"
+import { LuLeaf } from "react-icons/lu"
 import { calculateImpact } from "../utils/calculateImpact"
 import { questions } from "../data/questions"
 import BottomNav from "../components/BottomNav"
+import AppHeader from "../components/AppHeader"
 import "../App.css"
 
 function Home() {
@@ -54,28 +57,58 @@ function Home() {
     )
   )
 
-  return (
-    <div className="home-page">
-      <header className="home-header">
-        <div className="brand-mark">🌍</div>
-        <div>
-          <p className="brand-label">Duurzaam leven app</p>
-          <h1 className="brand-title">Impact</h1>
-        </div>
-      </header>
+  const dailyTrendBars = [
+    Math.max(24, Math.round(emissionData.dailyEmission * 2.2)),
+    Math.max(34, Math.round(emissionData.dailyEmission * 2.8)),
+    Math.max(28, Math.round(emissionData.dailyEmission * 2.4)),
+    Math.max(40, Math.round(emissionData.dailyEmission * 3.1)),
+  ]
 
-      <section className="emission-hero">
-        <p className="section-label">Wekelijkse uitstoot</p>
-        <h2 className="hero-number">{emissionData.weeklyEmission} kg CO₂e</h2>
-        <p className="hero-subtext">
-          Geschatte uitstoot op basis van jouw ingevulde vragenlijst
-        </p>
-      </section>
+  return (
+  <div className="home-page">
+    <AppHeader title="Impact" icon={<LuLeaf />} />
+
+    <section className="emission-hero">
+      <p className="section-label">Wekelijkse uitstoot</p>
+      <h2 className="hero-number">{emissionData.weeklyEmission} kg CO₂e</h2>
+      <p className="hero-subtext">
+        Geschatte uitstoot op basis van jouw ingevulde vragenlijst
+      </p>
+    </section>
 
       <section className="home-grid single">
-        <div className="info-card compact full-width">
-          <p className="section-label dark">Dagelijkse uitstoot</p>
-          <p className="compact-number">{emissionData.dailyEmission} kg CO₂e</p>
+        <div className="info-card compact full-width daily-widget-card">
+          <div className="daily-widget-top">
+            <div>
+              <p className="section-label dark">Dagelijkse uitstoot</p>
+              <p className="compact-number">{emissionData.dailyEmission} kg CO₂e</p>
+            </div>
+
+            <button
+              type="button"
+              className="daily-widget-icon daily-widget-link"
+              onClick={() => navigate("/calculator")}
+              aria-label="Ga naar calculator"
+            >
+              <HiOutlineCalculator />
+            </button>
+          </div>
+
+          <div className="daily-widget-bottom">
+            <div className="daily-widget-chart" aria-hidden="true">
+              {dailyTrendBars.map((barHeight, index) => (
+                <span
+                  key={index}
+                  className="daily-widget-bar"
+                  style={{ height: `${barHeight}px` }}
+                />
+              ))}
+            </div>
+
+            <p className="daily-widget-note">
+              Snelle inschatting van je gemiddelde dagelijkse impact.
+            </p>
+          </div>
         </div>
       </section>
 

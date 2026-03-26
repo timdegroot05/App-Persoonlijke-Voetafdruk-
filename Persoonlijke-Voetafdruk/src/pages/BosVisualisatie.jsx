@@ -1,8 +1,12 @@
 import BottomNav from "../components/BottomNav"
+import AppHeader from "../components/AppHeader"
+import { LuTrees } from "react-icons/lu"
 
 function BosVisualisatie() {
   return (
     <div className="calculator-page forest-page">
+      <AppHeader title="Bos" icon={<LuTrees />} />
+
       <div className="calculator-card forest-card">
         <p className="section-label dark">Visualisatie</p>
         <h1 className="calculator-title">Jouw Bos</h1>
