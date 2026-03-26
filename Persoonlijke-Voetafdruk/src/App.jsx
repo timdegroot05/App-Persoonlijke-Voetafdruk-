@@ -5,6 +5,7 @@ import Result from "./pages/Result"
 import Activiteiten from "./pages/activiteiten"
 import "./App.css"
 
+
 function App() {
   const [screen, setScreen] = useState("activities")
   const [result, setResult] = useState(null)
@@ -36,6 +37,8 @@ return (
       <Activiteiten setScreen={setScreen} />
     )}
   </>
-)
+  )
 
-export default App
+}
+
+export default App 
