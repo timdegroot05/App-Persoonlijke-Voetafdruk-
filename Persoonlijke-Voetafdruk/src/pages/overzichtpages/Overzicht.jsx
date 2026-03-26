@@ -1,5 +1,6 @@
 import "./overzicht.css"
 import { useNavigate } from "react-router-dom"
+import BottomNav from "../../components/BottomNav"
 
 function Overzicht() {
   const navigate = useNavigate()
@@ -50,6 +51,8 @@ function Overzicht() {
             <p>3650 kg CO2</p>
           </div>
         </div>
+
+        <BottomNav />
       </div>
     </div>
   )

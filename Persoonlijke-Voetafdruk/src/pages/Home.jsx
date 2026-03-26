@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { calculateImpact } from "../utils/calculateImpact"
 import { questions } from "../data/questions"
+import BottomNav from "../components/BottomNav"
 import "../App.css"
 
 function Home() {
@@ -135,6 +136,8 @@ function Home() {
         <p className="section-label dark">Tip van vandaag</p>
         <p className="tip-text">{tipOfTheDay}</p>
       </section>
+
+      <BottomNav />
     </div>
   )
 }

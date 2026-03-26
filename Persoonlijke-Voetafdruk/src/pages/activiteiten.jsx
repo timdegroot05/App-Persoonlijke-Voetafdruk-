@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom"
+import BottomNav from "../components/BottomNav"
 
 function Activiteiten() {
   const navigate = useNavigate()
@@ -44,6 +45,8 @@ function Activiteiten() {
           </button>
         </div>
       </section>
+
+      <BottomNav />
     </div>
   );
 }

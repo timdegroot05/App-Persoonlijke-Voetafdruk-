@@ -13,6 +13,8 @@ import FoodTasks from "./pages/tasks/Foodtasks";
 import TransportTasks from "./pages/tasks/Transporttasks";
 import EnergyTasks from "./pages/tasks/EnergyTasks";
 import Home from "./pages/Home";
+import Calculator from "./pages/Calculator";
+import BosVisualisatie from "./pages/BosVisualisatie";
 import ScrollToTop from "./components/ScrollToTop";
 import "./App.css"
 
@@ -37,6 +39,8 @@ function App() {
         <Route path="/transportTasks" element={<TransportTasks />} />
         <Route path="/energyTasks" element={<EnergyTasks />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/calculator" element={<Calculator />} />
+        <Route path="/bos" element={<BosVisualisatie />} />
       </Routes>
     </>
   )
