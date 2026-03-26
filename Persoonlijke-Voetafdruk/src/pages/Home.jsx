@@ -36,22 +36,22 @@ function Home() {
     sustainabilityTips[new Date().getDate() % sustainabilityTips.length]
 
   return (
-    <div className="home-page">
-      <header className="home-header">
-        <div className="brand-mark">🌍</div>
-        <div>
-          <p className="brand-label">Duurzaam leven app</p>
-          <h1 className="brand-title">Impact</h1>
-        </div>
-      </header>
+  <div className="home-page">
+    <header className="home-header">
+      <div className="header-left">🌍</div>
 
-      <section className="emission-hero">
-        <p className="section-label">Wekelijkse uitstoot</p>
-        <h2 className="hero-number">{emissionData.weeklyEmission} kg CO₂e</h2>
-        <p className="hero-subtext">
-          Geschatte uitstoot op basis van jouw ingevulde vragenlijst
-        </p>
-      </section>
+      <h1 className="header-title">Impact</h1>
+
+      <div className="header-right"></div>
+    </header>
+
+    <section className="emission-hero">
+      <p className="section-label">Wekelijkse uitstoot</p>
+      <h2 className="hero-number">{emissionData.weeklyEmission} kg CO₂e</h2>
+      <p className="hero-subtext">
+        Geschatte uitstoot op basis van jouw ingevulde vragenlijst
+      </p>
+    </section>
 
       <section className="home-grid single">
         <div className="info-card compact full-width">

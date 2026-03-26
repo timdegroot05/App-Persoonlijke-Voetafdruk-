@@ -23,45 +23,64 @@ body {
 .app-container,
 .result,
 .calculator-page {
-  width: 360px;
+   width: 360px;
   min-height: 640px;
-  background: linear-gradient(180deg, #55b85f 0%, #45a84f 100%);
+  background: #f4f4f1;
   border-radius: 30px;
-  padding: 22px;
+  padding: 0;
+  overflow: hidden;
   animation: fadeIn 0.3s ease;
 }
 
 .home-header {
+  position: relative;
+  height: 100px;
+  background: rgba(27, 94, 32, 1);
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 22px;
+  justify-content: space-between;
+
+  padding: 0 20px;
+
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.25),
+    0 8px 16px rgba(0,0,0,0.15);
 }
 
-.brand-mark {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.22);
+.header-left,
+.header-right {
+  width: 40px;   /* moet gelijk zijn */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 40px;
+  color: white;
 }
 
-.brand-label {
-  margin: 0 0 4px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 12px;
-  letter-spacing: 0.4px;
-}
-
-.brand-title,
-.app-title {
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   margin: 0;
   color: white;
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 40px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-family: 'Lilita One'; 
+}
+
+.emission-hero,
+.home-grid,
+.tip-card {
+  margin-left: 22px;
+  margin-right: 22px;
+}
+
+.emission-hero {
+  margin-top: 22px;
 }
 
 .emission-hero {
@@ -421,4 +440,88 @@ body {
 .start-btn:hover {
   transform: translateY(-1px);
   opacity: 0.95;
+}
+
+.activiteiten-page {
+  min-height: 100vh;
+  padding: 24px 18px;
+  box-sizing: border-box;
+  color: rgb(151, 45, 45);
+    background: linear-gradient(180deg, #4caf50 0%, #20c528 100%);
+    border-radius: 30px;
+}
+
+
+.activiteiten-header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+}
+
+.activiteiten-header p {
+  margin-top: 8px;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.progress-box {
+  margin-top: 24px;
+  background: linear-gradient(180deg, #4caf50 0%, #20c528 100%);
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(180deg, #4caf50 0%, #20c528 100%);
+  border-radius: 999px;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 40%;
+  height: 100%;
+  background: white;
+  border-radius: 999px;
+}
+
+.cards {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actie-card {
+  padding: 20px;
+  border-radius: 20px;
+  color: #1b1b1b;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.actie-card h2 {
+  margin: 0 0 8px 0;
+}
+
+.actie-card p {
+  margin: 0 0 16px 0;
+}
+
+.actie-card span {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.food {
+  background: #4caf50;
+}
+
+.transport {
+  background: #4caf50;
+}
+
+.energy {
+  background: #4caf50;
 }

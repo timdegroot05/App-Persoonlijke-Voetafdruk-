@@ -12,7 +12,7 @@ import Activiteiten from "./pages/Activiteiten";
 import FoodTasks from "./pages/tasks/Foodtasks";
 import TransportTasks from "./pages/tasks/Transporttasks";
 import EnergyTasks from "./pages/tasks/EnergyTasks";
-import home from "./pages/Home";
+import Home from "./pages/Home";
 import "./App.css"
 
 
