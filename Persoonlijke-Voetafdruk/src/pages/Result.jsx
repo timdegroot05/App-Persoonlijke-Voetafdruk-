@@ -32,9 +32,9 @@ function Result() {
 
       <button
         className="primary-button result-button"
-        onClick={() => navigate("/overzicht")}
+        onClick={() => navigate("/Home")}
       >
-        Naar overzicht
+        Naar Home
       </button>
     </div>
   )

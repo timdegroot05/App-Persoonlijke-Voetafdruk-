@@ -1,3 +1,4 @@
+import "./activiteiten.css";
 import { useNavigate } from "react-router-dom"
 
 function Activiteiten() {
