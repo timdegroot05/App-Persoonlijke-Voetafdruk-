@@ -8,12 +8,12 @@ import WekelijkseUitstoot from "./pages/WekelijkseUitstoot"
 import GemiddeldeWeek from "./pages/overzichtpages/GemiddeldeWeek"
 import GemiddeldeJaar from "./pages/overzichtpages/GemiddeldeJaar"
 import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie"
-import Activiteiten from "./pages/Activiteiten";
+import Activiteiten from "./pages/activiteiten"
 import FoodTasks from "./pages/tasks/Foodtasks";
 import TransportTasks from "./pages/tasks/Transporttasks";
 import EnergyTasks from "./pages/tasks/EnergyTasks";
-import home from "./pages/Home";
-import "./App.css"
+import Home from "./pages/Home";
+
 
 
 function App() {

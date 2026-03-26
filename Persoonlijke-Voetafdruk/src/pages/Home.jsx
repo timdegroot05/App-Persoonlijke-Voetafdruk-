@@ -1,9 +1,11 @@
 import { useMemo } from "react"
+import { useNavigate } from "react-router-dom"
 import { calculateImpact } from "../utils/calculateImpact"
 import { questions } from "../data/questions"
 import "../App.css"
 
 function Home() {
+  const navigate = useNavigate()
   const savedAnswers = JSON.parse(localStorage.getItem("answers")) || []
 
   const emissionData = useMemo(() => {
@@ -53,8 +55,15 @@ function Home() {
         </p>
       </section>
 
-      <section className="home-grid single">
-        <div className="info-card compact full-width">
+      <section className="home-grid" style={{ display: 'flex', gap: '1rem' }}>
+        <div
+          className="info-card compact"
+          onClick={() => navigate("/activiteiten")}
+          style={{ cursor: 'pointer', flex: 1 }}
+        >
+          <p className="section-label dark">Activiteit</p>
+        </div>
+        <div className="info-card compact" style={{ flex: 1 }}>
           <p className="section-label dark">Dagelijkse uitstoot</p>
           <p className="compact-number">{emissionData.dailyEmission} kg CO₂e</p>
         </div>
