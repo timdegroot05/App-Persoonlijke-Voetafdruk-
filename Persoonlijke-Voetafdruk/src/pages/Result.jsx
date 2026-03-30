@@ -1,9 +1,10 @@
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { FiArrowRight, FiAward, FiRefreshCcw } from "react-icons/fi"
 import { calculateImpact } from "../utils/calculateImpact"
 import { questions } from "../data/questions"
 import AppHeader from "../components/AppHeader"
+import { buildImpactSnapshot, saveImpactSnapshot } from "../utils/impactInsights"
 
 function Result() {
   const navigate = useNavigate()
@@ -14,6 +15,15 @@ function Result() {
 
   const result = calculateImpact(answers, questions)
   const totalScore = Math.max(0, Math.round(100 - result.total))
+
+  useEffect(() => {
+    if (answers.length === 0) {
+      return
+    }
+
+    const snapshot = buildImpactSnapshot(answers)
+    saveImpactSnapshot(snapshot)
+  }, [answers])
 
   return (
     <div className="result">
