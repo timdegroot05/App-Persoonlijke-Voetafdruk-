@@ -34,7 +34,7 @@ function QuestionCard({ question, selectAnswer }) {
             className={selected === index ? "answer selected" : "answer"}
             onClick={() => choose(answer, index)}
           >
-            {answer.text}
+            <span>{answer.text}</span>
           </button>
         ))}
       </div>
