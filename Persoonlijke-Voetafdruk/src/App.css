@@ -52,7 +52,7 @@ body {
 
 .header-left,
 .header-right {
-  width: 40px;   /* moet gelijk zijn */
+  width: 40px;   
   display: flex;
   align-items: center;
   justify-content: center;
