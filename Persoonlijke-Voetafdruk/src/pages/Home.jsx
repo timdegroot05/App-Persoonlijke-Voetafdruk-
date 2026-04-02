@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { calculateImpact } from "../utils/calculateImpact"
 import { questions } from "../data/questions"
 import "../App.css"
+import handFoto from "../assets/HandHandfoto.png"
 
 function Home() {
   const navigate = useNavigate()
@@ -13,16 +14,19 @@ function Home() {
       return {
         dailyEmission: 12.4,
         weeklyEmission: 86.8,
+        score: 52,
       }
     }
 
     const result = calculateImpact(savedAnswers, questions)
     const dailyEmission = Number((4 + result.total * 0.45).toFixed(1))
     const weeklyEmission = Number((dailyEmission * 7).toFixed(1))
+    const score = Math.max(12, Math.round(100 - result.total))
 
     return {
       dailyEmission,
       weeklyEmission,
+      score,
     }
   }, [savedAnswers])
 
@@ -36,6 +40,19 @@ function Home() {
 
   const tipOfTheDay =
     sustainabilityTips[new Date().getDate() % sustainabilityTips.length]
+
+  const weeklyGoal = 150
+  const savedKg = Math.max(
+    0,
+    Number((weeklyGoal - emissionData.weeklyEmission).toFixed(1))
+  )
+  const goalProgress = Math.min(
+    100,
+    Math.max(
+      8,
+      Math.round((savedKg / weeklyGoal) * 100)
+    )
+  )
 
   return (
     <div className="home-page">
@@ -61,11 +78,77 @@ function Home() {
           onClick={() => navigate("/activiteiten")}
           style={{ cursor: 'pointer', flex: 1 }}
         >
-          <p className="section-label dark">Activiteit</p>
-        </div>
+       <div
+  className="info-card compact"
+  style={{ flex: 1, overflow: "hidden", padding: 0 }}
+>
+  <img
+    src={handFoto}
+    alt="Duurzaamheid"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+      borderRadius: "16px"
+    }}
+  />
         <div className="info-card compact" style={{ flex: 1 }}>
           <p className="section-label dark">Dagelijkse uitstoot</p>
           <p className="compact-number">{emissionData.dailyEmission} kg CO₂e</p>
+        </div>
+      </div>
+      </section>
+
+      <section className="home-grid">
+        <button
+          className="info-card action-card home-action-card"
+          onClick={() => navigate("/overzicht")}
+        >
+          <p className="section-label dark">Inzichten</p>
+          <p className="action-title">Bekijk overzicht</p>
+          <span className="action-arrow">→</span>
+        </button>
+
+        <button
+          className="info-card action-card home-action-card"
+          onClick={() => navigate("/activiteiten")}
+        >
+          <p className="section-label dark">Aan de slag</p>
+          <p className="action-title">Open activiteiten</p>
+          <span className="action-arrow">→</span>
+        </button>
+      </section>
+
+      <section className="impact-widget">
+        <div className="impact-widget-top">
+          <div>
+            <p className="section-label">Persoonlijke voortgang</p>
+            <h2 className="impact-widget-title">{emissionData.score}/100</h2>
+          </div>
+          <div className="impact-badge">Groene week</div>
+        </div>
+
+        <p className="impact-widget-text">
+          Je zit op koers. Met kleine keuzes in vervoer en voeding maak je deze
+          week al zichtbaar verschil.
+        </p>
+
+        <div className="goal-progress">
+          <div
+            className="goal-progress-fill"
+            style={{ width: `${goalProgress}%` }}
+          />
+        </div>
+
+        <div className="impact-stats">
+          <div className="impact-stat-card">
+            <span>Bespaard t.o.v. doel</span>
+            <strong>{savedKg} kg</strong>
+          </div>
+          <div className="impact-stat-card">
+            <span>Focus vandaag</span>
+            <strong>Vervoer</strong>
+          </div>
         </div>
       </section>
 
