@@ -1,0 +1,6 @@
+{
+  "appId": "com.anass.impactapp",
+  "appName": "Impact",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
