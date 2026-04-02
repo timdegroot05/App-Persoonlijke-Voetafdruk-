@@ -151,7 +151,7 @@ function Home() {
       </div>
 
       <p className="home-feature-copy">
-        Zie jouw impact terug in een visueel bos dat meegroeit met je keuzes.
+        Hier willen we een visuele representatie van een bos maken dat groeit naarmate je impact daalt. Elke boom staat voor een bepaalde hoeveelheid CO₂ die je hebt bespaard. Naarmate je dichter bij je doelen komt, groeit het bos en worden de bomen voller en groener. Zo zie je direct hoe jouw acties bijdragen aan een gezondere planeet!
       </p>
     </section>
 
