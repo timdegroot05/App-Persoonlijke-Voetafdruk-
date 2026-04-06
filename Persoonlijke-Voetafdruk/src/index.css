@@ -1,5 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Manrope", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --font-display: "Chakra Petch", "Manrope", system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -13,6 +17,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  min-width: 320px;
+  min-height: 100%;
+}
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -24,10 +33,10 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  overflow-y: auto;
+  font-family: var(--font-body);
 }
 
 h1 {
