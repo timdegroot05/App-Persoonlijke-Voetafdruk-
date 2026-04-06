@@ -1,0 +1,68 @@
+.activiteiten-page {
+  height: calc(100vh - 32px);
+  padding: 0;
+  box-sizing: border-box;
+  color: #1f2d20;
+  background: var(--page-bg);
+  border-radius: 30px;
+  width: min(360px, calc(100vw - 24px));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.activiteiten-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 22px;
+}
+
+.activiteiten-header h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.2;
+  color: #1f2d20;
+  font-family: var(--font-display);
+}
+
+.activiteiten-header p {
+  margin: 8px 0 0;
+  font-size: 16px;
+  opacity: 0.9;
+  color: #506250;
+}
+
+.progress-box {
+  margin-top: 22px;
+  background: linear-gradient(180deg, #1f6b2a 0%, #174f20 100%);
+  padding: 18px;
+  border-radius: 22px;
+  color: white;
+  box-shadow: 0 18px 32px rgba(22, 53, 28, 0.16);
+}
+
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.progress-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+}
+
+.cards {
+  margin-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.activiteiten-page .bottom-nav {
+  flex-shrink: 0;
+}
