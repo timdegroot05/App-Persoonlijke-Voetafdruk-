@@ -15,6 +15,8 @@ import EnergyTasks from "./pages/tasks/EnergyTasks";
 import Home from "./pages/Home";
 import Calculator from "./pages/Calculator";
 import BosVisualisatie from "./pages/BosVisualisatie";
+import Tips from "./pages/Tips";
+import Profile from "./pages/Profile";
 import ScrollToTop from "./components/ScrollToTop";
 import "./App.css"
 
@@ -41,6 +43,8 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/calculator" element={<Calculator />} />
         <Route path="/bos" element={<BosVisualisatie />} />
+        <Route path="/tips" element={<Tips />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </>
   )
