@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react"
 
-function QuestionCard({ question, selectAnswer }) {
+function QuestionCard({ question, selectAnswer, selectedAnswerText }) {
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
-    setSelected(null)
-  }, [question])
+    const selectedIndex = question.answers.findIndex(
+      (answer) => answer.text === selectedAnswerText
+    )
+    setSelected(selectedIndex >= 0 ? selectedIndex : null)
+  }, [question, selectedAnswerText])
 
   const choose = (answer, index) => {
     setSelected(index)
 
     setTimeout(() => {
-      selectAnswer(answer.impact)
+      selectAnswer(answer)
     }, 200)
   }
 

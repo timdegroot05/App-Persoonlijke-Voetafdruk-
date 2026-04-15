@@ -2,28 +2,38 @@ import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { FiArrowRight, FiAward, FiRefreshCcw } from "react-icons/fi"
 import { calculateImpact } from "../utils/calculateImpact"
-import { questions } from "../data/questions"
+import { getVisibleQuestions } from "../data/questionnaires"
+import { weeklyQuestions } from "../data/questions"
 import AppHeader from "../components/AppHeader"
 import { buildImpactSnapshot, saveImpactSnapshot } from "../utils/impactInsights"
+import { getLatestWeeklyAnswers, getProfileAnswers } from "../utils/questionnaireStorage"
 
 function Result() {
   const navigate = useNavigate()
 
-  const answers = useMemo(() => {
-    return JSON.parse(localStorage.getItem("answers")) || []
+  const weeklyAnswers = useMemo(() => {
+    return getLatestWeeklyAnswers()
   }, [])
+  const profileAnswers = useMemo(() => getProfileAnswers(), [])
+  const visibleWeeklyQuestions = useMemo(
+    () => getVisibleQuestions(weeklyQuestions, weeklyAnswers),
+    [weeklyAnswers]
+  )
 
-  const result = calculateImpact(answers, questions)
-  const totalScore = Math.max(0, Math.round(186 - result.total))
+  const result = calculateImpact(weeklyAnswers, visibleWeeklyQuestions)
+  const snapshot = useMemo(
+    () => buildImpactSnapshot(profileAnswers, weeklyAnswers),
+    [profileAnswers, weeklyAnswers]
+  )
+  const totalScore = snapshot.totalScore
 
   useEffect(() => {
-    if (answers.length === 0) {
+    if (Object.keys(weeklyAnswers).length === 0) {
       return
     }
 
-    const snapshot = buildImpactSnapshot(answers)
     saveImpactSnapshot(snapshot)
-  }, [answers])
+  }, [snapshot, weeklyAnswers])
 
   return (
     <div className="result">
@@ -67,10 +77,10 @@ function Result() {
 
         <button
           className="secondary-button"
-          onClick={() => navigate("/questionnaire")}
+          onClick={() => navigate("/weekly-questionnaire")}
         >
           <FiRefreshCcw />
-          Opnieuw invullen
+          Wekelijkse vragenlijst opnieuw invullen
         </button>
       </div>
       </div>

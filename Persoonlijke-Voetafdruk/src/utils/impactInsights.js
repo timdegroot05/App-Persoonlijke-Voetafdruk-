@@ -1,28 +1,57 @@
-import { questions } from "../data/questions"
 import { calculateImpact } from "./calculateImpact"
+import {
+  initialProfileQuestions,
+  getVisibleQuestions,
+} from "../data/questionnaires"
+import { weeklyQuestions } from "../data/questions"
 
 const HISTORY_KEY = "impact-history"
 
-export function buildImpactSnapshot(answers) {
-  const safeAnswers = Array.isArray(answers) ? answers : []
-  const result = calculateImpact(safeAnswers, questions)
-  const totalScore = Math.max(0, Math.round(100 - result.total))
-  const dailyEmission = Number((4 + result.total * 0.45).toFixed(1))
+export function buildImpactSnapshot(profileAnswers = {}, weeklyAnswers = {}) {
+  const visibleProfileQuestions = getVisibleQuestions(initialProfileQuestions, profileAnswers)
+  const visibleWeeklyQuestions = getVisibleQuestions(weeklyQuestions, weeklyAnswers)
+  const profileResult = calculateImpact(profileAnswers, visibleProfileQuestions)
+  const weeklyResult = calculateImpact(weeklyAnswers, visibleWeeklyQuestions)
+  const totalImpact = profileResult.total + weeklyResult.total
+  const categories = {}
+  const maxImpact =
+    visibleProfileQuestions.reduce(
+      (sum, question) => sum + Math.max(...question.answers.map((answer) => answer.impact)),
+      0
+    ) +
+    visibleWeeklyQuestions.reduce(
+      (sum, question) => sum + Math.max(...question.answers.map((answer) => answer.impact)),
+      0
+    )
+
+  Object.entries(profileResult.categories).forEach(([category, value]) => {
+    categories[category] = (categories[category] || 0) + value
+  })
+
+  Object.entries(weeklyResult.categories).forEach(([category, value]) => {
+    categories[category] = (categories[category] || 0) + value
+  })
+
+  const totalScore = Math.max(
+    0,
+    Math.round(((Math.max(0, maxImpact - totalImpact)) / Math.max(1, maxImpact)) * 100)
+  )
+  const dailyEmission = Number((3.5 + totalImpact * 0.28).toFixed(1))
   const weeklyEmission = Number((dailyEmission * 7).toFixed(1))
 
   const dominantCategory =
-    Object.entries(result.categories).sort((a, b) => b[1] - a[1])[0]?.[0] ??
+    Object.entries(categories).sort((a, b) => b[1] - a[1])[0]?.[0] ??
     "energie"
 
   return {
-    id: `${Date.now()}-${safeAnswers.join("-")}`,
-    answersKey: safeAnswers.join("-"),
+    id: `${Date.now()}-${dominantCategory}-${totalImpact}`,
+    answersKey: JSON.stringify({ profileAnswers, weeklyAnswers }),
     createdAt: new Date().toISOString(),
     totalScore,
-    totalImpact: result.total,
+    totalImpact,
     dailyEmission,
     weeklyEmission,
-    categories: result.categories,
+    categories,
     dominantCategory,
   }
 }

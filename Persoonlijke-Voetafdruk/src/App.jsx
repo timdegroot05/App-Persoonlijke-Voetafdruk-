@@ -17,6 +17,7 @@ import Calculator from "./pages/Calculator";
 import BosVisualisatie from "./pages/BosVisualisatie";
 import Tips from "./pages/Tips";
 import Profile from "./pages/Profile";
+import QuestionnaireEditor from "./pages/QuestionnaireEditor";
 import ScrollToTop from "./components/ScrollToTop";
 import "./App.css"
 
@@ -28,7 +29,10 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Welcome />} />
-        <Route path="/questionnaire" element={<Questionnaire />} />
+        <Route path="/questionnaire" element={<Questionnaire mode="profile" />} />
+        <Route path="/weekly-questionnaire" element={<Questionnaire mode="weekly" />} />
+        <Route path="/profile-edit" element={<QuestionnaireEditor mode="profile" />} />
+        <Route path="/weekly-edit" element={<QuestionnaireEditor mode="weekly" />} />
         <Route path="/result" element={<Result />} />
         <Route path="/overzicht" element={<Overzicht />} />
         <Route path="/dagelijkse-uitstoot" element={<DagelijkseUitstoot />} />

@@ -99,6 +99,14 @@ body {
   stroke-width: 2.2;
 }
 
+.header-profile-link {
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
 .header-title {
   position: absolute;
   left: 50%;
@@ -1412,9 +1420,10 @@ body {
 
 .bottom-nav {
   position: static;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 0;
   width: 100%;
   max-width: none;
@@ -1422,7 +1431,7 @@ body {
   margin-right: 0;
   padding: 7px 10px 9px;
   box-sizing: border-box;
-  border-radius: 20px 20px 30px 30px;
+  border-radius: 0 0 30px 30px;
   background: rgba(17, 56, 22, 0.92);
   backdrop-filter: blur(10px);
   box-shadow: 0 -10px 24px rgba(17, 56, 22, 0.12);
@@ -1430,6 +1439,7 @@ body {
 }
 
 .bottom-nav-item {
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1499,6 +1509,22 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 12px;
+}
+
+.profile-page .tips-content,
+.questionnaire-editor-page .tips-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.profile-page .calculator-card,
+.questionnaire-editor-page .calculator-card {
+  margin-bottom: 0;
+}
+
+.profile-badges-list {
+  margin-top: 0;
 }
 
 .tips-hero-card {
@@ -1671,6 +1697,8 @@ body {
 }
 
 .answer {
+  appearance: none;
+  -webkit-appearance: none;
   width: 100%;
   padding: 15px 16px;
   border-radius: 18px;
@@ -1679,6 +1707,7 @@ body {
   color: #1f2d20;
   cursor: pointer;
   font-size: 15px;
+  font-family: inherit;
   text-align: left;
   box-shadow: 0 6px 14px rgba(31, 45, 32, 0.04);
 }
@@ -1737,6 +1766,19 @@ body {
   align-items: stretch;
   justify-content: flex-start;
   gap: 18px;
+}
+
+.calculator-tool-page > .calculator-card {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.calculator-tool-page > .bottom-nav {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
 }
 
 .calculator-card {
@@ -2049,7 +2091,7 @@ body {
 
 /* Activiteiten Page Styles */
 
-.progress-bar {
+.activiteiten-page .progress-bar {
   width: 100%;
   height: 10px;
   background: rgba(255, 255, 255, 0.18);
@@ -2100,10 +2142,28 @@ body {
 
 .forest-page {
   background: #f4f4f1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 32px);
+  overflow: hidden;
 }
 
 .forest-card {
   background: linear-gradient(180deg, #f7fbf6 0%, #eaf3e7 100%);
+}
+
+.forest-page .forest-card {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 18px;
+}
+
+.forest-page .bottom-nav {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
 }
 
 .forest-visual {
@@ -2213,6 +2273,42 @@ body {
 
 .profile-badge-card.unlocked {
   background: linear-gradient(180deg, #eef8ee 0%, #ddf0df 100%);
+}
+
+.home-questionnaire-card {
+  margin-bottom: 20px;
+}
+
+.home-questionnaire-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-questionnaire-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #f1e3cf;
+  color: #7b4c1a;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.home-questionnaire-status.done {
+  background: #daefdc;
+  color: #1d6a2e;
+}
+
+.home-questionnaire-status svg {
+  width: 14px;
+  height: 14px;
 }
 
 @media (max-width: 480px) {
@@ -2325,7 +2421,7 @@ body {
 
   .bottom-nav {
     padding: 6px 8px calc(10px + env(safe-area-inset-bottom));
-    border-radius: 18px 18px 0 0;
+    border-radius: 0;
   }
 
   .bottom-nav-item {
@@ -2367,4 +2463,33 @@ body {
   line-height: 1.3;
   color: var(--text-main);
   font-family: var(--font-display);
+}
+
+.questionnaire-editor-content {
+  padding-bottom: 22px;
+}
+
+.question-editor-list {
+  margin: 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.question-editor-card {
+  background: linear-gradient(180deg, #f8faf5 0%, #eef4ea 100%);
+  padding: 22px;
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+}
+
+.question-editor-text {
+  font-size: 20px;
+  margin-bottom: 18px;
+}
+
+.questionnaire-editor-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }

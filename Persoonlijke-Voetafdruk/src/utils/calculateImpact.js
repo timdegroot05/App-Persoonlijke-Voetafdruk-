@@ -1,25 +1,19 @@
-export function calculateImpact(answers, questions){
+export function calculateImpact(answers, questions) {
+  const categories = {}
 
-  let total = 0
-  let categories = {}
+  const total = questions.reduce((sum, question) => {
+    const impact = Number(answers?.[question.id]?.impact) || 0
 
-  answers.forEach((answer, index) => {
-
-    const category = questions[index].category
-
-    total += answer
-
-    if(!categories[category]){
-      categories[category] = 0
+    if (!categories[question.category]) {
+      categories[question.category] = 0
     }
 
-    categories[category] += answer
-
-  })
+    categories[question.category] += impact
+    return sum + impact
+  }, 0)
 
   return {
     total,
-    categories
+    categories,
   }
-
 }

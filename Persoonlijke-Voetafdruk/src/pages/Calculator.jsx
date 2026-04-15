@@ -56,7 +56,7 @@ function Calculator() {
   }, [distancePerTrip, tripsPerWeek, selectedTransport])
 
   return (
-    <div className="calculator-page">
+    <div className="calculator-page calculator-tool-page">
       <AppHeader title="Calculator" icon={<HiOutlineCalculator />} />
 
       <div className="calculator-card">
