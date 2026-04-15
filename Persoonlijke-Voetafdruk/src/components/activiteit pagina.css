@@ -79,6 +79,21 @@
   animation: slideUp 0.4s ease;
 }
 
+@media (max-width: 480px) {
+  .info-page {
+    min-height: 100dvh;
+    padding: 0;
+  }
+
+  .info-container {
+    width: 100vw;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0 }
   to { opacity: 1 }
