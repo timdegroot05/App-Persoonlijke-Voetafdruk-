@@ -27,6 +27,15 @@ function Activiteiten() {
           </div>
         </section>
 
+        <section className="actie-focus-card">
+          <p className="section-label dark">Deze weekfocus</p>
+          <h2>Kies 1 kleine actie met direct effect</h2>
+          <p>
+            Begin bij vervoer of voeding. Dat zijn meestal de snelste plekken om
+            winst te pakken in je persoonlijke voetafdruk.
+          </p>
+        </section>
+
         <section className="cards">
           <div className="actie-card food">
             <h2>Voedsel</h2>

@@ -1,5 +1,5 @@
 .activiteiten-page {
-  height: calc(100vh - 32px);
+  height: calc(100dvh - 32px);
   padding: 0;
   box-sizing: border-box;
   color: #1f2d20;
@@ -56,6 +56,28 @@
   color: white;
 }
 
+.actie-focus-card {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #f7faf4 0%, #ebf3e7 100%);
+  box-shadow: 0 12px 24px rgba(31, 45, 32, 0.08);
+}
+
+.actie-focus-card h2 {
+  margin: 0;
+  color: #1f2d20;
+  font-size: 24px;
+  line-height: 1.25;
+  font-family: var(--font-display);
+}
+
+.actie-focus-card p:last-child {
+  margin: 10px 0 0;
+  color: #5f705f;
+  line-height: 1.5;
+}
+
 .cards {
   margin-top: 22px;
   display: flex;
@@ -65,4 +87,25 @@
 
 .activiteiten-page .bottom-nav {
   flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .activiteiten-page {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .activiteiten-content {
+    padding: 16px;
+    padding-bottom: 12px;
+  }
+
+  .activiteiten-header h1 {
+    font-size: 22px;
+  }
+
+  .actie-focus-card h2 {
+    font-size: 22px;
+  }
 }

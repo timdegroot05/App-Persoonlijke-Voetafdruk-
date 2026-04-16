@@ -13,6 +13,20 @@ function Overzicht() {
         <AppHeader title="Overzicht" icon={<FiBarChart2 />} />
 
         <div className="overview-content">
+        <section className="overzicht-summary-card">
+          <p className="section-label dark">Jouw samenvatting</p>
+          <h2>Je weekimpact in een oogopslag</h2>
+          <div className="overzicht-summary-grid">
+            <div className="overzicht-summary-stat">
+              <span>Dagelijks</span>
+              <strong>10 kg</strong>
+            </div>
+            <div className="overzicht-summary-stat">
+              <span>Wekelijks</span>
+              <strong>70 kg</strong>
+            </div>
+          </div>
+        </section>
 
         <div
           className="overzicht-card overzicht-highlight clickable-card"

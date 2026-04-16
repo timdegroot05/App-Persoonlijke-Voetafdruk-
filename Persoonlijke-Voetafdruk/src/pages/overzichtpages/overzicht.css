@@ -7,7 +7,7 @@
 
 .overzicht-container {
   width: min(360px, calc(100vw - 24px));
-  height: calc(100vh - 32px);
+  height: calc(100dvh - 32px);
   background: #f4f4f1;
   border-radius: 30px;
   padding: 0;
@@ -26,6 +26,51 @@
   padding: 22px;
 }
 
+.overzicht-summary-card {
+  padding: 18px;
+  border-radius: 22px;
+  margin-bottom: 16px;
+  background: linear-gradient(180deg, #f7faf4 0%, #ebf3e7 100%);
+  box-shadow: 0 12px 24px rgba(31, 45, 32, 0.08);
+}
+
+.overzicht-summary-card h2 {
+  margin: 0;
+  color: #1f2d20;
+  font-size: 24px;
+  line-height: 1.25;
+  font-family: var(--font-display);
+}
+
+.overzicht-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.overzicht-summary-stat {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.overzicht-summary-stat span {
+  display: block;
+  margin-bottom: 6px;
+  color: #5f705f;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.overzicht-summary-stat strong {
+  color: #1f2d20;
+  font-size: 18px;
+  font-family: var(--font-display);
+}
+
 .overzicht-container .bottom-nav {
   flex-shrink: 0;
 }
@@ -38,9 +83,9 @@
 
 .overzicht-card {
   width: 100%;
-  background: #f2f3ea;
-  border-radius: 18px;
-  padding: 14px 16px;
+  background: linear-gradient(180deg, #f7f7f2 0%, #eff3eb 100%);
+  border-radius: 20px;
+  padding: 16px 18px;
   box-sizing: border-box;
   box-shadow: 0 10px 24px rgba(31, 45, 32, 0.08);
 }
@@ -103,4 +148,21 @@
 .overzicht-btn:hover {
   transform: translateY(-1px);
   opacity: 0.95;
+}
+
+@media (max-width: 480px) {
+  .overzicht-container {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .overview-content {
+    padding: 16px;
+    padding-bottom: 12px;
+  }
+
+  .overzicht-summary-card h2 {
+    font-size: 22px;
+  }
 }

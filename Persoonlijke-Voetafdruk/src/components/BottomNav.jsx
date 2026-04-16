@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"
-import { FiActivity, FiBarChart2, FiHome } from "react-icons/fi"
+import { FiActivity, FiBarChart2, FiHome, FiUser } from "react-icons/fi"
 import { HiOutlineCalculator } from "react-icons/hi"
 import { LuTrees } from "react-icons/lu"
 
@@ -7,8 +7,9 @@ const navItems = [
   { to: "/home", label: "Home", icon: FiHome },
   { to: "/activiteiten", label: "Acties", icon: FiActivity },
   { to: "/overzicht", label: "Overzicht", icon: FiBarChart2 },
-  { to: "/calculator", label: "Calc", icon: HiOutlineCalculator },
+  { to: "/calculator", label: "Reken", icon: HiOutlineCalculator },
   { to: "/bos", label: "Bos", icon: LuTrees },
+  { to: "/profile", label: "Profiel", icon: FiUser },
 ]
 
 function BottomNav() {
