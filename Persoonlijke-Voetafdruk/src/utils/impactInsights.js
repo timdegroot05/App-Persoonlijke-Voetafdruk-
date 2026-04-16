@@ -1,58 +1,36 @@
 import { calculateImpact } from "./calculateImpact"
-import {
-  initialProfileQuestions,
-  getVisibleQuestions,
-} from "../data/questionnaires"
-import { weeklyQuestions } from "../data/questions"
 
 const HISTORY_KEY = "impact-history"
 
 export function buildImpactSnapshot(profileAnswers = {}, weeklyAnswers = {}) {
-  const visibleProfileQuestions = getVisibleQuestions(initialProfileQuestions, profileAnswers)
-  const visibleWeeklyQuestions = getVisibleQuestions(weeklyQuestions, weeklyAnswers)
-  const profileResult = calculateImpact(profileAnswers, visibleProfileQuestions)
-  const weeklyResult = calculateImpact(weeklyAnswers, visibleWeeklyQuestions)
-  const totalImpact = profileResult.total + weeklyResult.total
-  const categories = {}
-  const maxImpact =
-    visibleProfileQuestions.reduce(
-      (sum, question) => sum + Math.max(...question.answers.map((answer) => answer.impact)),
-      0
-    ) +
-    visibleWeeklyQuestions.reduce(
-      (sum, question) => sum + Math.max(...question.answers.map((answer) => answer.impact)),
-      0
-    )
-
-  Object.entries(profileResult.categories).forEach(([category, value]) => {
-    categories[category] = (categories[category] || 0) + value
-  })
-
-  Object.entries(weeklyResult.categories).forEach(([category, value]) => {
-    categories[category] = (categories[category] || 0) + value
-  })
-
-  const totalScore = Math.max(
-    0,
-    Math.round(((Math.max(0, maxImpact - totalImpact)) / Math.max(1, maxImpact)) * 100)
+  const footprint = calculateImpact(profileAnswers, weeklyAnswers)
+  const weeklyEmission = footprint.totale_weekuitstoot
+  const dailyEmission = Number((weeklyEmission / 7).toFixed(1))
+  const totalScore = Math.max(0, Math.min(100, Math.round(100 - weeklyEmission)))
+  const categories = footprint.categories
+  const focusCategories = Object.entries(categories).filter(
+    ([category]) => category !== "achtergrondimpact"
   )
-  const dailyEmission = Number((3.5 + totalImpact * 0.28).toFixed(1))
-  const weeklyEmission = Number((dailyEmission * 7).toFixed(1))
-
   const dominantCategory =
-    Object.entries(categories).sort((a, b) => b[1] - a[1])[0]?.[0] ??
-    "energie"
+    focusCategories.sort((a, b) => b[1] - a[1])[0]?.[0] ?? "energie"
 
   return {
-    id: `${Date.now()}-${dominantCategory}-${totalImpact}`,
+    id: `${Date.now()}-${dominantCategory}-${weeklyEmission}`,
     answersKey: JSON.stringify({ profileAnswers, weeklyAnswers }),
     createdAt: new Date().toISOString(),
     totalScore,
-    totalImpact,
+    totalImpact: weeklyEmission,
     dailyEmission,
     weeklyEmission,
     categories,
     dominantCategory,
+    breakdown: {
+      aangepaste_woninguitstoot: footprint.aangepaste_woninguitstoot,
+      auto_uitstoot: footprint.auto_uitstoot,
+      ov_uitstoot: footprint.ov_uitstoot,
+      voeding_uitstoot: footprint.voeding_uitstoot,
+      consumptie_uitstoot: footprint.consumptie_uitstoot,
+    },
   }
 }
 
@@ -79,10 +57,12 @@ export function saveImpactSnapshot(snapshot) {
 
 export function getFocusLabel(category) {
   const labels = {
+    achtergrondimpact: "Achtergrondimpact",
     voeding: "Voeding",
     transport: "Vervoer",
     energie: "Energie",
     wonen: "Wonen",
+    consumptie: "Consumptie",
   }
 
   return labels[category] || "Leefstijl"
@@ -94,19 +74,23 @@ export function getPersonalInsight(snapshot) {
   const insightByCategory = {
     voeding: {
       title: "Voeding is nu je grootste kans",
-      body: "Minder vlees en vaker lokaal kiezen kan snel zichtbaar verschil maken.",
+      body: "Minder vlees en vaker plantaardig eten kan je weekuitstoot snel verlagen.",
     },
     transport: {
       title: "Vervoer vraagt nu de meeste aandacht",
-      body: "Vooral korte ritten vervangen door fiets of OV geeft vaak snelle winst.",
+      body: "Minder autokilometers en slim OV-gebruik leveren hier de meeste winst op.",
     },
     energie: {
       title: "Energieverbruik blijft belangrijk",
-      body: "Groene stroom en minder sluipverbruik zijn hier de slimste eerste stappen.",
+      body: "Douchen, verwarming en energiebesparing bepalen samen een groot deel van je woninguitstoot.",
     },
     wonen: {
       title: "Thuisgebruik bepaalt veel",
-      body: "Kleine keuzes rond verwarming en apparaten stapelen snel op.",
+      body: "Woningtype, isolatie en energiebron vormen de basis van je weekuitstoot thuis.",
+    },
+    consumptie: {
+      title: "Consumptie schiet deze week omhoog",
+      body: "Nieuwe aankopen, vooral elektronica en kleding, kunnen je totale uitstoot flink verhogen.",
     },
   }
 

@@ -8,6 +8,7 @@ import WekelijkseUitstoot from "./pages/WekelijkseUitstoot"
 import GemiddeldeWeek from "./pages/overzichtpages/GemiddeldeWeek"
 import GemiddeldeJaar from "./pages/overzichtpages/GemiddeldeJaar"
 import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie"
+import AchtergrondimpactInfo from "./pages/overzichtpages/AchtergrondimpactInfo"
 import Activiteiten from "./pages/Activiteiten";
 import FoodTasks from "./pages/tasks/Foodtasks";
 import TransportTasks from "./pages/tasks/Transporttasks";
@@ -40,6 +41,7 @@ function App() {
         <Route path="/gemiddelde-week" element={<GemiddeldeWeek />} />
         <Route path="/gemiddelde-jaar" element={<GemiddeldeJaar />} />
         <Route path="/grootste-categorie" element={<GrootsteCategorie />} />
+        <Route path="/achtergrondimpact-info" element={<AchtergrondimpactInfo />} />
         <Route path="/activiteiten" element={<Activiteiten />} />
         <Route path="/foodTasks" element={<FoodTasks />} />
         <Route path="/transportTasks" element={<TransportTasks />} />

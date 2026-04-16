@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { FiHelpCircle } from "react-icons/fi"
 import { useLocation, useNavigate } from "react-router-dom"
 import {
@@ -53,6 +53,12 @@ function Questionnaire({ mode = "profile" }) {
 
   const currentCategory = visibleQuestions[currentQuestion]?.category || "energie"
 
+  useEffect(() => {
+    if (currentQuestion > visibleQuestions.length - 1) {
+      setCurrentQuestion(Math.max(0, visibleQuestions.length - 1))
+    }
+  }, [currentQuestion, visibleQuestions.length])
+
   const selectAnswer = (answer) => {
     const current = visibleQuestions[currentQuestion]
     const newAnswers = {
@@ -62,9 +68,15 @@ function Questionnaire({ mode = "profile" }) {
         impact: answer.impact,
       },
     }
+    const nextVisibleQuestions = [...getVisibleQuestions(questionnaireSource, newAnswers)].sort(
+      (firstQuestion, secondQuestion) =>
+        categoryOrder.indexOf(firstQuestion.category) -
+        categoryOrder.indexOf(secondQuestion.category)
+    )
+
     setAnswers(newAnswers)
 
-    if (currentQuestion < visibleQuestions.length - 1) {
+    if (currentQuestion < nextVisibleQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1)
     } else {
       if (mode === "weekly") {

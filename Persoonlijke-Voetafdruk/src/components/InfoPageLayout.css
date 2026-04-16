@@ -53,6 +53,10 @@
   color: #334334;
 }
 
+.info-text-spaced {
+  margin-top: 16px;
+}
+
 .info-button {
   margin: auto 22px 0;
   padding: 14px;
