@@ -6,15 +6,16 @@ import { LuLeaf } from "react-icons/lu"
 import { buildImpactSnapshot, getImpactHistory, getFocusLabel } from "../utils/impactInsights"
 import {
   getProfileAnswers,
-  getWeekKey,
   getWeeklyEntry,
 } from "../utils/questionnaireStorage"
 import { initialProfileQuestions } from "../data/questionnaires"
+import { getWeeklyCheckinWeekInfo } from "../utils/weeklyResults"
 
 function Profile() {
   const navigate = useNavigate()
   const profileAnswers = getProfileAnswers()
-  const latestWeeklyAnswers = getWeeklyEntry(getWeekKey())?.answers || {}
+  const activeCheckinWeek = getWeeklyCheckinWeekInfo()
+  const latestWeeklyAnswers = getWeeklyEntry(activeCheckinWeek.weekStart)?.answers || {}
   const weeklyGoal = Number(localStorage.getItem("weekly-goal")) || 150
   const history = useMemo(() => getImpactHistory(), [])
 
@@ -34,7 +35,7 @@ function Profile() {
   const ecoLevel = Math.max(1, Math.floor(ecoPoints / 120) + 1)
   const categoryBadges = [
     {
-      name: "Vervoer badge",
+      name: "Transport badge",
       unlocked: (snapshot?.categories?.transport ?? 999) <= 10,
     },
     {
@@ -133,7 +134,7 @@ function Profile() {
             className="goal-edit-button"
             onClick={() =>
               navigate("/weekly-edit", {
-                state: { returnTo: "/profile", weekKey: getWeekKey() },
+                state: { returnTo: "/profile", weekKey: activeCheckinWeek.weekStart },
               })
             }
           >

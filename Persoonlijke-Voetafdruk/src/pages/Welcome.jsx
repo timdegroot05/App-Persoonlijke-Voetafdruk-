@@ -1,10 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { FiArrowRight, FiBarChart2, FiCompass } from "react-icons/fi"
 import { LuLeaf } from "react-icons/lu"
-import {
-  hasCompletedProfileQuestionnaire,
-  isWeeklyQuestionnaireDue,
-} from "../utils/questionnaireStorage"
+import { hasCompletedProfileQuestionnaire } from "../utils/questionnaireStorage"
 
 function Welcome() {
   const navigate = useNavigate()
@@ -12,11 +9,6 @@ function Welcome() {
   const openNextStep = () => {
     if (!hasCompletedProfileQuestionnaire()) {
       navigate("/questionnaire")
-      return
-    }
-
-    if (isWeeklyQuestionnaireDue()) {
-      navigate("/weekly-questionnaire")
       return
     }
 

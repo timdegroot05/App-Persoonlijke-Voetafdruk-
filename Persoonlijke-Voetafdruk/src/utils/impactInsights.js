@@ -59,7 +59,7 @@ export function getFocusLabel(category) {
   const labels = {
     achtergrondimpact: "Achtergrondimpact",
     voeding: "Voeding",
-    transport: "Vervoer",
+    transport: "Transport",
     energie: "Energie",
     wonen: "Wonen",
     consumptie: "Consumptie",
@@ -77,7 +77,7 @@ export function getPersonalInsight(snapshot) {
       body: "Minder vlees en vaker plantaardig eten kan je weekuitstoot snel verlagen.",
     },
     transport: {
-      title: "Vervoer vraagt nu de meeste aandacht",
+      title: "Transport vraagt nu de meeste aandacht",
       body: "Minder autokilometers en slim OV-gebruik leveren hier de meeste winst op.",
     },
     energie: {

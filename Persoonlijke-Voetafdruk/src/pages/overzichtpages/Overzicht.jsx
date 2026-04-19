@@ -9,6 +9,11 @@ import {
   getLatestWeeklyAnswers,
   getProfileAnswers,
 } from "../../utils/questionnaireStorage"
+import {
+  buildWeeklyOverviewItems,
+  formatWeekRangeLabel,
+  getStoredWeeklyResults,
+} from "../../utils/weeklyResults"
 
 function Overzicht() {
   const navigate = useNavigate()
@@ -18,18 +23,35 @@ function Overzicht() {
     () => buildImpactSnapshot(profileAnswers, weeklyAnswers),
     [profileAnswers, weeklyAnswers]
   )
+  const weeklyHistory = useMemo(
+    () => buildWeeklyOverviewItems(getStoredWeeklyResults()),
+    []
+  )
+  const latestWeeklyActivity = weeklyHistory[0] ?? null
   const weeklyOverview = useMemo(() => {
-    const entries = Object.entries(snapshot.categories)
+    const entries = latestWeeklyActivity
+      ? [
+          ["wonen", latestWeeklyActivity.homeEmission],
+          ["transport", latestWeeklyActivity.transportEmission],
+          ["voeding", latestWeeklyActivity.foodEmission],
+          ["consumptie", latestWeeklyActivity.consumptionEmission],
+          ["achtergrondimpact", latestWeeklyActivity.backgroundImpact],
+        ]
+      : Object.entries(snapshot.categories)
     const visibleEntries = entries
       .filter(([category]) => category !== "achtergrondimpact")
       .sort((firstEntry, secondEntry) => secondEntry[1] - firstEntry[1])
     const backgroundEntry = entries.find(([category]) => category === "achtergrondimpact")
 
     return backgroundEntry ? [...visibleEntries, backgroundEntry] : visibleEntries
-  }, [snapshot.categories])
+  }, [latestWeeklyActivity, snapshot.categories])
   const largestCategory = weeklyOverview.find(
     ([category]) => category !== "achtergrondimpact"
   )
+  const weeklyEmission = latestWeeklyActivity?.totalEmission ?? snapshot.weeklyEmission
+  const dailyEmission = latestWeeklyActivity
+    ? Number((latestWeeklyActivity.totalEmission / 7).toFixed(1))
+    : snapshot.dailyEmission
 
   return (
     <div className="overzicht-page">
@@ -43,11 +65,11 @@ function Overzicht() {
           <div className="overzicht-summary-grid">
             <div className="overzicht-summary-stat">
               <span>Dagelijks</span>
-              <strong>{snapshot.dailyEmission} kg</strong>
+              <strong>{dailyEmission} kg</strong>
             </div>
             <div className="overzicht-summary-stat">
               <span>Wekelijks</span>
-              <strong>{snapshot.weeklyEmission} kg</strong>
+              <strong>{weeklyEmission} kg</strong>
             </div>
           </div>
         </section>
@@ -91,13 +113,72 @@ function Overzicht() {
           </div>
         </section>
 
+        <section className="overzicht-card overzicht-history-card">
+          <div className="overzicht-history-header">
+            <h2>Wekelijkse activiteit</h2>
+            {weeklyHistory.length > 1 ? (
+              <button
+                type="button"
+                className="overzicht-history-button"
+                onClick={() => navigate("/wekelijkse-activiteit-geschiedenis")}
+              >
+                Geschiedenis
+              </button>
+            ) : null}
+          </div>
+          {latestWeeklyActivity ? (
+            <article className="overzicht-history-item">
+              <div className="overzicht-history-top">
+                <div>
+                  <span className="overzicht-history-kicker">
+                    Week {latestWeeklyActivity.weekNumber}
+                  </span>
+                  <strong>
+                    {formatWeekRangeLabel(
+                      latestWeeklyActivity.weekStart,
+                      latestWeeklyActivity.weekEnd
+                    )}
+                  </strong>
+                </div>
+                <span className="overzicht-history-total">
+                  {latestWeeklyActivity.totalEmission} kg CO2e
+                </span>
+              </div>
+
+              <div className="overzicht-history-categories">
+                <span>Wonen {latestWeeklyActivity.homeEmission} kg</span>
+                <span>Transport {latestWeeklyActivity.transportEmission} kg</span>
+                <span>Voeding {latestWeeklyActivity.foodEmission} kg</span>
+                <span>Consumptie {latestWeeklyActivity.consumptionEmission} kg</span>
+                <span>Achtergrondimpact {latestWeeklyActivity.backgroundImpact} kg</span>
+              </div>
+
+              <p className="overzicht-history-comparison">
+                {latestWeeklyActivity.comparison
+                  ? latestWeeklyActivity.comparison.trend === "equal"
+                    ? "Gelijk aan de week ervoor"
+                    : `${Math.abs(latestWeeklyActivity.comparison.difference)} kg ${
+                        latestWeeklyActivity.comparison.trend === "lower" ? "lager" : "hoger"
+                      } dan de week ervoor (${Math.abs(
+                        latestWeeklyActivity.comparison.percentageChange
+                      )}%)`
+                  : "Nog geen vergelijking met een eerdere week"}
+              </p>
+            </article>
+          ) : (
+            <p className="overzicht-history-empty">
+              Je wekelijkse activiteit verschijnt hier zodra je je eerste week hebt ingevuld.
+            </p>
+          )}
+        </section>
+
         <div className="overzicht-cards">
           <div
             className="overzicht-card"
             onClick={() => navigate("/dagelijkse-uitstoot")}
           >
             <h2>Dagelijkse uitstoot</h2>
-            <p>{snapshot.dailyEmission} kg CO2e</p>
+            <p>{dailyEmission} kg CO2e</p>
           </div>
 
           <div
@@ -105,7 +186,7 @@ function Overzicht() {
             onClick={() => navigate("/wekelijkse-uitstoot")}
           >
             <h2>Wekelijkse uitstoot</h2>
-            <p>{snapshot.weeklyEmission} kg CO2e</p>
+            <p>{weeklyEmission} kg CO2e</p>
           </div>
 
           <div
@@ -113,7 +194,7 @@ function Overzicht() {
             onClick={() => navigate("/gemiddelde-week")}
           >
             <h2>Gemiddelde wekelijkse uitstoot</h2>
-            <p>{snapshot.weeklyEmission} kg CO2e</p>
+            <p>{weeklyEmission} kg CO2e</p>
           </div>
 
           <div
@@ -121,7 +202,7 @@ function Overzicht() {
             onClick={() => navigate("/gemiddelde-jaar")}
           >
             <h2>Gemiddelde jaarlijkse uitstoot</h2>
-            <p>{Number((snapshot.weeklyEmission * 52).toFixed(0))} kg CO2e</p>
+            <p>{Number((weeklyEmission * 52).toFixed(0))} kg CO2e</p>
           </div>
         </div>
         </div>

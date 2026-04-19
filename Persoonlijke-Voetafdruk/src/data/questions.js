@@ -41,7 +41,7 @@ export const weeklyQuestions = [
   {
     id: "carKilometers",
     category: "transport",
-    title: "Vervoer",
+    title: "Transport",
     summaryLabel: "Autokilometers",
     question: "Hoeveel km heb je deze week met de auto gereden?",
     answers: [
@@ -55,7 +55,7 @@ export const weeklyQuestions = [
   {
     id: "publicTransportFrequency",
     category: "transport",
-    title: "Vervoer",
+    title: "Transport",
     summaryLabel: "OV",
     question: "Hoe lang heb je het OV gebruikt deze week?",
     answers: [
@@ -68,7 +68,7 @@ export const weeklyQuestions = [
   {
     id: "publicTransportDuration",
     category: "transport",
-    title: "Vervoer",
+    title: "Transport",
     summaryLabel: "OV-tijd",
     question: "Hoe lang heb je per dag het OV gebruikt?",
     showIf: (answers) => answers.publicTransportFrequency?.text !== "0 keer",
@@ -83,8 +83,8 @@ export const weeklyQuestions = [
   {
     id: "mainTransportMode",
     category: "transport",
-    title: "Vervoer",
-    summaryLabel: "Hoofdvervoer",
+    title: "Transport",
+    summaryLabel: "Hoofdtransport",
     question: "Welk vervoermiddel heb je het meest gebruikt deze week?",
     answers: [
       { text: "Auto", impact: 8 },
