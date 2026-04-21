@@ -1,3 +1,109 @@
+export const initialProfileQuestions = [
+  {
+    id: "housingType",
+    category: "wonen",
+    title: "Wonen",
+    summaryLabel: "Woning",
+    question: "In wat voor woning woon je?",
+    answers: [
+      { text: "Appartement", impact: 3 },
+      { text: "Rijtjeshuis", impact: 5 },
+      { text: "Vrijstaand huis", impact: 8 },
+      { text: "Studentenwoning", impact: 2 },
+      { text: "Anders", impact: 4 },
+    ],
+  },
+  {
+    id: "householdSize",
+    category: "wonen",
+    title: "Wonen",
+    summaryLabel: "Huishouden",
+    question: "Uit hoeveel personen bestaat je huishouden?",
+    answers: [
+      { text: "1", impact: 4 },
+      { text: "2", impact: 3 },
+      { text: "3-4", impact: 2 },
+      { text: "5+", impact: 3 },
+    ],
+  },
+  {
+    id: "primaryEnergySource",
+    category: "energie",
+    title: "Energie",
+    summaryLabel: "Energiebron",
+    question: "Wat is je belangrijkste energiebron thuis?",
+    answers: [
+      { text: "Grijze stroom", impact: 8 },
+      { text: "Groene stroom", impact: 2 },
+      { text: "Gas", impact: 7 },
+      { text: "Warmtepomp", impact: 3 },
+      { text: "Weet ik niet", impact: 5 },
+    ],
+  },
+  {
+    id: "hasSolarPanels",
+    category: "energie",
+    title: "Energie",
+    summaryLabel: "Zonnepanelen",
+    question: "Maak je gebruik van zonnepanelen?",
+    answers: [
+      { text: "Ja", impact: 1 },
+      { text: "Nee", impact: 4 },
+      { text: "Weet ik niet", impact: 3 },
+    ],
+  },
+  {
+    id: "usesGasAtHome",
+    category: "energie",
+    title: "Energie",
+    summaryLabel: "Gas",
+    question: "Gebruik je gas in huis?",
+    answers: [
+      { text: "Ja", impact: 6 },
+      { text: "Nee", impact: 1 },
+      { text: "Weet ik niet", impact: 4 },
+    ],
+  },
+  {
+    id: "hasCar",
+    category: "transport",
+    title: "Vervoer",
+    summaryLabel: "Auto",
+    question: "Heb je een auto?",
+    answers: [
+      { text: "Ja", impact: 5 },
+      { text: "Nee", impact: 1 },
+    ],
+  },
+  {
+    id: "carType",
+    category: "transport",
+    title: "Vervoer",
+    summaryLabel: "Autotype",
+    question: "Zo ja, welk type auto rijd je?",
+    showIf: (answers) => answers.hasCar?.text === "Ja",
+    answers: [
+      { text: "Benzine", impact: 8 },
+      { text: "Diesel", impact: 9 },
+      { text: "Elektrisch", impact: 2 },
+      { text: "Hybride", impact: 5 },
+    ],
+  },
+  {
+    id: "homeInsulation",
+    category: "wonen",
+    title: "Wonen",
+    summaryLabel: "Isolatie",
+    question: "Hoe goed is je huis geïsoleerd?",
+    answers: [
+      { text: "Slecht", impact: 8 },
+      { text: "Gemiddeld", impact: 5 },
+      { text: "Goed", impact: 3 },
+      { text: "Zeer goed", impact: 1 },
+    ],
+  },
+]
+
 export const weeklyQuestions = [
   {
     id: "meatFrequency",
@@ -169,7 +275,12 @@ export const weeklyQuestions = [
   },
 ]
 
-export const questions = weeklyQuestions
+export function getVisibleQuestions(questions, answers = {}) {
+  return questions.filter((question) => {
+    if (typeof question.showIf !== "function") {
+      return true
+    }
 
-
-
+    return question.showIf(answers)
+  })
+}

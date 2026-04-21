@@ -21,18 +21,27 @@ const tipsList = [
   },
 ]
 
+const factsList = [
+  "Plantaardiger eten verlaagt vaak sneller je uitstoot dan je denkt.",
+  "Minder korte autoritten maakt vaak direct het grootste verschil.",
+  "Sluipverbruik thuis zorgt ongemerkt voor extra uitstoot.",
+  "Een treinrit veroorzaakt meestal veel minder CO2 dan dezelfde rit met de auto.",
+  "Goed isoleren thuis verlaagt niet alleen je energierekening maar ook je uitstoot.",
+  "Korte vluchten hebben per kilometer vaak een relatief hoge klimaatimpact.",
+]
+
 function Tips() {
   return (
     <div className="calculator-page tips-page">
-      <AppHeader title="Tips" icon={<LuLeaf />} />
+      <AppHeader title="Tips & Feitjes" icon={<LuLeaf />} />
 
       <div className="tips-content">
         <section className="calculator-card tips-hero-card">
           <p className="section-label dark">Slimme keuzes</p>
-          <h1 className="calculator-title">Kleine acties, minder uitstoot</h1>
+          <h1 className="calculator-title">Tips en feitjes voor minder uitstoot</h1>
           <p className="calculator-text">
-            Op deze pagina staan praktische tips die passen bij een CO2-app:
-            snel toepasbaar, overzichtelijk en gericht op je dagelijkse keuzes.
+            Op deze pagina staan praktische tips en korte feitjes die je helpen
+            om bewuster te kiezen in je dagelijkse leven.
           </p>
 
           <img
@@ -48,6 +57,16 @@ function Tips() {
               <p className="section-label dark">Tip</p>
               <h2>{tip.title}</h2>
               <p>{tip.body}</p>
+            </article>
+          ))}
+        </section>
+
+        <section className="tips-list">
+          {factsList.map((fact, index) => (
+            <article key={index} className="tips-list-card">
+              <p className="section-label dark">Feitje</p>
+              <h2>Wist je dat?</h2>
+              <p>{fact}</p>
             </article>
           ))}
         </section>

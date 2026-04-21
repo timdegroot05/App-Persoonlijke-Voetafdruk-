@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { FiArrowRight, FiMap } from "react-icons/fi"
+import { FiArrowRight, FiCheckCircle, FiEdit3, FiMap } from "react-icons/fi"
 import { HiOutlineCalculator } from "react-icons/hi"
 import { LuLeaf, LuTrees, LuUtensilsCrossed } from "react-icons/lu"
 import BottomNav from "../components/BottomNav"
@@ -11,6 +11,12 @@ import {
   getImpactHistory,
   getPersonalInsight,
 } from "../utils/impactInsights"
+import {
+  getLatestWeeklyAnswers,
+  getProfileAnswers,
+  hasCompletedProfileQuestionnaire,
+  isWeeklyQuestionnaireDue,
+} from "../utils/questionnaireStorage"
 import "../App.css"
 import handFoto from "../assets/HandHandfoto.png"
 
@@ -27,15 +33,17 @@ function Home() {
     return Number.isFinite(savedGoal) && savedGoal > 0 ? savedGoal : 150
   })
   const [goalDraft, setGoalDraft] = useState(() => String(weeklyGoal))
-  const savedAnswers = JSON.parse(localStorage.getItem("answers")) || []
+  const profileAnswers = getProfileAnswers()
+  const weeklyAnswers = getLatestWeeklyAnswers()
+  const weeklyQuestionnaireDone = !isWeeklyQuestionnaireDue()
 
   const currentSnapshot = useMemo(() => {
-    if (savedAnswers.length === 0) {
+    if (Object.keys(profileAnswers).length === 0 && Object.keys(weeklyAnswers).length === 0) {
       return null
     }
 
-    return buildImpactSnapshot(savedAnswers)
-  }, [savedAnswers])
+    return buildImpactSnapshot(profileAnswers, weeklyAnswers)
+  }, [profileAnswers, weeklyAnswers])
 
   const emissionData = useMemo(() => {
     if (!currentSnapshot) {
@@ -370,6 +378,12 @@ function Home() {
   }
 
   useEffect(() => {
+    if (!hasCompletedProfileQuestionnaire()) {
+      navigate("/questionnaire")
+    }
+  }, [navigate])
+
+  useEffect(() => {
     const intervalId = window.setInterval(() => {
       setActiveFactIndex((currentIndex) => (currentIndex + 1) % facts.length)
     }, 4500)
@@ -563,6 +577,59 @@ function Home() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="calculator-card home-questionnaire-card">
+        <div className="home-questionnaire-top">
+          <div>
+            <p className="section-label dark">Wekelijkse vragenlijst</p>
+            <h2 className="calculator-title">Vul je week in</h2>
+          </div>
+          <span className={`home-questionnaire-status${weeklyQuestionnaireDone ? " done" : ""}`}>
+            {weeklyQuestionnaireDone ? <FiCheckCircle /> : <FiEdit3 />}
+            {weeklyQuestionnaireDone ? "Ingevuld" : "Nog niet ingevuld"}
+          </span>
+        </div>
+
+        <p className="calculator-text">
+          {weeklyQuestionnaireDone
+            ? "Je kunt je antwoorden van deze week bekijken en aanpassen."
+            : "Je hebt deze week nog geen vragenlijst ingevuld."}
+        </p>
+
+        <button
+          type="button"
+          className="goal-edit-button"
+          onClick={() => navigate("/weekly-questionnaire")}
+        >
+          {weeklyQuestionnaireDone ? "Bewerk wekelijkse vragen" : "Open wekelijkse vragenlijst"}
+        </button>
+      </section>
+
+      <section className="calculator-card home-questionnaire-card">
+        <div className="home-questionnaire-top">
+          <div>
+            <p className="section-label dark">Calculator</p>
+            <h2 className="calculator-title">Reken je vervoer door</h2>
+          </div>
+          <span className="home-questionnaire-status done">
+            <HiOutlineCalculator />
+            Openen
+          </span>
+        </div>
+
+        <p className="calculator-text">
+          Maak een snelle berekening van je ritten en zie hoeveel uitstoot je
+          vervoer ongeveer veroorzaakt.
+        </p>
+
+        <button
+          type="button"
+          className="goal-edit-button"
+          onClick={() => navigate("/calculator")}
+        >
+          Open calculator
+        </button>
       </section>
 
       <section className="home-widget-rail-section">
