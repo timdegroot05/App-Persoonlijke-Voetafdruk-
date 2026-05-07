@@ -1,9 +1,19 @@
 import { useNavigate } from "react-router-dom"
 import { FiArrowRight, FiBarChart2, FiCompass } from "react-icons/fi"
 import { LuLeaf } from "react-icons/lu"
+import { hasCompletedProfileQuestionnaire } from "../utils/questionnaireStorage"
 
 function Welcome() {
   const navigate = useNavigate()
+
+  const openNextStep = () => {
+    if (!hasCompletedProfileQuestionnaire()) {
+      navigate("/questionnaire")
+      return
+    }
+
+    navigate("/home")
+  }
 
   return (
     <div className="welcome-page">
@@ -40,7 +50,7 @@ function Welcome() {
 
         <button
           className="start-btn"
-          onClick={() => navigate("/questionnaire")}
+          onClick={openNextStep}
         >
           Start test
           <FiArrowRight />

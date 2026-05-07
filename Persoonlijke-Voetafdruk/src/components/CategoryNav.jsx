@@ -1,24 +1,33 @@
 import { FiHome } from "react-icons/fi"
-import { LuCarFront, LuSalad, LuZap } from "react-icons/lu"
+import { LuCarFront, LuSalad, LuShoppingBag, LuZap } from "react-icons/lu"
 
-function CategoryNav({category}){
+const iconByCategory = {
+  voeding: LuSalad,
+  transport: LuCarFront,
+  energie: LuZap,
+  wonen: FiHome,
+  consumptie: LuShoppingBag,
+}
 
-  return(
+function CategoryNav({ category, categories = [] }) {
+  const visibleCategories =
+    categories.length > 0
+      ? categories
+      : ["voeding", "transport", "energie", "wonen", "consumptie"]
 
+  return (
     <div className="category-nav">
+      {visibleCategories.map((item) => {
+        const Icon = iconByCategory[item]
 
-      <div className={category === "voeding" ? "icon active" : "icon"}><LuSalad /></div>
-
-      <div className={category === "transport" ? "icon active" : "icon"}><LuCarFront /></div>
-
-      <div className={category === "energie" ? "icon active" : "icon"}><LuZap /></div>
-
-      <div className={category === "wonen" ? "icon active" : "icon"}><FiHome /></div>
-
+        return (
+          <div key={item} className={category === item ? "icon active" : "icon"}>
+            <Icon />
+          </div>
+        )
+      })}
     </div>
-
   )
-
 }
 
 export default CategoryNav

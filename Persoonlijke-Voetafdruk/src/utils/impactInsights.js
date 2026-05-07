@@ -1,29 +1,36 @@
-import { questions } from "../data/questions"
 import { calculateImpact } from "./calculateImpact"
 
 const HISTORY_KEY = "impact-history"
 
-export function buildImpactSnapshot(answers) {
-  const safeAnswers = Array.isArray(answers) ? answers : []
-  const result = calculateImpact(safeAnswers, questions)
-  const totalScore = Math.max(0, Math.round(100 - result.total))
-  const dailyEmission = Number((4 + result.total * 0.45).toFixed(1))
-  const weeklyEmission = Number((dailyEmission * 7).toFixed(1))
-
+export function buildImpactSnapshot(profileAnswers = {}, weeklyAnswers = {}) {
+  const footprint = calculateImpact(profileAnswers, weeklyAnswers)
+  const weeklyEmission = footprint.totale_weekuitstoot
+  const dailyEmission = Number((weeklyEmission / 7).toFixed(1))
+  const totalScore = Math.max(0, Math.min(100, Math.round(100 - weeklyEmission)))
+  const categories = footprint.categories
+  const focusCategories = Object.entries(categories).filter(
+    ([category]) => category !== "achtergrondimpact"
+  )
   const dominantCategory =
-    Object.entries(result.categories).sort((a, b) => b[1] - a[1])[0]?.[0] ??
-    "energie"
+    focusCategories.sort((a, b) => b[1] - a[1])[0]?.[0] ?? "energie"
 
   return {
-    id: `${Date.now()}-${safeAnswers.join("-")}`,
-    answersKey: safeAnswers.join("-"),
+    id: `${Date.now()}-${dominantCategory}-${weeklyEmission}`,
+    answersKey: JSON.stringify({ profileAnswers, weeklyAnswers }),
     createdAt: new Date().toISOString(),
     totalScore,
-    totalImpact: result.total,
+    totalImpact: weeklyEmission,
     dailyEmission,
     weeklyEmission,
-    categories: result.categories,
+    categories,
     dominantCategory,
+    breakdown: {
+      aangepaste_woninguitstoot: footprint.aangepaste_woninguitstoot,
+      auto_uitstoot: footprint.auto_uitstoot,
+      ov_uitstoot: footprint.ov_uitstoot,
+      voeding_uitstoot: footprint.voeding_uitstoot,
+      consumptie_uitstoot: footprint.consumptie_uitstoot,
+    },
   }
 }
 
@@ -50,10 +57,12 @@ export function saveImpactSnapshot(snapshot) {
 
 export function getFocusLabel(category) {
   const labels = {
+    achtergrondimpact: "Achtergrondimpact",
     voeding: "Voeding",
-    transport: "Vervoer",
+    transport: "Transport",
     energie: "Energie",
     wonen: "Wonen",
+    consumptie: "Consumptie",
   }
 
   return labels[category] || "Leefstijl"
@@ -65,19 +74,23 @@ export function getPersonalInsight(snapshot) {
   const insightByCategory = {
     voeding: {
       title: "Voeding is nu je grootste kans",
-      body: "Minder vlees en vaker lokaal kiezen kan snel zichtbaar verschil maken.",
+      body: "Minder vlees en vaker plantaardig eten kan je weekuitstoot snel verlagen.",
     },
     transport: {
-      title: "Vervoer vraagt nu de meeste aandacht",
-      body: "Vooral korte ritten vervangen door fiets of OV geeft vaak snelle winst.",
+      title: "Transport vraagt nu de meeste aandacht",
+      body: "Minder autokilometers en slim OV-gebruik leveren hier de meeste winst op.",
     },
     energie: {
       title: "Energieverbruik blijft belangrijk",
-      body: "Groene stroom en minder sluipverbruik zijn hier de slimste eerste stappen.",
+      body: "Douchen, verwarming en energiebesparing bepalen samen een groot deel van je woninguitstoot.",
     },
     wonen: {
       title: "Thuisgebruik bepaalt veel",
-      body: "Kleine keuzes rond verwarming en apparaten stapelen snel op.",
+      body: "Woningtype, isolatie en energiebron vormen de basis van je weekuitstoot thuis.",
+    },
+    consumptie: {
+      title: "Consumptie schiet deze week omhoog",
+      body: "Nieuwe aankopen, vooral elektronica en kleding, kunnen je totale uitstoot flink verhogen.",
     },
   }
 

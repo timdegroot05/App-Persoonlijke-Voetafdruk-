@@ -99,6 +99,28 @@ body {
   stroke-width: 2.2;
 }
 
+.header-profile-link {
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.header-profile-link:hover,
+.header-profile-link:focus,
+.header-profile-link:focus-visible,
+.header-profile-link:active {
+  color: white;
+  background: transparent;
+  transform: none;
+  opacity: 1;
+  box-shadow: none;
+}
+
+
 .header-title {
   position: absolute;
   left: 50%;
@@ -163,6 +185,21 @@ body {
   gap: 12px;
 }
 
+.home-feature-title {
+  margin: 4px 0 0;
+  color: var(--text-main);
+  font-size: 24px;
+  line-height: 1.1;
+  font-family: var(--font-display);
+}
+
+.home-feature-title-accent {
+  margin-bottom: 14px;
+  font-size: 32px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
 .home-feature-icon {
   width: 42px;
   height: 42px;
@@ -180,23 +217,18 @@ body {
 }
 
 .home-feature-visual {
-  min-height: 112px;
+  min-height: 168px;
   margin-top: 14px;
   border-radius: 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(239, 246, 235, 0.94) 100%);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
+  overflow: hidden;
 }
 
 .home-feature-photo {
   width: 100%;
-  height: 92px;
-  border-radius: 14px;
+  height: 168px;
+  border-radius: 18px;
   object-fit: cover;
-  box-shadow: 0 10px 18px rgba(31, 45, 32, 0.12);
   animation: floatIn 0.55s ease both;
 }
 
@@ -415,10 +447,6 @@ body {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.secondary-button:hover {
-  transform: translateY(-1px);
-  opacity: 0.96;
-}
 
 .hero-number {
   margin: 0;
@@ -445,7 +473,8 @@ body {
 }
 
 .home-widget-rail-section {
-  width: calc(100% - 44px);
+  /* Match left/right breathing room so the swipe section sits evenly. */
+  width: calc(100% - 32px);
   max-width: 316px;
   margin: 0 auto 20px;
 }
@@ -467,10 +496,14 @@ body {
 
 .home-widget-rail {
   display: flex;
-  gap: 14px;
+  /* Tighten the card spacing a bit while keeping the swipe cards distinct. */
+  gap: 12px;
   overflow-x: auto;
-  padding: 6px 2px 10px;
+  /* Keep equal horizontal padding so the first and last card align evenly. */
+  padding: 6px 0 8px;
   scroll-snap-type: x mandatory;
+  /* Match the snap offset to the visual rail edge for every card, including the last one. */
+  scroll-padding-inline: 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -479,10 +512,65 @@ body {
   display: none;
 }
 
+.home-widget-rail::after {
+  /* Add enough trailing space for the last card to snap flush to the left,
+     just like the earlier cards, instead of stopping too far to the right. */
+  content: "";
+  flex: 0 0 max(12px, calc(100% - 256px));
+}
+
 .home-widget-rail-card {
-  flex: 0 0 252px;
+  /* Slightly wider cards plus a smaller gap makes the dashboard feel denser. */
+  flex: 0 0 256px;
   scroll-snap-align: start;
   animation: riseIn 0.45s ease both;
+}
+
+.home-widget-rail > .home-widget-rail-card {
+  /* Force every swipe card to use the same box model inside the rail. */
+  width: auto;
+  max-width: none;
+  margin: 0;
+  box-sizing: border-box;
+  box-shadow: none;
+}
+
+.home-widget-rail > .impact-widget.home-widget-rail-card {
+  /* Reset the shared page-level impact card sizing so the green card
+     no longer introduces extra spacing inside the swipe row. */
+  width: auto;
+  max-width: none;
+  margin: 0;
+  margin-bottom: 0;
+}
+
+.home-goal-card {
+  display: none;
+}
+
+.home-rail-dots {
+  /* Show a clear mobile-style pagination indicator under each swipe rail. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.home-rail-dot {
+  /* Keep inactive dots subtle so the active card stands out more clearly. */
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(31, 107, 42, 0.18);
+  transition: width 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.home-rail-dot.active {
+  /* Stretch and darken the active dot so users can see which card is in view. */
+  width: 18px;
+  background: var(--brand-dark);
+  transform: scale(1.02);
 }
 
 .info-card {
@@ -532,10 +620,6 @@ body {
   transition: transform 0.2s ease, "background" 0.2s ease;
 }
 
-.daily-widget-link:hover {
-  transform: translateY(-1px);
-  background: rgba(31, 107, 42, 0.16);
-}
 
 .daily-widget-icon svg {
   width: 22px;
@@ -547,6 +631,10 @@ body {
   font-size: 12px;
   line-height: 1.45;
   color: var(--text-muted);
+}
+
+.daily-widget-subtitle-spacer {
+  visibility: hidden;
 }
 
 .daily-widget-bottom {
@@ -763,13 +851,6 @@ body {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.goal-edit-button:hover,
-.goal-save-button:hover,
-.goal-preset-chip:hover,
-.goal-reset-button:hover {
-  transform: translateY(-1px);
-  opacity: 0.97;
-}
 
 .goal-editor {
   margin-top: 14px;
@@ -830,10 +911,6 @@ body {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.insight-action-button:hover {
-  transform: translateY(-1px);
-  opacity: 0.97;
-}
 
 .insight-meta-row {
   display: flex;
@@ -860,6 +937,24 @@ body {
   cursor: pointer;
 }
 
+.home-focus-week-card {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  transition: none;
+}
+
+.home-focus-week-card:hover,
+.home-focus-week-card:focus,
+.home-focus-week-card:focus-visible,
+.home-focus-week-card:active {
+  transform: none;
+  box-shadow: none;
+  background: var(--card-soft);
+  opacity: 1;
+  transition: none;
+  outline: none;
+}
+
 .co2-widget-arrow {
   margin-top: 16px;
   width: 20px;
@@ -884,12 +979,6 @@ body {
   height: 20px;
 }
 
-.action-card:hover,
-.primary-button:hover,
-.back-btn:hover {
-  transform: translateY(-1px);
-  opacity: 0.96;
-}
 
 .action-title {
   margin: 0;
@@ -971,9 +1060,9 @@ body {
 .home-fact-card {
   margin-top: 4px;
   margin-bottom: 20px;
-  padding: 18px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #d8edd3 0%, #cee7c8 100%);
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--card-cream);
   box-shadow: var(--shadow-soft);
 }
 
@@ -982,6 +1071,33 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 12px;
+}
+
+.home-fact-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-fact-timer {
+  --fact-progress: 100%;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: conic-gradient(
+    var(--brand-dark) 0 calc(var(--fact-progress) * 1deg * 3.6),
+    rgba(23, 79, 32, 0.12) 0 360deg
+  );
+  position: relative;
+  flex-shrink: 0;
+}
+
+.home-fact-timer::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 999px;
+  background: var(--card-cream);
 }
 
 .home-fact-counter {
@@ -1002,6 +1118,23 @@ body {
   line-height: 1.5;
   text-align: left;
   animation: fadeSwap 0.45s ease;
+}
+
+.home-fact-progress {
+  width: 100%;
+  height: 8px;
+  margin-top: 14px;
+  border-radius: 999px;
+  background: rgba(23, 79, 32, 0.12);
+  overflow: hidden;
+}
+
+.home-fact-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3e8f55 0%, #6fb8a0 100%);
+  transition: width 0.1s linear;
 }
 
 .challenge-card {
@@ -1172,10 +1305,6 @@ body {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.challenge-button:hover {
-  transform: translateY(-1px);
-  opacity: 0.97;
-}
 
 .achievement-grid {
   display: grid;
@@ -1413,9 +1542,10 @@ body {
 
 .bottom-nav {
   position: static;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 5px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 8px;
   margin-top: 0;
   width: 100%;
   max-width: none;
@@ -1423,7 +1553,7 @@ body {
   margin-right: 0;
   padding: 7px 10px 9px;
   box-sizing: border-box;
-  border-radius: 20px 20px 30px 30px;
+  border-radius: 0 0 30px 30px;
   background: rgba(17, 56, 22, 0.92);
   backdrop-filter: blur(10px);
   box-shadow: 0 -10px 24px rgba(17, 56, 22, 0.12);
@@ -1431,6 +1561,7 @@ body {
 }
 
 .bottom-nav-item {
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1440,14 +1571,21 @@ body {
   border-radius: 14px;
   color: rgba(255, 255, 255, 0.78);
   text-decoration: none;
-  transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
 }
 
-.bottom-nav-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  transform: translateY(-1px);
+.bottom-nav-item:hover,
+.bottom-nav-item:focus,
+.bottom-nav-item:focus-visible,
+.bottom-nav-item:active {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.78);
+  transform: none;
+  opacity: 1;
+  box-shadow: none;
 }
+
 
 .bottom-nav-item.active {
   background: linear-gradient(180deg, #ffffff 0%, #dff6e2 100%);
@@ -1500,6 +1638,22 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 12px;
+}
+
+.profile-page .tips-content,
+.questionnaire-editor-page .tips-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.profile-page .calculator-card,
+.questionnaire-editor-page .calculator-card {
+  margin-bottom: 0;
+}
+
+.profile-badges-list {
+  margin-top: 0;
 }
 
 .tips-hero-card {
@@ -1618,7 +1772,7 @@ body {
 .progress-text {
   text-align: right;
   font-size: 12px;
-  color: var(--text-muted);
+  color: #1f2d20;
   margin-bottom: 10px;
   font-weight: 700;
 }
@@ -1672,6 +1826,8 @@ body {
 }
 
 .answer {
+  appearance: none;
+  -webkit-appearance: none;
   width: 100%;
   padding: 15px 16px;
   border-radius: 18px;
@@ -1680,6 +1836,7 @@ body {
   color: #1f2d20;
   cursor: pointer;
   font-size: 15px;
+  font-family: inherit;
   text-align: left;
   box-shadow: 0 6px 14px rgba(31, 45, 32, 0.04);
 }
@@ -1738,6 +1895,19 @@ body {
   align-items: stretch;
   justify-content: flex-start;
   gap: 18px;
+}
+
+.calculator-tool-page > .calculator-card {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.calculator-tool-page > .bottom-nav {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
 }
 
 .calculator-card {
@@ -1920,6 +2090,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-top: 24px;
 }
 
 .home-grid.single {
@@ -2043,14 +2214,10 @@ body {
   gap: 10px;
 }
 
-.start-btn:hover {
-  transform: translateY(-1px);
-  opacity: 0.95;
-}
 
 /* Activiteiten Page Styles */
 
-.progress-bar {
+.activiteiten-page .progress-bar {
   width: 100%;
   height: 10px;
   background: rgba(255, 255, 255, 0.18);
@@ -2101,10 +2268,28 @@ body {
 
 .forest-page {
   background: #f4f4f1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100dvh - 32px);
+  overflow: hidden;
 }
 
 .forest-card {
   background: linear-gradient(180deg, #f7fbf6 0%, #eaf3e7 100%);
+}
+
+.forest-page .forest-card {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 18px;
+}
+
+.forest-page .bottom-nav {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
 }
 
 .forest-visual {
@@ -2216,6 +2401,143 @@ body {
   background: linear-gradient(180deg, #eef8ee 0%, #ddf0df 100%);
 }
 
+.home-questionnaire-card {
+  margin-bottom: 20px;
+}
+
+.home-quick-card {
+  min-height: 184px;
+  margin: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.home-quick-title {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.home-quick-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.home-quick-button {
+  margin-top: 12px;
+  padding: 11px 12px;
+}
+
+.home-quick-status {
+  padding: 8px;
+  min-width: 34px;
+  min-height: 34px;
+  justify-content: center;
+}
+
+.home-quick-status svg {
+  width: 15px;
+  height: 15px;
+}
+
+.home-quick-plus-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.home-quick-plus {
+  width: 78px;
+  min-width: 78px;
+  height: 78px;
+  min-height: 78px;
+  border-radius: 50%;
+  padding: 0;
+  justify-content: center;
+}
+
+.home-questionnaire-status.home-quick-plus svg {
+  width: 34px;
+  height: 34px;
+}
+
+.home-questionnaire-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.home-questionnaire-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #f1e3cf;
+  color: #7b4c1a;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.home-questionnaire-status.done {
+  background: #daefdc;
+  color: #1d6a2e;
+}
+
+.home-questionnaire-status svg {
+  width: 14px;
+  height: 14px;
+}
+
+.home-reminder-card {
+  width: calc(100% - 44px);
+  max-width: 316px;
+  margin: 22px auto 0;
+  padding: 20px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #f7faf4 0%, #e9f3e4 100%);
+  box-shadow: var(--shadow-soft);
+}
+
+.home-reminder-title {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 24px;
+  line-height: 1.2;
+  font-family: var(--font-display);
+}
+
+.home-reminder-text {
+  margin: 10px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.home-reminder-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.home-reminder-dismiss {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: rgba(31, 107, 42, 0.08);
+  color: var(--brand-dark);
+  font-size: 14px;
+  font-weight: 700;
+}
+
 @media (max-width: 480px) {
   #root {
     min-height: 100dvh;
@@ -2285,7 +2607,8 @@ body {
   }
 
   .home-widget-rail-card {
-    flex-basis: calc(100vw - 48px);
+    /* Use the same side margins on mobile so swipe cards keep equal spacing. */
+    flex-basis: calc(100vw - 32px);
   }
 
   .home-feature-stats,
@@ -2297,12 +2620,8 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .home-feature-visual {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .home-feature-photo {
-    height: 84px;
+    height: 152px;
   }
 
   .hero-number,
@@ -2326,7 +2645,7 @@ body {
 
   .bottom-nav {
     padding: 6px 8px calc(10px + env(safe-area-inset-bottom));
-    border-radius: 18px 18px 0 0;
+    border-radius: 0;
   }
 
   .bottom-nav-item {
@@ -2370,6 +2689,34 @@ body {
   font-family: var(--font-display);
 }
 
+.questionnaire-editor-content {
+  padding-bottom: 22px;
+}
+
+.question-editor-list {
+  margin: 0 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.question-editor-card {
+  background: linear-gradient(180deg, #f8faf5 0%, #eef4ea 100%);
+  padding: 22px;
+  border-radius: 24px;
+  box-shadow: var(--shadow-soft);
+}
+
+.question-editor-text {
+  font-size: 20px;
+  margin-bottom: 18px;
+}
+
+.questionnaire-editor-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 .auth-block {
   margin-top: 30px;
   padding-top: 20px;

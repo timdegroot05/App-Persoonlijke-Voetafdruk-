@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { FiArrowRight, FiMap } from "react-icons/fi"
+import { FiArrowRight, FiCheckCircle, FiEdit3, FiPlus } from "react-icons/fi"
 import { HiOutlineCalculator } from "react-icons/hi"
-import { LuLeaf, LuTrees, LuUtensilsCrossed } from "react-icons/lu"
+import { LuLeaf } from "react-icons/lu"
 import BottomNav from "../components/BottomNav"
 import AppHeader from "../components/AppHeader"
 import {
@@ -11,30 +11,59 @@ import {
   getImpactHistory,
   getPersonalInsight,
 } from "../utils/impactInsights"
+import {
+  getLatestWeeklyAnswers,
+  getProfileAnswers,
+  hasCompletedProfileQuestionnaire,
+} from "../utils/questionnaireStorage"
+import {
+  formatWeekRangeLabel,
+  getStoredWeeklyResults,
+  getWeeklyCheckinWeekInfo,
+  hasWeeklyResultForWeek,
+  shouldShowWeeklyCheckinPopup,
+} from "../utils/weeklyResults"
 import "../App.css"
+
+const forestHeroPhoto = {
+  src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
+  alt: "Groen bos als visualisatie van natuurlijke groei",
+}
 
 function Home() {
   const navigate = useNavigate()
-  const dashboardRailRef = useRef(null)
-  const insightRailRef = useRef(null)
-  const [activeDashboardIndex, setActiveDashboardIndex] = useState(0)
-  const [activeInsightIndex, setActiveInsightIndex] = useState(0)
+  const emissionRailRef = useRef(null)
+  const quickActionsRailRef = useRef(null)
+  const focusRailRef = useRef(null)
+  const [activeEmissionIndex, setActiveEmissionIndex] = useState(0)
+  const [activeQuickActionIndex, setActiveQuickActionIndex] = useState(0)
+  const [activeFocusIndex, setActiveFocusIndex] = useState(0)
   const [activeFactIndex, setActiveFactIndex] = useState(0)
+  const [factTimerProgress, setFactTimerProgress] = useState(100)
+  const [showWeeklyReminder, setShowWeeklyReminder] = useState(false)
   const [isGoalEditorOpen, setIsGoalEditorOpen] = useState(false)
   const [weeklyGoal, setWeeklyGoal] = useState(() => {
     const savedGoal = Number(localStorage.getItem("weekly-goal"))
-    return Number.isFinite(savedGoal) && savedGoal > 0 ? savedGoal : 150
+    return Number.isFinite(savedGoal) && savedGoal >= 0 ? savedGoal : 0
   })
   const [goalDraft, setGoalDraft] = useState(() => String(weeklyGoal))
-  const savedAnswers = JSON.parse(localStorage.getItem("answers")) || []
+  const profileAnswers = getProfileAnswers()
+  const weeklyAnswers = getLatestWeeklyAnswers()
+  const weeklyResults = useMemo(() => getStoredWeeklyResults(), [])
+  const latestWeeklyResult = weeklyResults[0] ?? null
+  const activeCheckinWeek = useMemo(() => getWeeklyCheckinWeekInfo(), [])
+  const weeklyQuestionnaireDone = useMemo(
+    () => hasWeeklyResultForWeek(weeklyResults, activeCheckinWeek),
+    [activeCheckinWeek, weeklyResults]
+  )
 
   const currentSnapshot = useMemo(() => {
-    if (savedAnswers.length === 0) {
+    if (Object.keys(profileAnswers).length === 0 && Object.keys(weeklyAnswers).length === 0) {
       return null
     }
 
-    return buildImpactSnapshot(savedAnswers)
-  }, [savedAnswers])
+    return buildImpactSnapshot(profileAnswers, weeklyAnswers)
+  }, [profileAnswers, weeklyAnswers])
 
   const emissionData = useMemo(() => {
     if (!currentSnapshot) {
@@ -46,13 +75,30 @@ function Home() {
       }
     }
 
+    const resolvedCategories = latestWeeklyResult
+      ? {
+          wonen: latestWeeklyResult.homeEmission,
+          transport: latestWeeklyResult.transportEmission,
+          voeding: latestWeeklyResult.foodEmission,
+          consumptie: latestWeeklyResult.consumptionEmission,
+          achtergrondimpact: latestWeeklyResult.backgroundImpact,
+        }
+      : currentSnapshot.categories
+    const dominantCategory =
+      Object.entries(resolvedCategories)
+        .filter(([category]) => category !== "achtergrondimpact")
+        .sort((firstEntry, secondEntry) => secondEntry[1] - firstEntry[1])[0]?.[0] ??
+      currentSnapshot.dominantCategory
+
     return {
-      dailyEmission: currentSnapshot.dailyEmission,
-      weeklyEmission: currentSnapshot.weeklyEmission,
+      dailyEmission: latestWeeklyResult
+        ? Number((latestWeeklyResult.totalEmission / 7).toFixed(1))
+        : currentSnapshot.dailyEmission,
+      weeklyEmission: latestWeeklyResult?.totalEmission ?? currentSnapshot.weeklyEmission,
       score: currentSnapshot.totalScore,
-      dominantCategory: currentSnapshot.dominantCategory,
+      dominantCategory,
     }
-  }, [currentSnapshot])
+  }, [currentSnapshot, latestWeeklyResult])
 
   const history = useMemo(() => getImpactHistory(), [])
   const latestHistoryEntry = history[0] ?? null
@@ -76,28 +122,6 @@ function Home() {
     "Goed isoleren thuis verlaagt niet alleen je energierekening maar ook je uitstoot.",
     "Korte vluchten hebben per kilometer vaak een relatief hoge klimaatimpact.",
   ]
-  const forestPhotoCards = [
-    {
-      src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
-      alt: "Groen bos als visualisatie van natuurlijke groei",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=900&q=80",
-      alt: "Jonge planten die duurzame groei verbeelden",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&w=900&q=80",
-      alt: "Natuurlijke omgeving als rustige duurzame visual",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
-      alt: "Bosrand als teken van duurzame vooruitgang",
-    },
-    {
-      src: "https://images.unsplash.com/photo-1425913397330-cf8af2ff40a1?auto=format&fit=crop&w=900&q=80",
-      alt: "Boomkruinen die een groeiend bos laten zien",
-    },
-  ]
   const personalInsight = getPersonalInsight(currentSnapshot)
   const focusLabel = getFocusLabel(emissionData.dominantCategory)
   const savedKg = Math.max(
@@ -111,17 +135,19 @@ function Home() {
   const goalProgress = Math.min(
     100,
     Math.max(
-      8,
-      Math.round((savedKg / weeklyGoal) * 100)
+      0,
+      weeklyGoal > 0 ? Math.round((savedKg / weeklyGoal) * 100) : 0
     )
   )
 
   const dailyCategoryBreakdown = useMemo(() => {
     const categoryLabels = {
       voeding: "Voeding",
-      transport: "Vervoer",
+      transport: "Transport",
       energie: "Energie",
       wonen: "Wonen",
+      consumptie: "Consumptie",
+      achtergrondimpact: "Achtergrondimpact",
     }
 
     const categoryColors = {
@@ -129,25 +155,42 @@ function Home() {
       transport: "#3e8f55",
       energie: "#b7d96d",
       wonen: "#6fb8a0",
+      consumptie: "#d2c1a3",
+      achtergrondimpact: "#cfd9c7",
     }
 
-    const categories = currentSnapshot?.categories
+    const categories = latestWeeklyResult
+      ? {
+          wonen: latestWeeklyResult.homeEmission,
+          transport: latestWeeklyResult.transportEmission,
+          voeding: latestWeeklyResult.foodEmission,
+          consumptie: latestWeeklyResult.consumptionEmission,
+          achtergrondimpact: latestWeeklyResult.backgroundImpact,
+        }
+      : currentSnapshot?.categories
+    const visibleCategories = categories
+      ? Object.fromEntries(
+          Object.entries(categories).filter(([key]) => key !== "achtergrondimpact")
+        )
+      : null
+    // Keep background impact inside the total emission denominator so the
+    // visible categories keep their real size instead of being inflated.
     const totalCategoryValue = categories
       ? Object.values(categories).reduce((sum, value) => sum + value, 0)
       : 0
 
     const fallback = [
-      { key: "transport", label: "Vervoer", value: 4.6, share: 38, color: "#3e8f55" },
+      { key: "transport", label: "Transport", value: 4.6, share: 38, color: "#3e8f55" },
       { key: "energie", label: "Energie", value: 3.2, share: 26, color: "#b7d96d" },
       { key: "voeding", label: "Voeding", value: 2.7, share: 22, color: "#8bcf91" },
       { key: "wonen", label: "Wonen", value: 1.9, share: 14, color: "#6fb8a0" },
     ]
 
-    if (!categories || totalCategoryValue <= 0) {
+    if (!visibleCategories || totalCategoryValue <= 0) {
       return fallback
     }
 
-    return Object.entries(categories)
+    return Object.entries(visibleCategories)
       .map(([key, value]) => {
         const normalizedValue = Number(value) || 0
         const share = Math.max(
@@ -161,52 +204,267 @@ function Home() {
         return {
           key,
           label: categoryLabels[key] || "Overig",
+          rawValue: normalizedValue,
           value: dailyValue,
           share,
           color: categoryColors[key] || "#8bcf91",
         }
       })
+      .sort((a, b) => b.rawValue - a.rawValue)
+  }, [currentSnapshot, emissionData.dailyEmission, latestWeeklyResult])
+
+  const dailyCategoryChartBreakdown = useMemo(() => {
+    const categoryColors = {
+      voeding: "#8bcf91",
+      transport: "#3e8f55",
+      energie: "#b7d96d",
+      wonen: "#6fb8a0",
+      consumptie: "#d2c1a3",
+      achtergrondimpact: "#cfd9c7",
+    }
+
+    const categories = latestWeeklyResult
+      ? {
+          wonen: latestWeeklyResult.homeEmission,
+          transport: latestWeeklyResult.transportEmission,
+          voeding: latestWeeklyResult.foodEmission,
+          consumptie: latestWeeklyResult.consumptionEmission,
+          achtergrondimpact: latestWeeklyResult.backgroundImpact,
+        }
+      : currentSnapshot?.categories
+    const totalCategoryValue = categories
+      ? Object.values(categories).reduce((sum, value) => sum + value, 0)
+      : 0
+
+    if (!categories || totalCategoryValue <= 0) {
+      return dailyCategoryBreakdown
+    }
+
+    const rawBreakdown = Object.entries(categories).map(([key, value]) => ({
+      key,
+      rawShare: ((Number(value) || 0) / totalCategoryValue) * 100,
+      color: categoryColors[key] || "#8bcf91",
+    }))
+
+    const backgroundImpact = rawBreakdown.find(
+      (category) => category.key === "achtergrondimpact"
+    )
+    const editableCategories = rawBreakdown.filter(
+      (category) => category.key !== "achtergrondimpact"
+    )
+    const largestEditableShare = editableCategories.reduce(
+      (largestShare, category) => Math.max(largestShare, category.rawShare),
+      0
+    )
+
+    if (!backgroundImpact || largestEditableShare > 47) {
+      return rawBreakdown
+        .map((category) => ({
+          key: category.key,
+          share: Math.max(4, Math.round(category.rawShare)),
+          color: category.color,
+        }))
+        .sort((a, b) => b.share - a.share)
+    }
+
+    const otherTotalShare = editableCategories.reduce(
+      (sum, category) => sum + category.rawShare,
+      0
+    )
+    const scaledEditableCategories = editableCategories.map((category) => ({
+      key: category.key,
+      share:
+        otherTotalShare > 0
+          ? (category.rawShare / otherTotalShare) * 53
+          : 0,
+      color: category.color,
+    }))
+
+    return [
+      {
+        key: backgroundImpact.key,
+        share: 47,
+        color: backgroundImpact.color,
+      },
+      ...scaledEditableCategories,
+    ]
+      .map((category) => ({
+        ...category,
+        share: Math.max(4, Math.round(category.share)),
+      }))
       .sort((a, b) => b.share - a.share)
-  }, [currentSnapshot, emissionData.dailyEmission])
+  }, [currentSnapshot, dailyCategoryBreakdown, latestWeeklyResult])
 
   const weeklyCategoryBreakdown = useMemo(
-    () =>
-      dailyCategoryBreakdown.map((category) => ({
+    () => {
+      if (latestWeeklyResult) {
+        return [
+          {
+            key: "transport",
+            label: "Transport",
+            value: latestWeeklyResult.transportEmission,
+            color: "#3e8f55",
+          },
+          {
+            key: "wonen",
+            label: "Wonen",
+            value: latestWeeklyResult.homeEmission,
+            color: "#6fb8a0",
+          },
+          {
+            key: "voeding",
+            label: "Voeding",
+            value: latestWeeklyResult.foodEmission,
+            color: "#8bcf91",
+          },
+          {
+            key: "consumptie",
+            label: "Consumptie",
+            value: latestWeeklyResult.consumptionEmission,
+            color: "#d2c1a3",
+          },
+        ]
+          .filter((category) => category.value > 0)
+          .sort((first, second) => second.value - first.value)
+      }
+
+      return dailyCategoryBreakdown.map((category) => ({
         ...category,
         value: Number((category.value * 7).toFixed(1)),
-      })),
-    [dailyCategoryBreakdown]
+      }))
+    },
+    [dailyCategoryBreakdown, latestWeeklyResult]
   )
+  const monthInfo = useMemo(() => {
+    const formatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Amsterdam",
+      year: "numeric",
+      month: "2-digit",
+    })
+    const parts = formatter.formatToParts(new Date())
+    const map = Object.fromEntries(parts.map((part) => [part.type, part.value]))
+    const year = Number(map.year)
+    const month = Number(map.month)
+    const monthStart = new Date(Date.UTC(year, month - 1, 1))
+    const monthEnd = new Date(Date.UTC(year, month, 0))
+    const monthLabelFormatter = new Intl.DateTimeFormat("nl-NL", {
+      timeZone: "UTC",
+      day: "numeric",
+      month: "long",
+    })
+    const monthNameFormatter = new Intl.DateTimeFormat("nl-NL", {
+      timeZone: "UTC",
+      month: "long",
+    })
+
+    let firstCoveredDate = null
+    let lastCoveredDate = null
+
+    const monthlyCategoryTemplate = [
+      {
+        key: "transport",
+        label: "Transport",
+        value: 0,
+        color: "#3e8f55",
+      },
+      {
+        key: "wonen",
+        label: "Wonen",
+        value: 0,
+        color: "#6fb8a0",
+      },
+      {
+        key: "voeding",
+        label: "Voeding",
+        value: 0,
+        color: "#8bcf91",
+      },
+      {
+        key: "consumptie",
+        label: "Consumptie",
+        value: 0,
+        color: "#d2c1a3",
+      },
+    ]
+
+    const totals = weeklyResults.reduce(
+      (currentTotals, week) => {
+        const weekStart = new Date(`${week.weekStart}T00:00:00Z`)
+        const weekEnd = new Date(`${week.weekEnd}T00:00:00Z`)
+        const overlapStart = weekStart > monthStart ? weekStart : monthStart
+        const overlapEnd = weekEnd < monthEnd ? weekEnd : monthEnd
+
+        if (overlapEnd < overlapStart) {
+          return currentTotals
+        }
+
+        if (!firstCoveredDate || overlapStart < firstCoveredDate) {
+          firstCoveredDate = overlapStart
+        }
+
+        if (!lastCoveredDate || overlapEnd > lastCoveredDate) {
+          lastCoveredDate = overlapEnd
+        }
+
+        const overlapDays = Math.floor((overlapEnd - overlapStart) / 86400000) + 1
+        const overlapShare = overlapDays / 7
+
+        return {
+          totalEmission: currentTotals.totalEmission + (week.totalEmission || 0) * overlapShare,
+          categoryBreakdown: monthlyCategoryTemplate.map((category, index) => ({
+            ...category,
+            value:
+              currentTotals.categoryBreakdown[index].value +
+              ((category.key === "transport"
+                ? week.transportEmission
+                : category.key === "wonen"
+                  ? week.homeEmission
+                  : category.key === "voeding"
+                    ? week.foodEmission
+                    : week.consumptionEmission) || 0) * overlapShare,
+          })),
+        }
+      },
+      {
+        totalEmission: 0,
+        categoryBreakdown: monthlyCategoryTemplate.map((category) => ({
+          ...category,
+          value: 0,
+        })),
+      }
+    )
+
+    const roundedCategoryBreakdown = totals.categoryBreakdown
+      .map((category) => ({
+        ...category,
+        value: Number(category.value.toFixed(1)),
+      }))
+      .filter((category) => category.value > 0)
+      .sort((first, second) => second.value - first.value)
+    const chartTotal = roundedCategoryBreakdown.reduce(
+      (sum, category) => sum + category.value,
+      0
+    )
+
+    return {
+      totalEmission: Number(totals.totalEmission.toFixed(1)),
+      rangeLabel: `Uitstoot ${monthNameFormatter.format(monthStart)}`,
+      categoryBreakdown: roundedCategoryBreakdown,
+      chartBreakdown:
+        chartTotal > 0
+          ? roundedCategoryBreakdown.map((category) => ({
+              key: category.key,
+              color: category.color,
+              share: Math.max(4, Math.round((category.value / chartTotal) * 100)),
+            }))
+          : dailyCategoryChartBreakdown,
+    }
+  }, [dailyCategoryChartBreakdown, weeklyResults])
 
   const weeklyTargetLeft = Math.max(
     0,
     Number((weeklyGoal - emissionData.weeklyEmission).toFixed(1))
   )
-
-  const forestTrees = Math.min(
-    5,
-    Math.max(1, Math.round((savedKg / weeklyGoal) * 5))
-  )
-  const forestHealthLabel =
-    forestTrees >= 4 ? "Sterke groei" : forestTrees >= 2 ? "Rustige groei" : "Startgroei"
-  const forestFocusMeaning =
-    forestHealthLabel === "Sterke groei"
-      ? "Je uitstoot blijft ruim onder je weekdoel, dus je bos groeit zichtbaar voller."
-      : forestHealthLabel === "Rustige groei"
-        ? "Je zit op de goede weg. Met een paar slimme keuzes kan je bos nog dichter worden."
-        : "Je zit nog dicht bij je weekdoel. Kleine besparingen zorgen hier voor de eerste groei."
-  const kgPerTree = Math.max(1, Math.round(weeklyGoal / 5))
-  const nextTreeThreshold = Math.max(0, forestTrees * kgPerTree - savedKg)
-  const forestStepProgress =
-    forestTrees >= 5
-      ? 100
-      : Math.min(
-          100,
-          Math.max(
-            10,
-            Math.round(((savedKg % kgPerTree) / kgPerTree) * 100)
-          )
-        )
   const goalStatus =
     emissionData.weeklyEmission <= weeklyGoal
       ? "Op schema"
@@ -216,143 +474,22 @@ function Home() {
     : null
   const dailyGoal = Number((weeklyGoal / 7).toFixed(1))
   const stretchGoal = Math.max(40, weeklyGoal - 20)
-  const focusCategoryData = dailyCategoryBreakdown[0]
-  const secondaryCategoryData = dailyCategoryBreakdown[1]
-  const forestLevels = [
-    { name: "Zaailing", badge: "Beginfase" },
-    { name: "Groeipad", badge: "In opbouw" },
-    { name: "Groene zone", badge: "Sterker ritme" },
-    { name: "Mini-bos", badge: "Goede week" },
-    { name: "Vol bos", badge: "Topprestatie" },
-  ]
-  const forestLevel = forestLevels[forestTrees - 1]
-  const nextUnlockLabel =
-    forestTrees >= 5
-      ? "Je hoogste bosniveau is bereikt."
-      : `Nog ${nextTreeThreshold} kg winst tot ${forestLevels[forestTrees].name}.`
-  const nextBestAction =
-    focusLabel === "Vervoer"
-      ? "Vervang deze week 1 korte autorit door fiets of OV."
-      : focusLabel === "Voeding"
-        ? "Plan deze week 2 plantaardige maaltijden."
-        : focusLabel === "Energie"
-          ? "Check thuis 1 apparaat op sluipverbruik."
-          : "Kies deze week 1 concrete besparing voor thuis."
-  const challengeByFocus = {
-    Vervoer: {
-      title: "Autovrije sprint",
-      body: "Laat deze week 1 korte autorit staan en kies fiets of lopen.",
-      reward: "+12 groeipunten",
-      action: () => navigate("/activiteiten"),
-      button: "Start challenge",
-    },
-    Voeding: {
-      title: "Groene maaltijd",
-      body: "Kies vandaag een plantaardige lunch of diner.",
-      reward: "+10 groeipunten",
-      action: () => navigate("/tips"),
-      button: "Bekijk tips",
-    },
-    Energie: {
-      title: "Slim verbruik",
-      body: "Schakel vanavond 1 apparaat volledig uit en voorkom sluipverbruik.",
-      reward: "+8 groeipunten",
-      action: () => navigate("/activiteiten"),
-      button: "Doe mee",
-    },
-    Wonen: {
-      title: "Thuischeck",
-      body: "Kies 1 kleine thuisactie om je verbruik direct te verlagen.",
-      reward: "+8 groeipunten",
-      action: () => navigate("/activiteiten"),
-      button: "Open acties",
-    },
-  }
-  const activeChallenge = challengeByFocus[focusLabel] || challengeByFocus.Energie
-  const achievements = [
-    {
-      title: "Trend Tracker",
-      status: history.length >= 2 ? "Ontgrendeld" : "Bijna vrij",
-      progress: Math.min(100, history.length * 50),
-    },
-    {
-      title: "Doelbewaker",
-      status: goalStatus === "Op schema" ? "Actief" : "Inhalen",
-      progress: goalStatus === "Op schema" ? 100 : Math.max(20, 100 - Math.round((excessKg / weeklyGoal) * 100)),
-    },
-    {
-      title: "Bosbouwer",
-      status: forestTrees >= 3 ? "Sterk" : "Groeit",
-      progress: Math.min(100, forestTrees * 20),
-    },
-  ]
-  const ecoPoints = Math.max(
-    40,
-    Math.round(emissionData.score * 2 + savedKg * 3 + history.length * 8)
-  )
-  const ecoLevel = Math.max(1, Math.floor(ecoPoints / 120) + 1)
-  const pointsIntoLevel = ecoPoints % 120
-  const pointsToNextLevel = 120 - pointsIntoLevel
-  const ecoLevelProgress = Math.max(8, Math.round((pointsIntoLevel / 120) * 100))
-  const greenStreak = Math.max(
-    1,
-    history.reduce((count, entry) => {
-      if (entry.weeklyEmission <= weeklyGoal) {
-        return count + 1
-      }
-      return count
-    }, emissionData.weeklyEmission <= weeklyGoal ? 1 : 0)
-  )
-  const weekRhythm = [
-    { day: "M", active: emissionData.dailyEmission <= dailyGoal },
-    { day: "D", active: emissionData.score >= 55 },
-    { day: "W", active: savedKg >= 5 },
-    { day: "D", active: history.length >= 1 },
-    { day: "V", active: forestTrees >= 2 },
-    { day: "Z", active: goalStatus === "Op schema" },
-    { day: "Z", active: greenStreak >= 2 },
-  ]
-  const dailyQuests = [
-    {
-      title: "Korte rit overslaan",
-      detail: "Vervang vandaag 1 korte rit door lopen of fietsen.",
-      points: 6,
-      done: focusLabel !== "Vervoer" || savedKg >= 5,
-    },
-    {
-      title: "Slimme energiekeuze",
-      detail: "Zet 1 apparaat volledig uit voor de nacht.",
-      points: 4,
-      done: emissionData.score >= 60,
-    },
-    {
-      title: "Groene maaltijd",
-      detail: "Kies vandaag 1 plantaardige maaltijd.",
-      points: 5,
-      done: focusLabel !== "Voeding" || history.length >= 1,
-    },
-  ]
-  const categoryBadges = [
-    {
-      title: "Vervoer badge",
-      category: "Vervoer",
-      unlocked: dailyCategoryBreakdown.find((item) => item.key === "transport")?.value <= 4.5,
-    },
-    {
-      title: "Voeding badge",
-      category: "Voeding",
-      unlocked: dailyCategoryBreakdown.find((item) => item.key === "voeding")?.value <= 3,
-    },
-    {
-      title: "Energie badge",
-      category: "Energie",
-      unlocked: dailyCategoryBreakdown.find((item) => item.key === "energie")?.value <= 3.5,
-    },
-  ]
+  const monthlyFocusCategory = monthInfo.categoryBreakdown[0] ?? null
+  const monthlyFocusLabel = monthlyFocusCategory?.label ?? "Nog geen maanddata"
+  const monthlyFocusAction =
+    monthlyFocusCategory?.key === "transport"
+      ? "Kijk welke rit je deze maand kunt vervangen door OV of fiets."
+      : monthlyFocusCategory?.key === "voeding"
+        ? "Plan deze maand extra plantaardige maaltijden voor snelle winst."
+        : monthlyFocusCategory?.key === "wonen"
+          ? "Pak deze maand thuis 1 concrete energiebesparing mee."
+          : monthlyFocusCategory?.key === "consumptie"
+            ? "Koop deze maand alleen wat je echt nodig hebt."
+            : "Vul je weekcheck-in in om je maandfocus te zien."
 
-  const dashboardCardsCount = 5
-  const insightCardsCount = 3
-
+  const emissionCardsCount = 3
+  const quickActionCardsCount = 3
+  const focusCardsCount = 2
   const updateActiveIndex = (element, setter) => {
     if (!element) {
       return
@@ -363,18 +500,44 @@ function Home() {
       return
     }
 
-    const cardWidth = firstCard.getBoundingClientRect().width + 14
+    // Read the real rail gap from CSS so swipe pagination stays aligned
+    // after we tighten the spacing between dashboard cards.
+    const railGap = Number.parseFloat(window.getComputedStyle(element).columnGap || "0")
+    const cardWidth = firstCard.getBoundingClientRect().width + railGap
     const index = Math.round(element.scrollLeft / cardWidth)
     setter(index)
   }
 
   useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setActiveFactIndex((currentIndex) => (currentIndex + 1) % facts.length)
-    }, 4500)
+    if (!hasCompletedProfileQuestionnaire()) {
+      navigate("/questionnaire")
+    }
+  }, [navigate])
 
-    return () => window.clearInterval(intervalId)
-  }, [facts.length])
+  useEffect(() => {
+    setShowWeeklyReminder(shouldShowWeeklyCheckinPopup(weeklyResults))
+  }, [weeklyResults])
+
+  useEffect(() => {
+    const factDurationMs = 5000
+    const startedAt = Date.now()
+
+    const progressIntervalId = window.setInterval(() => {
+      const elapsed = Date.now() - startedAt
+      const nextProgress = Math.max(0, 100 - (elapsed / factDurationMs) * 100)
+      setFactTimerProgress(nextProgress)
+    }, 100)
+
+    const factTimeoutId = window.setTimeout(() => {
+      setActiveFactIndex((currentIndex) => (currentIndex + 1) % facts.length)
+      setFactTimerProgress(100)
+    }, factDurationMs)
+
+    return () => {
+      window.clearInterval(progressIntervalId)
+      window.clearTimeout(factTimeoutId)
+    }
+  }, [activeFactIndex, facts.length])
 
   useEffect(() => {
     localStorage.setItem("weekly-goal", String(weeklyGoal))
@@ -385,7 +548,7 @@ function Home() {
   }, [weeklyGoal])
 
   const applyGoal = (value) => {
-    const nextGoal = Math.min(300, Math.max(40, Number(value)))
+    const nextGoal = Math.min(300, Math.max(0, Number(value)))
     if (!Number.isFinite(nextGoal)) {
       return
     }
@@ -395,8 +558,8 @@ function Home() {
   }
 
   const resetGoal = () => {
-    setWeeklyGoal(150)
-    setGoalDraft("150")
+    setWeeklyGoal(0)
+    setGoalDraft("0")
     setIsGoalEditorOpen(false)
   }
 
@@ -405,6 +568,36 @@ function Home() {
     <AppHeader title="Impact" icon={<LuLeaf />} />
 
     <div className="home-content">
+      {showWeeklyReminder ? (
+        <section className="home-reminder-card">
+          <p className="section-label dark">Wekelijkse reminder</p>
+          <h2 className="home-reminder-title">Vul je activiteit van afgelopen week in</h2>
+          <p className="home-reminder-text">
+            Week van {formatWeekRangeLabel(activeCheckinWeek.weekStart, activeCheckinWeek.weekEnd)} staat klaar om in te vullen.
+          </p>
+          <div className="home-reminder-actions">
+            <button
+              type="button"
+              className="goal-edit-button"
+              onClick={() =>
+                navigate("/weekly-questionnaire", {
+                  state: { weekKey: activeCheckinWeek.weekStart },
+                })
+              }
+            >
+              Open wekelijkse vragenlijst
+            </button>
+            <button
+              type="button"
+              className="home-reminder-dismiss"
+              onClick={() => setShowWeeklyReminder(false)}
+            >
+              Later
+            </button>
+          </div>
+        </section>
+      ) : null}
+
       <section
         className="home-feature-card action-card"
         onClick={() => navigate("/bos")}
@@ -417,190 +610,102 @@ function Home() {
           }
         }}
       >
-        <div className="home-feature-header">
-          <p className="section-label dark">Bos overzicht</p>
-          <div className="home-feature-icon">
-            <LuTrees />
-          </div>
-        </div>
+        <p className="section-label dark">Jouw Persoonlijke Bos</p>
 
         <div className="home-feature-visual" aria-hidden="true">
-          {forestPhotoCards.slice(0, forestTrees).map((photo) => (
-            <img
-              key={photo.src}
-              className="home-feature-photo"
-              src={photo.src}
-              alt={photo.alt}
+          <img
+            className="home-feature-photo"
+            src={forestHeroPhoto.src}
+            alt={forestHeroPhoto.alt}
+          />
+        </div>
+      </section>
+
+      <section className="home-widget-rail-section home-emission-rail-section">
+        <div className="home-rail-header">
+          <p className="section-label dark">Uitstootoverzicht</p>
+          <span className="home-rail-hint">Swipe</span>
+        </div>
+
+        <div className="home-rail-dots" aria-hidden="true">
+          {Array.from({ length: emissionCardsCount }).map((_, index) => (
+            <span
+              key={index}
+              className={`home-rail-dot${index === activeEmissionIndex ? " active" : ""}`}
             />
           ))}
         </div>
 
-        <div className="home-feature-stats">
-          <div className="home-feature-stat">
-            <span>Groei</span>
-            <strong>{forestTrees} bomen</strong>
-          </div>
-          <div className="home-feature-stat">
-            <span>Focus</span>
-            <strong>{forestHealthLabel}</strong>
-          </div>
-        </div>
-
-        <div className="forest-level-strip">
-          <div>
-            <span className="forest-level-label">Niveau</span>
-            <strong className="forest-level-value">{forestLevel.name}</strong>
-          </div>
-          <span className="forest-level-badge">{forestLevel.badge}</span>
-        </div>
-
-        <div className="forest-progress-bar" aria-hidden="true">
-          <div
-            className="forest-progress-fill"
-            style={{ width: `${forestStepProgress}%` }}
-          />
-        </div>
-
-        <p className="home-feature-note">
-          1 boom staat hier voor ongeveer {kgPerTree} kg ruimte onder je weekdoel.
-          {" "}
-          {nextUnlockLabel}
-        </p>
-
-        <p className="home-feature-note emphasis">
-          Focus betekent hier hoe gezond je bos nu groeit: {forestFocusMeaning}
-        </p>
-      </section>
-
-      <section className="home-widget-rail-section">
-        <div className="home-rail-header">
-          <p className="section-label dark">Jouw level</p>
-          <span className="home-rail-hint">Progress</span>
-        </div>
-
-        <section className="level-card">
-          <div className="level-card-top">
-            <div>
-              <p className="section-label dark">Eco level</p>
-              <h3 className="level-title">Level {ecoLevel}</h3>
-            </div>
-            <div className="level-points-badge">{ecoPoints} XP</div>
-          </div>
-
-          <div className="level-progress">
-            <div
-              className="level-progress-fill"
-              style={{ width: `${ecoLevelProgress}%` }}
-            />
-          </div>
-
-          <div className="level-stats-row">
-            <div className="level-stat-box">
-              <span>Streak</span>
-              <strong>{greenStreak} weken</strong>
-            </div>
-            <div className="level-stat-box">
-              <span>Volgend level</span>
-              <strong>{pointsToNextLevel} XP</strong>
-            </div>
-          </div>
-
-          <div className="week-rhythm">
-            {weekRhythm.map((item, index) => (
-              <span
-                key={`${item.day}-${index}`}
-                className={`week-rhythm-day${item.active ? " active" : ""}`}
-              >
-                {item.day}
-              </span>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            className="level-profile-button"
-            onClick={() => navigate("/profile")}
-          >
-            Open profiel
-          </button>
-        </section>
-      </section>
-
-      <section className="emission-hero home-week-card">
-        <p className="section-label dark">Wekelijkse uitstoot</p>
-        <div className="home-week-panel">
-          <h2 className="hero-number weekly-widget-number">
-            {emissionData.weeklyEmission} kg CO₂e
-          </h2>
-          <p className="weekly-widget-subtitle">
-            Gebaseerd op de verdeling uit je laatste vragenlijst
-          </p>
-          <div className="weekly-widget-chart" aria-hidden="true">
-            {weeklyCategoryBreakdown.map((category) => (
-              <span
-                key={category.key}
-                className="weekly-widget-segment"
-                style={{
-                  width: `${category.share}%`,
-                  background: category.color,
-                }}
-              />
-            ))}
-          </div>
-          <div className="weekly-widget-legend">
-            {weeklyCategoryBreakdown.slice(0, 3).map((category) => (
-              <div key={category.key} className="weekly-widget-legend-item">
-                <span
-                  className="weekly-widget-legend-dot"
-                  style={{ background: category.color }}
-                />
-                <span className="weekly-widget-legend-label">{category.label}</span>
-                <strong className="weekly-widget-legend-value">
-                  {category.value} kg
-                </strong>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="home-widget-rail-section">
-        <div className="home-rail-header">
-          <p className="section-label dark">Jouw dashboard</p>
-          <span className="home-rail-hint">Swipe</span>
-        </div>
-
         <div
-          ref={dashboardRailRef}
+          ref={emissionRailRef}
           className="home-widget-rail"
-          aria-label="Horizontaal scrollbare widgets"
+          aria-label="Horizontaal scrollbare uitstootkaarten"
           onScroll={(event) =>
-            updateActiveIndex(event.currentTarget, setActiveDashboardIndex)
+            updateActiveIndex(event.currentTarget, setActiveEmissionIndex)
           }
         >
-          <div className="info-card compact daily-widget-card home-widget-rail-card">
+          <section className="info-card daily-widget-card home-widget-rail-card home-emission-card">
             <div className="daily-widget-top">
               <div>
-                <p className="section-label dark">Dagelijkse uitstoot</p>
-                <p className="compact-number">{emissionData.dailyEmission} kg CO₂e</p>
+                <p className="section-label dark">Wekelijkse uitstoot</p>
+                <p className="compact-number">{emissionData.weeklyEmission} kg CO₂e</p>
                 <p className="daily-widget-subtitle">
-                  Verdeling op basis van je laatste vragenlijst
+                  Week {activeCheckinWeek.weekNumber} · {formatWeekRangeLabel(
+                    activeCheckinWeek.weekStart,
+                    activeCheckinWeek.weekEnd
+                  )}
                 </p>
               </div>
-
-              <button
-                type="button"
-                className="daily-widget-icon daily-widget-link"
-                onClick={() => navigate("/calculator")}
-                aria-label="Ga naar calculator"
-              >
-                <HiOutlineCalculator />
-              </button>
             </div>
 
             <div className="daily-widget-bottom">
               <div className="daily-widget-chart" aria-hidden="true">
-                {dailyCategoryBreakdown.map((category) => (
+                {dailyCategoryChartBreakdown.map((category) => (
+                  <span
+                    key={category.key}
+                    className="daily-widget-segment"
+                    style={{
+                      width: `${category.share}%`,
+                      background: category.color,
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="daily-widget-legend">
+                {weeklyCategoryBreakdown.slice(0, 3).map((category) => (
+                  <div key={category.key} className="daily-widget-legend-item">
+                    <span
+                      className="daily-widget-legend-dot"
+                      style={{ background: category.color }}
+                    />
+                    <span className="daily-widget-legend-label">{category.label}</span>
+                    <strong className="daily-widget-legend-value">
+                      {category.value} kg
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="info-card daily-widget-card home-widget-rail-card home-emission-card">
+            <div className="daily-widget-top">
+              <div>
+                <p className="section-label dark">Dagelijkse uitstoot</p>
+                <p className="compact-number">{emissionData.dailyEmission} kg CO₂e</p>
+                <p
+                  className="daily-widget-subtitle daily-widget-subtitle-spacer"
+                  aria-hidden="true"
+                >
+                  &nbsp;
+                </p>
+              </div>
+            </div>
+
+            <div className="daily-widget-bottom">
+              <div className="daily-widget-chart" aria-hidden="true">
+                {dailyCategoryChartBreakdown.map((category) => (
                   <span
                     key={category.key}
                     className="daily-widget-segment"
@@ -619,9 +724,7 @@ function Home() {
                       className="daily-widget-legend-dot"
                       style={{ background: category.color }}
                     />
-                    <span className="daily-widget-legend-label">
-                      {category.label}
-                    </span>
+                    <span className="daily-widget-legend-label">{category.label}</span>
                     <strong className="daily-widget-legend-value">
                       {category.value} kg
                     </strong>
@@ -629,8 +732,166 @@ function Home() {
                 ))}
               </div>
             </div>
+          </section>
+
+          <section className="info-card daily-widget-card home-widget-rail-card home-emission-card">
+            <div className="daily-widget-top">
+              <div>
+                <p className="section-label dark">Maandelijkse uitstoot</p>
+                <p className="compact-number">{monthInfo.totalEmission} kg CO₂e</p>
+                <p className="daily-widget-subtitle">{monthInfo.rangeLabel}</p>
+              </div>
+            </div>
+
+            <div className="daily-widget-bottom">
+              <div className="daily-widget-chart" aria-hidden="true">
+                {monthInfo.chartBreakdown.map((category) => (
+                  <span
+                    key={category.key}
+                    className="daily-widget-segment"
+                    style={{
+                      width: `${category.share}%`,
+                      background: category.color,
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="daily-widget-legend">
+                {monthInfo.categoryBreakdown.slice(0, 3).map((category) => (
+                  <div key={category.key} className="daily-widget-legend-item">
+                    <span
+                      className="daily-widget-legend-dot"
+                      style={{ background: category.color }}
+                    />
+                    <span className="daily-widget-legend-label">{category.label}</span>
+                    <strong className="daily-widget-legend-value">
+                      {category.value} kg
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section className="home-widget-rail-section">
+        <div className="home-rail-header">
+          <p className="section-label dark">Snelle acties</p>
+          <span className="home-rail-hint">Swipe</span>
+        </div>
+
+        <div className="home-rail-dots" aria-hidden="true">
+          {Array.from({ length: quickActionCardsCount }).map((_, index) => (
+            <span
+              key={index}
+              className={`home-rail-dot${index === activeQuickActionIndex ? " active" : ""}`}
+            />
+          ))}
+        </div>
+
+        <div
+          ref={quickActionsRailRef}
+          className="home-widget-rail"
+          aria-label="Horizontaal scrollbare snelle acties"
+          onScroll={(event) =>
+            updateActiveIndex(event.currentTarget, setActiveQuickActionIndex)
+          }
+        >
+          <section className="calculator-card home-questionnaire-card home-quick-card home-widget-rail-card home-quick-placeholder-card">
+            <div className="home-questionnaire-top">
+              <div>
+                <p className="section-label dark">Activiteit</p>
+                <h2 className="calculator-title home-quick-title">Activiteit toevoegen</h2>
+              </div>
+            </div>
+
+            <div className="home-quick-plus-wrap">
+              <span className="home-questionnaire-status home-quick-plus done">
+                <FiPlus />
+              </span>
+            </div>
+          </section>
+
+          <section className="calculator-card home-questionnaire-card home-quick-card home-widget-rail-card">
+            <div className="home-questionnaire-top">
+              <div>
+                <p className="section-label dark">Wekelijkse vragenlijst</p>
+                <h2 className="calculator-title home-quick-title">Vul je week in</h2>
+              </div>
+              <span className={`home-questionnaire-status home-quick-status${weeklyQuestionnaireDone ? " done" : ""}`}>
+                {weeklyQuestionnaireDone ? <FiCheckCircle /> : <FiEdit3 />}
+              </span>
           </div>
 
+          <p className="calculator-text home-quick-text">
+            Duurt max 2 minuten
+          </p>
+
+            <button
+              type="button"
+              className="goal-edit-button home-quick-button"
+              onClick={() =>
+                navigate("/weekly-questionnaire", {
+                  state: { weekKey: activeCheckinWeek.weekStart },
+                })
+              }
+            >
+              Open
+            </button>
+          </section>
+
+          <section className="calculator-card home-questionnaire-card home-quick-card home-widget-rail-card">
+            <div className="home-questionnaire-top">
+              <div>
+                <p className="section-label dark">Calculator</p>
+                <h2 className="calculator-title home-quick-title">Transport</h2>
+              </div>
+              <span className="home-questionnaire-status done home-quick-status">
+                <HiOutlineCalculator />
+              </span>
+            </div>
+
+            <p className="calculator-text home-quick-text">
+              Bereken snel de uitstoot van jouw ritten.
+            </p>
+
+            <button
+              type="button"
+              className="goal-edit-button home-quick-button"
+              onClick={() => navigate("/calculator")}
+            >
+              Open
+            </button>
+          </section>
+        </div>
+      </section>
+
+      {false ? (
+      <section className="home-widget-rail-section">
+        <div className="home-rail-header">
+          <p className="section-label dark">Jouw dashboard</p>
+          <span className="home-rail-hint">Swipe</span>
+        </div>
+
+        <div className="home-rail-dots" aria-hidden="true">
+          {Array.from({ length: dashboardCardsCount }).map((_, index) => (
+            <span
+              key={index}
+              className={`home-rail-dot${index === activeDashboardIndex ? " active" : ""}`}
+            />
+          ))}
+        </div>
+
+        <div
+          ref={dashboardRailRef}
+          className="home-widget-rail"
+          aria-label="Horizontaal scrollbare widgets"
+          onScroll={(event) =>
+            updateActiveIndex(event.currentTarget, setActiveDashboardIndex)
+          }
+        >
           <button
             className="info-card action-card home-action-card activity-quick-card home-widget-rail-card"
             onClick={() => navigate("/activiteiten")}
@@ -667,7 +928,8 @@ function Home() {
             </div>
           </section>
 
-          <section className="info-card co2-widget-card home-widget-rail-card">
+          {false ? (
+            <section className="info-card co2-widget-card home-widget-rail-card home-goal-card">
             <p className="section-label dark">Doel van deze week</p>
             <h3 className="co2-widget-value">{weeklyGoal} kg doel</h3>
             <p className="co2-widget-copy">
@@ -744,7 +1006,8 @@ function Home() {
                 </button>
               </div>
             ) : null}
-          </section>
+            </section>
+          ) : null}
 
           <button
             className="info-card co2-widget-card co2-widget-link home-widget-rail-card"
@@ -761,116 +1024,73 @@ function Home() {
           </button>
         </div>
 
-        <div className="home-rail-dots" aria-hidden="true">
-          {Array.from({ length: dashboardCardsCount }).map((_, index) => (
-            <span
-              key={index}
-              className={`home-rail-dot${index === activeDashboardIndex ? " active" : ""}`}
-            />
-          ))}
-        </div>
       </section>
+      ) : null}
 
       <section className="home-widget-rail-section">
         <div className="home-rail-header">
-          <p className="section-label dark">Snelle inzichten</p>
-          <span className="home-rail-hint">Meer</span>
+          <p className="section-label dark">Grootste categorieën</p>
+          <span className="home-rail-hint">Swipe</span>
+        </div>
+
+        <div className="home-rail-dots" aria-hidden="true">
+          {Array.from({ length: focusCardsCount }).map((_, index) => (
+            <span
+              key={index}
+              className={`home-rail-dot${index === activeFocusIndex ? " active" : ""}`}
+            />
+          ))}
         </div>
 
         <div
-          ref={insightRailRef}
+          ref={focusRailRef}
           className="home-widget-rail"
-          aria-label="Horizontaal scrollbare inzichten"
+          aria-label="Horizontaal scrollbare grootste categorie kaarten"
           onScroll={(event) =>
-            updateActiveIndex(event.currentTarget, setActiveInsightIndex)
+            updateActiveIndex(event.currentTarget, setActiveFocusIndex)
           }
         >
-          <section className="info-card insight-widget-card home-widget-rail-card">
-            <div className="insight-widget-icon">
-              <FiMap />
-            </div>
-            <p className="section-label dark">Prioriteit</p>
-            <h3 className="co2-widget-value">{focusLabel}</h3>
-            <p className="co2-widget-copy">
-              {nextBestAction}
-            </p>
-            <div className="insight-meta-row">
-              <span>Grootste deel</span>
-              <strong>{focusCategoryData?.value ?? 0} kg/dag</strong>
+          <section className="calculator-card home-questionnaire-card home-quick-card home-widget-rail-card home-focus-week-card">
+            <div>
+              <p className="section-label dark">Deze week</p>
+              <h3 className="co2-widget-value">{focusLabel}</h3>
+              <p className="co2-widget-copy">
+                Kijk wat je volgende week anders kan doen.
+              </p>
             </div>
             <button
               type="button"
               className="insight-action-button"
-              onClick={() => navigate("/activiteiten")}
+              onClick={() =>
+                navigate("/activiteiten", {
+                  state: { focusCategory: emissionData.dominantCategory },
+                })
+              }
             >
               Open acties
             </button>
           </section>
 
-          <section className="info-card insight-widget-card home-widget-rail-card">
-            <div className="insight-widget-icon">
-              <LuUtensilsCrossed />
-            </div>
-            <p className="section-label dark">Volgende winst</p>
-            <h3 className="co2-widget-value">
-              {weeklyTargetLeft > 0 ? `${weeklyTargetLeft} kg marge` : "Doel geraakt"}
-            </h3>
-            <p className="co2-widget-copy">
-              {weeklyTargetLeft > 0
-                ? `Je hebt nog ruimte binnen je doel. ${secondaryCategoryData?.label ?? "Je tweede categorie"} is nu je beste extra kans.`
-                : `${personalInsight.body}`}
-            </p>
-            <div className="insight-meta-row">
-              <span>Volgende focus</span>
-              <strong>{secondaryCategoryData?.label ?? focusLabel}</strong>
+          <section className="calculator-card home-questionnaire-card home-quick-card home-widget-rail-card">
+            <div>
+              <p className="section-label dark">Deze maand</p>
+              <h3 className="co2-widget-value">{monthlyFocusLabel}</h3>
+              <p className="co2-widget-copy">
+                Hier moet je verandering in brengen.
+              </p>
             </div>
             <button
               type="button"
               className="insight-action-button"
-              onClick={() => navigate("/calculator")}
+              onClick={() =>
+                navigate("/activiteiten", {
+                  state: { focusCategory: monthlyFocusCategory?.key ?? null },
+                })
+              }
             >
-              Reken door
+              Open acties
             </button>
           </section>
-
-          <section className="info-card insight-widget-card home-widget-rail-card">
-            <div className="insight-widget-icon">
-              <HiOutlineCalculator />
-            </div>
-            <p className="section-label dark">Trend</p>
-            <h3 className="co2-widget-value">
-              {historyDelta === null
-                ? "Nog geen trend"
-                : historyDelta <= 0
-                  ? `${Math.abs(historyDelta)} kg lager`
-                  : `${historyDelta} kg hoger`}
-            </h3>
-            <p className="co2-widget-copy">
-              {historyDelta === null
-                ? "Vul de vragenlijst nog eens in om je voortgang te kunnen vergelijken."
-                : "Vergelijking met je laatst opgeslagen meting uit je historie."}
-            </p>
-            <div className="insight-meta-row">
-              <span>Historie</span>
-              <strong>{history.length} metingen</strong>
-            </div>
-            <button
-              type="button"
-              className="insight-action-button"
-              onClick={() => navigate("/tips")}
-            >
-              Bekijk tips
-            </button>
-          </section>
-        </div>
-
-        <div className="home-rail-dots" aria-hidden="true">
-          {Array.from({ length: insightCardsCount }).map((_, index) => (
-            <span
-              key={index}
-              className={`home-rail-dot${index === activeInsightIndex ? " active" : ""}`}
-            />
-          ))}
         </div>
       </section>
 
@@ -895,89 +1115,26 @@ function Home() {
       <section className="home-fact-card">
         <div className="home-fact-header">
           <p className="section-label dark">Feitjes</p>
-          <span className="home-fact-counter">
-            {activeFactIndex + 1}/{facts.length}
-          </span>
+          <div className="home-fact-status">
+            <span
+              className="home-fact-timer"
+              style={{ "--fact-progress": `${factTimerProgress}%` }}
+              aria-hidden="true"
+            />
+            <span className="home-fact-counter">
+              {activeFactIndex + 1}/{facts.length}
+            </span>
+          </div>
         </div>
         <p className="home-fact-text">{facts[activeFactIndex]}</p>
-      </section>
-
-      <section className="home-widget-rail-section">
-        <div className="home-rail-header">
-          <p className="section-label dark">Challenges</p>
-          <span className="home-rail-hint">Level up</span>
-        </div>
-
-        <section className="challenge-card">
-          <div className="challenge-card-top">
-            <div>
-              <p className="section-label dark">Actieve missie</p>
-              <h3 className="challenge-title">{activeChallenge.title}</h3>
-            </div>
-            <span className="challenge-reward">{activeChallenge.reward}</span>
-          </div>
-          <p className="challenge-copy">{activeChallenge.body}</p>
-          <button
-            type="button"
-            className="challenge-button"
-            onClick={activeChallenge.action}
-          >
-            {activeChallenge.button}
-          </button>
-        </section>
-
-        <div className="achievement-grid">
-          {achievements.map((achievement) => (
-            <article key={achievement.title} className="achievement-card">
-              <p className="section-label dark">Badge</p>
-              <h3>{achievement.title}</h3>
-              <div className="achievement-status-row">
-                <span>{achievement.status}</span>
-                <strong>{achievement.progress}%</strong>
-              </div>
-              <div className="achievement-progress">
-                <div
-                  className="achievement-progress-fill"
-                  style={{ width: `${achievement.progress}%` }}
-                />
-              </div>
-            </article>
-          ))}
+        <div className="home-fact-progress" aria-hidden="true">
+          <span
+            className="home-fact-progress-fill"
+            style={{ width: `${factTimerProgress}%` }}
+          />
         </div>
       </section>
 
-      <section className="home-widget-rail-section">
-        <div className="home-rail-header">
-          <p className="section-label dark">Daily quests</p>
-          <span className="home-rail-hint">Vandaag</span>
-        </div>
-
-        <div className="daily-quest-grid">
-          {dailyQuests.map((quest) => (
-            <article key={quest.title} className="daily-quest-card">
-              <div className="daily-quest-top">
-                <h3>{quest.title}</h3>
-                <span className={`daily-quest-points${quest.done ? " done" : ""}`}>
-                  +{quest.points}
-                </span>
-              </div>
-              <p>{quest.detail}</p>
-              <div className={`daily-quest-status${quest.done ? " done" : ""}`}>
-                {quest.done ? "Voltooid" : "Open"}
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className="badge-row">
-          {categoryBadges.map((badge) => (
-            <article key={badge.title} className={`category-badge-card${badge.unlocked ? " unlocked" : ""}`}>
-              <span>{badge.category}</span>
-              <strong>{badge.unlocked ? "Badge vrij" : "Bijna vrij"}</strong>
-            </article>
-          ))}
-        </div>
-      </section>
     </div>
 
       <BottomNav />

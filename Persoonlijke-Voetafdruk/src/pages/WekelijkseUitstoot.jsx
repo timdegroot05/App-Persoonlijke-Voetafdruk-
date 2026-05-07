@@ -1,15 +1,16 @@
+import { useMemo } from "react"
 import InfoPageLayout from "../components/InfoPageLayout"
+import { getStoredWeeklyResults } from "../utils/weeklyResults"
 
 function WekelijkseUitstoot() {
+  const latestWeeklyResult = useMemo(() => getStoredWeeklyResults()[0] ?? null, [])
+  const weeklyEmission = latestWeeklyResult?.totalEmission ?? 0
+
   return (
     <InfoPageLayout
       title="Wekelijkse uitstoot"
       icon="📊"
-      value="70 kg CO2"
-      subtitle="Totaal per week"
-      text="Dit is jouw geschatte CO2-uitstoot over een volledige week."
-      detailTitle="Hoe lees je dit?"
-      detailText="Deze waarde bundelt jouw dagelijkse keuzes in vervoer, voeding en energieverbruik. Zo zie je beter wat jouw totale impact is over meerdere dagen."
+      text={`Dit is jouw geschatte CO2-uitstoot van de laatst opgeslagen week: ${weeklyEmission} kg CO2e.`}
     />
   )
 }

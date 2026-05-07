@@ -1,52 +1,76 @@
 import { useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FiArrowRight, FiAward, FiRefreshCcw } from "react-icons/fi";
 
 import { calculateImpact } from "../utils/calculateImpact";
-import { questions } from "../data/questions";
 import AppHeader from "../components/AppHeader";
-
 import { buildImpactSnapshot, saveImpactSnapshot } from "../utils/impactInsights";
 import { saveQuestionnaire } from "../userService";
 import { getCurrentUser } from "../auth";
+import {
+  getLatestWeeklyAnswers,
+  getProfileAnswers,
+  getWeeklyEntry,
+} from "../utils/questionnaireStorage";
+import {
+  formatWeekRangeLabel,
+  getWeekInfoFromKey,
+} from "../utils/weeklyResults";
 
 function Result() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const answers = useMemo(() => {
-    return JSON.parse(localStorage.getItem("answers")) || [];
+  const activeWeekInfo = useMemo(() => {
+    if (!location.state?.weekKey) return null;
+    return getWeekInfoFromKey(location.state.weekKey);
+  }, [location.state?.weekKey]);
+
+  const weeklyAnswers = useMemo(() => {
+    if (activeWeekInfo?.weekStart) {
+      return getWeeklyEntry(activeWeekInfo.weekStart)?.answers || {};
+    }
+
+    return getLatestWeeklyAnswers() || {};
+  }, [activeWeekInfo?.weekStart]);
+
+  const profileAnswers = useMemo(() => {
+    return getProfileAnswers() || {};
   }, []);
 
-  const result = calculateImpact(answers, questions);
-  const totalScore = Math.max(0, Math.round(100 - result.total));
+  const result = useMemo(() => {
+    return calculateImpact(profileAnswers, weeklyAnswers);
+  }, [profileAnswers, weeklyAnswers]);
+
+  const snapshot = useMemo(() => {
+    return buildImpactSnapshot(profileAnswers, weeklyAnswers);
+  }, [profileAnswers, weeklyAnswers]);
 
   useEffect(() => {
-    if (answers.length === 0) return;
-
-    const snapshot = buildImpactSnapshot(answers);
+    if (Object.keys(weeklyAnswers).length === 0) return;
     saveImpactSnapshot(snapshot);
-  }, [answers]);
+  }, [snapshot, weeklyAnswers]);
 
-  // 🔥 NIEUW: opslaan + doorgaan
   async function handleContinueWithoutAccount() {
     const user = getCurrentUser();
 
     if (!user) {
-      console.error("Geen gebruiker gevonden");
+      navigate("/home");
       return;
     }
 
     const footprint = {
-      dailyCo2: result.total / 7,
-      weeklyCo2: result.total,
-      totalScore: totalScore,
+      dailyCo2: Number((result.total / 7).toFixed(2)),
+      weeklyCo2: Number(result.total.toFixed(2)),
+      totalScore: Number(result.total.toFixed(2)),
     };
 
     try {
-      await saveQuestionnaire(user.uid, answers, footprint);
+      await saveQuestionnaire(user.uid, weeklyAnswers, footprint);
       navigate("/home");
     } catch (error) {
       console.error("Fout bij opslaan:", error);
+      navigate("/home");
     }
   }
 
@@ -56,34 +80,57 @@ function Result() {
 
       <div className="page-section result-content">
         <p className="section-label dark">Jouw persoonlijke uitslag</p>
-        <h1 className="result-title">Jouw Impact</h1>
+        <h1 className="result-title">Jouw weekuitstoot</h1>
 
-        {/* SCORE */}
+        {activeWeekInfo ? (
+          <p className="result-text">
+            Week van{" "}
+            {formatWeekRangeLabel(
+              activeWeekInfo.weekStart,
+              activeWeekInfo.weekEnd
+            )}
+          </p>
+        ) : null}
+
         <div className="result-hero-card">
           <div>
-            <span className="result-hero-label">Duurzaamheidsscore</span>
-            <div className="score">{totalScore}/100</div>
+            <span className="result-hero-label">Totale weekuitstoot</span>
+            <div className="score">{snapshot.weeklyEmission} kg</div>
           </div>
+
           <p className="result-hero-text">
-            Hoe hoger je score, hoe dichter je al bij een duurzamere leefstijl zit.
+            Geschatte uitstoot in kg CO2e per week, berekend uit je basisprofiel
+            en je antwoorden van deze week.
           </p>
         </div>
 
-        {/* CATEGORIEËN */}
         <div className="category-scores">
-          {Object.entries(result.categories).map(([key, value]) => (
-            <div key={key} className="category-score">
-              <strong>{key}</strong>
-              <span>{value} punten</span>
-            </div>
-          ))}
+          <div className="category-score">
+            <strong>Wonen</strong>
+            <span>{result.aangepaste_woninguitstoot} kg CO2e</span>
+          </div>
+
+          <div className="category-score">
+            <strong>Auto</strong>
+            <span>{result.auto_uitstoot} kg CO2e</span>
+          </div>
+
+          <div className="category-score">
+            <strong>OV</strong>
+            <span>{result.ov_uitstoot} kg CO2e</span>
+          </div>
+
+          <div className="category-score">
+            <strong>Voeding</strong>
+            <span>{result.voeding_uitstoot} kg CO2e</span>
+          </div>
+
+          <div className="category-score">
+            <strong>Consumptie</strong>
+            <span>{result.consumptie_uitstoot} kg CO2e</span>
+          </div>
         </div>
 
-        <p className="result-text">
-          Dit overzicht laat zien waar jouw grootste kansen liggen om nog duurzamer te leven.
-        </p>
-
-        {/* ACTIES */}
         <div className="result-actions">
           <button
             className="primary-button result-button"
@@ -102,7 +149,6 @@ function Result() {
           </button>
         </div>
 
-        {/* 🔥 AUTH BLOK */}
         <div className="auth-block">
           <h3>Wil je je resultaat opslaan?</h3>
           <p style={{ color: "#666", marginBottom: "10px" }}>

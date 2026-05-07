@@ -1,21 +1,31 @@
 import { useMemo } from "react"
+import { useNavigate } from "react-router-dom"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import { LuLeaf } from "react-icons/lu"
 import { buildImpactSnapshot, getImpactHistory, getFocusLabel } from "../utils/impactInsights"
+import {
+  getProfileAnswers,
+  getWeeklyEntry,
+} from "../utils/questionnaireStorage"
+import { initialProfileQuestions } from "../data/questionnaires"
+import { getWeeklyCheckinWeekInfo } from "../utils/weeklyResults"
 
 function Profile() {
-  const savedAnswers = JSON.parse(localStorage.getItem("answers")) || []
+  const navigate = useNavigate()
+  const profileAnswers = getProfileAnswers()
+  const activeCheckinWeek = getWeeklyCheckinWeekInfo()
+  const latestWeeklyAnswers = getWeeklyEntry(activeCheckinWeek.weekStart)?.answers || {}
   const weeklyGoal = Number(localStorage.getItem("weekly-goal")) || 150
   const history = useMemo(() => getImpactHistory(), [])
 
   const snapshot = useMemo(() => {
-    if (savedAnswers.length === 0) {
+    if (Object.keys(profileAnswers).length === 0 && Object.keys(latestWeeklyAnswers).length === 0) {
       return null
     }
 
-    return buildImpactSnapshot(savedAnswers)
-  }, [savedAnswers])
+    return buildImpactSnapshot(profileAnswers, latestWeeklyAnswers)
+  }, [latestWeeklyAnswers, profileAnswers])
 
   const weeklyEmission = snapshot?.weeklyEmission ?? 86.8
   const score = snapshot?.totalScore ?? 52
@@ -25,7 +35,7 @@ function Profile() {
   const ecoLevel = Math.max(1, Math.floor(ecoPoints / 120) + 1)
   const categoryBadges = [
     {
-      name: "Vervoer badge",
+      name: "Transport badge",
       unlocked: (snapshot?.categories?.transport ?? 999) <= 10,
     },
     {
@@ -75,7 +85,64 @@ function Profile() {
           </div>
         </section>
 
-        <section className="tips-list">
+        <section className="calculator-card">
+          <p className="section-label dark">Opgeslagen profiel</p>
+          <h2 className="calculator-title">Gegevens</h2>
+          <p className="calculator-text">
+            Deze gegevens worden in je profiel bewaard en je kunt ze later altijd aanpassen.
+          </p>
+
+          <div className="daily-widget-legend">
+            {initialProfileQuestions.map((question) => {
+              if (typeof question.showIf === "function" && !question.showIf(profileAnswers)) {
+                return null
+              }
+
+              return (
+                <div key={question.id} className="daily-widget-legend-item">
+                  <span className="daily-widget-legend-label">
+                    {question.summaryLabel || question.title}
+                  </span>
+                  <strong className="daily-widget-legend-value">
+                    {profileAnswers[question.id]?.text || "Nog niet ingevuld"}
+                  </strong>
+                </div>
+              )
+            })}
+          </div>
+
+          <button
+            type="button"
+            className="goal-edit-button"
+            onClick={() => navigate("/profile-edit", { state: { returnTo: "/profile" } })}
+          >
+            Bewerk profielvragen
+          </button>
+        </section>
+
+        <section className="calculator-card">
+          <p className="section-label dark">Wekelijkse check-in</p>
+          <h2 className="calculator-title">Deze week</h2>
+          <p className="calculator-text">
+            {Object.keys(latestWeeklyAnswers).length > 0
+              ? "Je wekelijkse antwoorden zijn opgeslagen en kunnen opnieuw worden aangepast."
+              : "Je hebt voor deze week nog geen vragenlijst ingevuld."}
+          </p>
+
+          <button
+            type="button"
+            className="goal-edit-button"
+            onClick={() =>
+              navigate("/weekly-edit", {
+                state: { returnTo: "/profile", weekKey: activeCheckinWeek.weekStart },
+              })
+            }
+          >
+            Bewerk wekelijkse vragen
+          </button>
+        </section>
+
+        <section className="tips-list profile-badges-list">
           {categoryBadges.map((badge) => (
             <article key={badge.name} className={`tips-list-card profile-badge-card${badge.unlocked ? " unlocked" : ""}`}>
               <p className="section-label dark">Badge</p>

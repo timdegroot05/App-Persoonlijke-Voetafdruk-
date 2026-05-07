@@ -10,6 +10,8 @@ import WekelijkseUitstoot from "./pages/WekelijkseUitstoot";
 import GemiddeldeWeek from "./pages/overzichtpages/GemiddeldeWeek";
 import GemiddeldeJaar from "./pages/overzichtpages/GemiddeldeJaar";
 import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie";
+import AchtergrondimpactInfo from "./pages/overzichtpages/AchtergrondimpactInfo"
+import WekelijkseActiviteitGeschiedenis from "./pages/overzichtpages/WekelijkseActiviteitGeschiedenis"
 import Activiteiten from "./pages/Activiteiten";
 import FoodTasks from "./pages/tasks/Foodtasks";
 import TransportTasks from "./pages/tasks/Transporttasks";
@@ -19,6 +21,7 @@ import Calculator from "./pages/Calculator";
 import BosVisualisatie from "./pages/BosVisualisatie";
 import Tips from "./pages/Tips";
 import Profile from "./pages/Profile";
+import QuestionnaireEditor from "./pages/QuestionnaireEditor";
 import ScrollToTop from "./components/ScrollToTop";
 
 import { loginAnoniem } from "./auth";
@@ -57,7 +60,10 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Welcome />} />
-        <Route path="/questionnaire" element={<Questionnaire />} />
+        <Route path="/questionnaire" element={<Questionnaire mode="profile" />} />
+        <Route path="/weekly-questionnaire" element={<Questionnaire mode="weekly" />} />
+        <Route path="/profile-edit" element={<QuestionnaireEditor mode="profile" />} />
+        <Route path="/weekly-edit" element={<QuestionnaireEditor mode="weekly" />} />
         <Route path="/result" element={<Result />} />
         <Route path="/overzicht" element={<Overzicht />} />
         <Route path="/dagelijkse-uitstoot" element={<DagelijkseUitstoot />} />
@@ -65,6 +71,8 @@ function App() {
         <Route path="/gemiddelde-week" element={<GemiddeldeWeek />} />
         <Route path="/gemiddelde-jaar" element={<GemiddeldeJaar />} />
         <Route path="/grootste-categorie" element={<GrootsteCategorie />} />
+        <Route path="/achtergrondimpact-info" element={<AchtergrondimpactInfo />} />
+        <Route path="/wekelijkse-activiteit-geschiedenis" element={<WekelijkseActiviteitGeschiedenis />} />
         <Route path="/activiteiten" element={<Activiteiten />} />
         <Route path="/foodTasks" element={<FoodTasks />} />
         <Route path="/transportTasks" element={<TransportTasks />} />

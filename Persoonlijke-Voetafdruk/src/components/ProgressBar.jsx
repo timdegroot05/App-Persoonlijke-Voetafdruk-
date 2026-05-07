@@ -1,28 +1,23 @@
-function ProgressBar({current, total}){
+function ProgressBar({ current, total }) {
+  const rawPercentage = total > 0 ? (current / total) * 100 : 0
+  const percentage = Number(rawPercentage.toFixed(1))
+  const label =
+    Number.isInteger(percentage) ? `${percentage}%` : `${percentage.toFixed(1)}%`
 
-  const percentage = Math.round((current / total) * 100)
-
-  return(
-
+  return (
     <div className="progress-container">
-
       <div className="progress-text">
-        {percentage}%
+        {label}
       </div>
 
       <div className="progress-bar">
-
         <div
           className="progress"
-          style={{width:`${percentage}%`}}
+          style={{ width: `${percentage}%` }}
         />
-
       </div>
-
     </div>
-
   )
-
 }
 
 export default ProgressBar
