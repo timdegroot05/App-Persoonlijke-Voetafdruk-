@@ -1,13 +1,15 @@
-import { Routes, Route } from "react-router-dom"
-import Welcome from "./pages/Welcome"
-import Questionnaire from "./pages/Questionnaire"
-import Result from "./pages/Result"
-import Overzicht from "./pages/overzichtpages/Overzicht"
-import DagelijkseUitstoot from "./pages/overzichtpages/DagelijkseUitstoot"
-import WekelijkseUitstoot from "./pages/WekelijkseUitstoot"
-import GemiddeldeWeek from "./pages/overzichtpages/GemiddeldeWeek"
-import GemiddeldeJaar from "./pages/overzichtpages/GemiddeldeJaar"
-import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie"
+import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+
+import Welcome from "./pages/Welcome";
+import Questionnaire from "./pages/Questionnaire";
+import Result from "./pages/Result";
+import Overzicht from "./pages/overzichtpages/Overzicht";
+import DagelijkseUitstoot from "./pages/overzichtpages/DagelijkseUitstoot";
+import WekelijkseUitstoot from "./pages/WekelijkseUitstoot";
+import GemiddeldeWeek from "./pages/overzichtpages/GemiddeldeWeek";
+import GemiddeldeJaar from "./pages/overzichtpages/GemiddeldeJaar";
+import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie";
 import AchtergrondimpactInfo from "./pages/overzichtpages/AchtergrondimpactInfo"
 import WekelijkseActiviteitGeschiedenis from "./pages/overzichtpages/WekelijkseActiviteitGeschiedenis"
 import Activiteiten from "./pages/Activiteiten";
@@ -21,11 +23,38 @@ import Tips from "./pages/Tips";
 import Profile from "./pages/Profile";
 import QuestionnaireEditor from "./pages/QuestionnaireEditor";
 import ScrollToTop from "./components/ScrollToTop";
-import "./App.css"
 
+import { loginAnoniem } from "./auth";
+import { createUserDocument } from "./userService";
 
+import Login from "./pages/Login"
+import Register from "./pages/Register"
+
+import "./App.css";
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function setupUser() {
+      try {
+        const user = await loginAnoniem();
+        await createUserDocument(user);
+        console.log("User klaar:", user.uid);
+      } catch (error) {
+        console.error("Fout bij auth setup:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    setupUser();
+  }, []);
+
+  if (loading) {
+    return <p>Laden...</p>;
+  }
+
   return (
     <>
       <ScrollToTop />
@@ -53,9 +82,11 @@ function App() {
         <Route path="/bos" element={<BosVisualisatie />} />
         <Route path="/tips" element={<Tips />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
