@@ -39,7 +39,11 @@ function App() {
     async function setupUser() {
       try {
         const user = await loginAnoniem();
-        await createUserDocument(user);
+        try {
+          await createUserDocument(user);
+        } catch (firestoreError) {
+          console.warn("Firebase profielopslag overgeslagen:", firestoreError);
+        }
         console.log("User klaar:", user.uid);
       } catch (error) {
         console.error("Fout bij auth setup:", error);
