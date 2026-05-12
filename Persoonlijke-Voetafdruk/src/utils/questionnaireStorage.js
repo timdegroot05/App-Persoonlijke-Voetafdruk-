@@ -1,18 +1,10 @@
+import { getCurrentWeekInfo, getWeeklyCheckinWeekInfo } from "./weeklyResults"
+
 const PROFILE_KEY = "profile-questionnaire"
 const WEEKLY_KEY = "weekly-questionnaire-history"
 
 export function getWeekKey(date = new Date()) {
-  const localDate = new Date(date)
-  const day = localDate.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  localDate.setHours(0, 0, 0, 0)
-  localDate.setDate(localDate.getDate() + diff)
-
-  const year = localDate.getFullYear()
-  const month = String(localDate.getMonth() + 1).padStart(2, "0")
-  const dayOfMonth = String(localDate.getDate()).padStart(2, "0")
-
-  return `${year}-${month}-${dayOfMonth}`
+  return getCurrentWeekInfo(date).weekStart
 }
 
 export function getProfileAnswers() {
@@ -62,5 +54,5 @@ export function saveWeeklyAnswers(answers, weekKey = getWeekKey()) {
 }
 
 export function isWeeklyQuestionnaireDue() {
-  return !getWeeklyEntry()
+  return !getWeeklyEntry(getWeeklyCheckinWeekInfo().weekStart)
 }

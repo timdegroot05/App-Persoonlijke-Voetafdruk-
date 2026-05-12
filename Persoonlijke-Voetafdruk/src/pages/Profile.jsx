@@ -1,22 +1,39 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
-import { LuLeaf } from "react-icons/lu"
+import { LuBell, LuLeaf } from "react-icons/lu"
 import { buildImpactSnapshot, getImpactHistory, getFocusLabel } from "../utils/impactInsights"
 import {
   getProfileAnswers,
-  getWeekKey,
   getWeeklyEntry,
 } from "../utils/questionnaireStorage"
 import { initialProfileQuestions } from "../data/questionnaires"
+import { getWeeklyCheckinWeekInfo } from "../utils/weeklyResults"
+import {
+  getNotificationPermission,
+  getNotificationSettings,
+  isNotificationSupported,
+  requestNotificationPermission,
+  saveNotificationSettings,
+  sendTestNotification,
+} from "../utils/notifications"
 
 function Profile() {
   const navigate = useNavigate()
   const profileAnswers = getProfileAnswers()
-  const latestWeeklyAnswers = getWeeklyEntry(getWeekKey())?.answers || {}
+  const activeCheckinWeek = getWeeklyCheckinWeekInfo()
+  const latestWeeklyAnswers = getWeeklyEntry(activeCheckinWeek.weekStart)?.answers || {}
   const weeklyGoal = Number(localStorage.getItem("weekly-goal")) || 150
   const history = useMemo(() => getImpactHistory(), [])
+  const [notificationSettings, setNotificationSettings] = useState(() =>
+    getNotificationSettings()
+  )
+  const [notificationPermission, setNotificationPermission] = useState(() =>
+    getNotificationPermission()
+  )
+  const [notificationStatusText, setNotificationStatusText] = useState("")
+  const [notificationPreview, setNotificationPreview] = useState(null)
 
   const snapshot = useMemo(() => {
     if (Object.keys(profileAnswers).length === 0 && Object.keys(latestWeeklyAnswers).length === 0) {
@@ -34,7 +51,7 @@ function Profile() {
   const ecoLevel = Math.max(1, Math.floor(ecoPoints / 120) + 1)
   const categoryBadges = [
     {
-      name: "Vervoer badge",
+      name: "Transport badge",
       unlocked: (snapshot?.categories?.transport ?? 999) <= 10,
     },
     {
@@ -50,6 +67,58 @@ function Profile() {
       unlocked: savedKg >= 20,
     },
   ]
+  const notificationSupported = isNotificationSupported()
+  const notificationPermissionLabel = {
+    granted: "Toegestaan",
+    denied: "Geblokkeerd",
+    default: "Nog niet gekozen",
+    unsupported: "Niet ondersteund",
+  }[notificationPermission]
+
+  const updateNotificationSetting = async (key, value) => {
+    if (value) {
+      const permission = await requestNotificationPermission()
+      setNotificationPermission(permission)
+
+      if (permission !== "granted") {
+        setNotificationStatusText(
+          permission === "denied"
+            ? "Notificaties zijn geblokkeerd in je browser."
+            : "Deze browser ondersteunt geen notificaties."
+        )
+        return
+      }
+    }
+
+    const nextSettings = saveNotificationSettings({ [key]: value })
+    setNotificationSettings(nextSettings)
+    setNotificationStatusText(value ? "Notificatie staat aan." : "Notificatie staat uit.")
+  }
+
+  const handleTestNotification = async () => {
+    const testResult = await sendTestNotification()
+    const permission =
+      typeof testResult === "string" ? testResult : testResult.permission
+    setNotificationPermission(permission)
+
+    if (permission === "granted") {
+      setNotificationStatusText(`Testmelding verzonden om ${testResult.timestamp}.`)
+      setNotificationPreview({
+        title: "Persoonlijke Voetafdruk",
+        body: `Testmelding verzonden om ${testResult.timestamp}.`,
+      })
+      return
+    }
+
+    if (permission === "denied") {
+      setNotificationStatusText("Notificaties zijn geblokkeerd in je browser.")
+      setNotificationPreview(null)
+      return
+    }
+
+    setNotificationStatusText("Deze browser ondersteunt geen notificaties.")
+    setNotificationPreview(null)
+  }
 
   return (
     <div className="calculator-page profile-page">
@@ -82,6 +151,77 @@ function Profile() {
               <strong>{history.length} metingen</strong>
             </div>
           </div>
+        </section>
+
+        <section className="calculator-card notification-card">
+          <div className="notification-card-top">
+            <div>
+              <p className="section-label dark">Notificaties</p>
+              <h2 className="calculator-title">Reminders</h2>
+            </div>
+            <span className="notification-card-icon">
+              <LuBell />
+            </span>
+          </div>
+
+          <p className="calculator-text">
+            Zet meldingen aan voor je weekcheck-in en test direct of je browser
+            ze kan tonen.
+          </p>
+
+          <div className="notification-status-row">
+            <span>Status</span>
+            <strong>{notificationPermissionLabel}</strong>
+          </div>
+
+          <label className="notification-toggle">
+            <span>
+              <strong>Weekcheck-in reminder</strong>
+              <small>Melding wanneer je wekelijkse vragenlijst klaarstaat.</small>
+            </span>
+            <input
+              type="checkbox"
+              checked={notificationSettings.weeklyCheckin}
+              onChange={(event) =>
+                updateNotificationSetting("weeklyCheckin", event.target.checked)
+              }
+            />
+          </label>
+
+          <label className="notification-toggle">
+            <span>
+              <strong>Dagelijkse tip</strong>
+              <small>Ontvang een tip wanneer je de app opent.</small>
+            </span>
+            <input
+              type="checkbox"
+              checked={notificationSettings.dailyTip}
+              onChange={(event) =>
+                updateNotificationSetting("dailyTip", event.target.checked)
+              }
+            />
+          </label>
+
+          <button
+            type="button"
+            className="goal-edit-button"
+            onClick={handleTestNotification}
+            disabled={!notificationSupported}
+          >
+            Test notificatie
+          </button>
+
+          {notificationStatusText ? (
+            <p className="notification-helper-text">{notificationStatusText}</p>
+          ) : null}
+
+          {notificationPreview ? (
+            <div className="notification-preview">
+              <span>Voorbeeld</span>
+              <strong>{notificationPreview.title}</strong>
+              <p>{notificationPreview.body}</p>
+            </div>
+          ) : null}
         </section>
 
         <section className="calculator-card">
@@ -133,7 +273,7 @@ function Profile() {
             className="goal-edit-button"
             onClick={() =>
               navigate("/weekly-edit", {
-                state: { returnTo: "/profile", weekKey: getWeekKey() },
+                state: { returnTo: "/profile", weekKey: activeCheckinWeek.weekStart },
               })
             }
           >

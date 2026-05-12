@@ -1,17 +1,35 @@
 import { useEffect, useMemo } from "react"
-import { useNavigate } from "react-router-dom"
-import { FiArrowRight, FiAward, FiRefreshCcw } from "react-icons/fi"
+import { useLocation, useNavigate } from "react-router-dom"
+import { FiArrowRight, FiAward } from "react-icons/fi"
 import { calculateImpact } from "../utils/calculateImpact"
 import AppHeader from "../components/AppHeader"
 import { buildImpactSnapshot, saveImpactSnapshot } from "../utils/impactInsights"
-import { getLatestWeeklyAnswers, getProfileAnswers } from "../utils/questionnaireStorage"
+import {
+  getLatestWeeklyAnswers,
+  getProfileAnswers,
+  getWeeklyEntry,
+} from "../utils/questionnaireStorage"
+import {
+  formatWeekRangeLabel,
+  getWeekInfoFromKey,
+} from "../utils/weeklyResults"
 
 function Result() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const activeWeekInfo = useMemo(
+    () =>
+      location.state?.weekKey ? getWeekInfoFromKey(location.state.weekKey) : null,
+    [location.state?.weekKey]
+  )
 
   const weeklyAnswers = useMemo(() => {
+    if (activeWeekInfo?.weekStart) {
+      return getWeeklyEntry(activeWeekInfo.weekStart)?.answers || {}
+    }
+
     return getLatestWeeklyAnswers()
-  }, [])
+  }, [activeWeekInfo?.weekStart])
   const profileAnswers = useMemo(() => getProfileAnswers(), [])
   const result = useMemo(
     () => calculateImpact(profileAnswers, weeklyAnswers),
@@ -37,6 +55,11 @@ function Result() {
       <div className="page-section result-content">
       <p className="section-label dark">Jouw persoonlijke uitslag</p>
       <h1 className="result-title">Jouw weekuitstoot</h1>
+      {activeWeekInfo ? (
+        <p className="result-text">
+          Week van {formatWeekRangeLabel(activeWeekInfo.weekStart, activeWeekInfo.weekEnd)}
+        </p>
+      ) : null}
 
       <div className="result-hero-card">
         <div>
@@ -71,10 +94,6 @@ function Result() {
         </div>
       </div>
 
-      <p className="result-text">
-        Indicatieve score: {snapshot.totalScore}/100. Dit overzicht laat zien welke onderdelen deze week het meest bijdragen aan je uitstoot.
-      </p>
-
       <div className="result-actions">
         <button
           className="primary-button result-button"
@@ -82,14 +101,6 @@ function Result() {
         >
           Naar Home
           <FiArrowRight />
-        </button>
-
-        <button
-          className="secondary-button"
-          onClick={() => navigate("/weekly-questionnaire")}
-        >
-          <FiRefreshCcw />
-          Wekelijkse vragenlijst opnieuw invullen
         </button>
       </div>
       </div>

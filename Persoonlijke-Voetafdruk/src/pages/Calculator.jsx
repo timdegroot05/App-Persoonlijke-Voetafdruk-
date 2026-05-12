@@ -54,7 +54,7 @@ const transportOptions = [
   {
     id: "trein",
     label: "Trein",
-    note: "Trein is een aparte categorie binnen het vervoersmodel.",
+    note: "Trein is een aparte categorie binnen het transportmodel.",
   },
   {
     id: "anderOv",
@@ -129,7 +129,7 @@ function Calculator() {
         <p className="section-label dark">Slim rekenen</p>
         <h1 className="calculator-title">CO2 Calculator</h1>
         <p className="calculator-text">
-          Maak een snelle berekening van je vervoer en zie hoeveel uitstoot je
+          Maak een snelle berekening van je transport en zie hoeveel uitstoot je
           ritten ongeveer veroorzaken.
         </p>
 

@@ -188,6 +188,132 @@
   color: white;
 }
 
+.overzicht-history-card {
+  margin-bottom: 14px;
+}
+
+.overzicht-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.overzicht-history-button {
+  border: none;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #dbe8d8;
+  color: #1f6b2a;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.overzicht-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.overzicht-history-item {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.overzicht-history-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.overzicht-history-top strong {
+  display: block;
+  margin-top: 4px;
+  color: #1f2d20;
+  font-size: 16px;
+  font-family: var(--font-display);
+}
+
+.overzicht-history-kicker {
+  color: #5f705f;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.overzicht-history-total {
+  color: #1f6b2a;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  white-space: nowrap;
+}
+
+.overzicht-history-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.overzicht-history-categories span {
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #edf3e8;
+  color: #506250;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.overzicht-history-comparison,
+.overzicht-history-empty {
+  margin: 12px 0 0;
+  color: #506250;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.overzicht-history-swipe-section {
+  margin-bottom: 14px;
+}
+
+.overzicht-history-swipe-rail {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0 8px;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.overzicht-history-swipe-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.overzicht-history-swipe-rail::after {
+  content: "";
+  flex: 0 0 max(12px, calc(100% - 260px));
+}
+
+.overzicht-history-swipe-card {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+  padding: 16px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #f7f7f2 0%, #eff3eb 100%);
+  box-shadow: 0 10px 24px rgba(31, 45, 32, 0.08);
+}
+
 .overzicht-buttons {
   display: flex;
   flex-direction: column;
@@ -227,5 +353,9 @@
 
   .overzicht-summary-card h2 {
     font-size: 22px;
+  }
+
+  .overzicht-history-swipe-card {
+    flex-basis: calc(100vw - 32px);
   }
 }

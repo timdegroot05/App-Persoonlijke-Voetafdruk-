@@ -10,14 +10,18 @@ import QuestionCard from "../components/QuestionCard"
 import ProgressBar from "../components/ProgressBar"
 import CategoryNav from "../components/CategoryNav"
 import AppHeader from "../components/AppHeader"
+import { calculateImpact } from "../utils/calculateImpact"
 import {
   getProfileAnswers,
-  getWeekKey,
   getWeeklyEntry,
-  isWeeklyQuestionnaireDue,
   saveProfileAnswers,
   saveWeeklyAnswers,
 } from "../utils/questionnaireStorage"
+import {
+  getWeekInfoFromKey,
+  getWeeklyCheckinWeekInfo,
+  saveWeeklyResult,
+} from "../utils/weeklyResults"
 import "../App.css"
 
 function Questionnaire({ mode = "profile" }) {
@@ -28,13 +32,19 @@ function Questionnaire({ mode = "profile" }) {
     mode === "weekly"
       ? ["voeding", "transport", "consumptie", "energie"]
       : ["wonen", "energie", "transport"]
+  const activeWeekInfo =
+    mode === "weekly"
+      ? location.state?.weekKey
+        ? getWeekInfoFromKey(location.state.weekKey)
+        : getWeeklyCheckinWeekInfo()
+      : null
   const initialAnswers = useMemo(() => {
     if (mode === "weekly") {
-      return getWeeklyEntry(location.state?.weekKey || getWeekKey())?.answers || {}
+      return getWeeklyEntry(activeWeekInfo?.weekStart)?.answers || {}
     }
 
     return getProfileAnswers()
-  }, [location.state?.weekKey, mode])
+  }, [activeWeekInfo?.weekStart, mode])
   const [answers, setAnswers] = useState(initialAnswers)
   const visibleQuestions = useMemo(() => {
     const filteredQuestions = getVisibleQuestions(questionnaireSource, answers)
@@ -80,8 +90,14 @@ function Questionnaire({ mode = "profile" }) {
       setCurrentQuestion(currentQuestion + 1)
     } else {
       if (mode === "weekly") {
-        saveWeeklyAnswers(newAnswers, location.state?.weekKey || getWeekKey())
-        navigate(location.state?.returnTo || "/result")
+        saveWeeklyAnswers(newAnswers, activeWeekInfo.weekStart)
+        saveWeeklyResult(
+          calculateImpact(getProfileAnswers(), newAnswers),
+          activeWeekInfo
+        )
+        navigate(location.state?.returnTo || "/result", {
+          state: { weekKey: activeWeekInfo.weekStart },
+        })
         return
       }
 
@@ -89,11 +105,6 @@ function Questionnaire({ mode = "profile" }) {
 
       if (location.state?.returnTo) {
         navigate(location.state.returnTo)
-        return
-      }
-
-      if (isWeeklyQuestionnaireDue()) {
-        navigate("/weekly-questionnaire")
         return
       }
 

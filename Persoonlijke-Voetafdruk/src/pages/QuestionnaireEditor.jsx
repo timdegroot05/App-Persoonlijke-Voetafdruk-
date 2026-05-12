@@ -2,6 +2,7 @@ import { useMemo, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { FiCheckCircle, FiEdit3 } from "react-icons/fi"
 import AppHeader from "../components/AppHeader"
+import { calculateImpact } from "../utils/calculateImpact"
 import {
   getVisibleQuestions,
   initialProfileQuestions,
@@ -9,20 +10,30 @@ import {
 import { weeklyQuestions } from "../data/questions"
 import {
   getProfileAnswers,
-  getWeekKey,
   getWeeklyEntry,
   saveProfileAnswers,
   saveWeeklyAnswers,
 } from "../utils/questionnaireStorage"
+import {
+  getWeekInfoFromKey,
+  getWeeklyCheckinWeekInfo,
+  saveWeeklyResult,
+} from "../utils/weeklyResults"
 import "../App.css"
 
 function QuestionnaireEditor({ mode = "profile" }) {
   const navigate = useNavigate()
   const location = useLocation()
   const questions = mode === "weekly" ? weeklyQuestions : initialProfileQuestions
+  const activeWeekInfo =
+    mode === "weekly"
+      ? location.state?.weekKey
+        ? getWeekInfoFromKey(location.state.weekKey)
+        : getWeeklyCheckinWeekInfo()
+      : null
   const [answers, setAnswers] = useState(() => {
     if (mode === "weekly") {
-      return getWeeklyEntry(location.state?.weekKey || getWeekKey())?.answers || {}
+      return getWeeklyEntry(activeWeekInfo?.weekStart)?.answers || {}
     }
 
     return getProfileAnswers()
@@ -53,7 +64,11 @@ function QuestionnaireEditor({ mode = "profile" }) {
     }, {})
 
     if (mode === "weekly") {
-      saveWeeklyAnswers(cleanedAnswers, location.state?.weekKey || getWeekKey())
+      saveWeeklyAnswers(cleanedAnswers, activeWeekInfo.weekStart)
+      saveWeeklyResult(
+        calculateImpact(getProfileAnswers(), cleanedAnswers),
+        activeWeekInfo
+      )
     } else {
       saveProfileAnswers(cleanedAnswers)
     }
