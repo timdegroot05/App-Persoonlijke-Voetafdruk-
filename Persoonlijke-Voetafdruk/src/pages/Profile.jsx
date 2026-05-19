@@ -1,12 +1,17 @@
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import { LuLeaf } from "react-icons/lu"
-import { buildImpactSnapshot, getImpactHistory, getFocusLabel } from "../utils/impactInsights"
+import { logoutGebruiker } from "../auth"
+import { watchAuthState } from "../authState"
+import { getUserName } from "../userService"
+import { buildImpactSnapshot, getFocusLabel, getImpactHistory } from "../utils/impactInsights"
 import {
   getProfileAnswers,
+  getProfileUsername,
   getWeeklyEntry,
+  saveProfileUsername,
 } from "../utils/questionnaireStorage"
 import { initialProfileQuestions } from "../data/questionnaires"
 import { getWeeklyCheckinWeekInfo } from "../utils/weeklyResults"
@@ -39,6 +44,8 @@ function getProgressStatus(savedKg, hasWeeklyAnswers) {
 
 function Profile() {
   const navigate = useNavigate()
+  const [currentUser, setCurrentUser] = useState(null)
+  const [username, setUsername] = useState(() => getProfileUsername())
   const profileAnswers = getProfileAnswers()
   const activeCheckinWeek = getWeeklyCheckinWeekInfo()
   const latestWeeklyAnswers = getWeeklyEntry(activeCheckinWeek.weekStart)?.answers || {}
@@ -46,6 +53,33 @@ function Profile() {
   const history = useMemo(() => getImpactHistory(), [])
   const hasProfileAnswers = Object.keys(profileAnswers).length > 0
   const hasWeeklyAnswers = Object.keys(latestWeeklyAnswers).length > 0
+
+  useEffect(() => {
+    return watchAuthState((user) => {
+      setCurrentUser(user)
+    })
+  }, [])
+
+  useEffect(() => {
+    async function loadStoredUserName() {
+      if (!currentUser?.uid || currentUser.isAnonymous) {
+        return
+      }
+
+      try {
+        const storedName = await getUserName(currentUser.uid)
+
+        if (storedName) {
+          saveProfileUsername(storedName)
+          setUsername(storedName)
+        }
+      } catch (error) {
+        console.error("Fout bij ophalen gebruikersnaam:", error)
+      }
+    }
+
+    loadStoredUserName()
+  }, [currentUser])
 
   const snapshot = useMemo(() => {
     if (!hasProfileAnswers && !hasWeeklyAnswers) {
@@ -59,6 +93,13 @@ function Profile() {
   const focusLabel = getFocusLabel(snapshot?.dominantCategory ?? "energie")
   const savedKg = Math.max(0, Number((weeklyGoal - weeklyEmission).toFixed(1)))
   const progressStatus = getProgressStatus(savedKg, hasWeeklyAnswers)
+  const hasLinkedAccount = Boolean(currentUser && !currentUser.isAnonymous)
+  const displayName = username || currentUser?.displayName || "Gebruiker"
+  const accountLabel = hasLinkedAccount
+    ? currentUser.email || "Ingelogd account"
+    : currentUser
+      ? "Anonieme sessie"
+      : "Niet ingelogd"
   const profileBadges = [
     {
       name: "Profiel klaar",
@@ -88,16 +129,30 @@ function Profile() {
 
       <div className="tips-content">
         <section className="calculator-card profile-hero-card">
-          <p className="section-label dark">Mijn voortgang</p>
-          <h1 className="calculator-title">{progressStatus.title}</h1>
-          <p className="calculator-text">
-            {progressStatus.text}
-          </p>
+          <p className="section-label dark">Profiel</p>
+          <h1 className="calculator-title">{displayName}</h1>
+
+          <div className={`profile-auth-banner${hasLinkedAccount ? " logged-in" : ""}`}>
+            <span className="profile-auth-kicker">
+              {hasLinkedAccount ? "Ingelogd" : "Accountstatus"}
+            </span>
+            <strong>{accountLabel}</strong>
+          </div>
+
+          <div className="profile-name-editor">
+            <button
+              type="button"
+              className="goal-edit-button profile-account-button"
+              onClick={() => navigate("/account-gegevens")}
+            >
+              Bewerk accountgegevens
+            </button>
+          </div>
 
           <div className="profile-summary-card">
-            <span>Deze week</span>
+            <span>{progressStatus.title}</span>
             <strong>{weeklyEmission} kg CO₂e</strong>
-            <p>Doel: {weeklyGoal} kg CO₂e</p>
+            <p>{progressStatus.text} Doel: {weeklyGoal} kg CO₂e</p>
           </div>
 
           <div className="profile-hero-grid">
@@ -162,6 +217,27 @@ function Profile() {
           >
             Bewerk profielvragen
           </button>
+
+          {hasLinkedAccount ? (
+            <button
+              type="button"
+              className="secondary-button profile-register-button"
+              onClick={async () => {
+                await logoutGebruiker()
+                navigate("/login")
+              }}
+            >
+              Uitloggen
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="primary-button result-button profile-register-button"
+              onClick={() => navigate("/register")}
+            >
+              Account aanmaken
+            </button>
+          )}
         </section>
 
         <section className="calculator-card">

@@ -2,6 +2,7 @@ import { getCurrentWeekInfo, getWeeklyCheckinWeekInfo } from "./weeklyResults"
 
 const PROFILE_KEY = "profile-questionnaire"
 const WEEKLY_KEY = "weekly-questionnaire-history"
+const USERNAME_KEY = "profile-username"
 
 export function getWeekKey(date = new Date()) {
   return getCurrentWeekInfo(date).weekStart
@@ -22,6 +23,20 @@ export function saveProfileAnswers(answers) {
 
 export function hasCompletedProfileQuestionnaire() {
   return Object.keys(getProfileAnswers()).length > 0
+}
+
+export function getProfileUsername() {
+  try {
+    return localStorage.getItem(USERNAME_KEY) || ""
+  } catch {
+    return ""
+  }
+}
+
+export function saveProfileUsername(username) {
+  const cleanedUsername = String(username || "").trim()
+  localStorage.setItem(USERNAME_KEY, cleanedUsername)
+  return cleanedUsername
 }
 
 export function getWeeklyHistory() {

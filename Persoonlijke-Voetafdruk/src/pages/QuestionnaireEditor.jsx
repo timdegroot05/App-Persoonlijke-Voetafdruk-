@@ -89,9 +89,6 @@ function QuestionnaireEditor({ mode = "profile" }) {
           <h1 className="calculator-title">
             {mode === "weekly" ? "Pas je week aan" : "Pas je profiel aan"}
           </h1>
-          <p className="calculator-text">
-            Je kunt hieronder losse antwoorden aanpassen zonder de hele vragenlijst opnieuw stap voor stap te doorlopen.
-          </p>
         </section>
 
         <section className="question-editor-list">

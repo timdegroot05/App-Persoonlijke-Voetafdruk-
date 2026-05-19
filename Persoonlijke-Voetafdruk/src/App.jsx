@@ -21,6 +21,7 @@ import Calculator from "./pages/Calculator";
 import BosVisualisatie from "./pages/BosVisualisatie";
 import Tips from "./pages/Tips";
 import Profile from "./pages/Profile";
+import AccountGegevens from "./pages/AccountGegevens";
 import QuestionnaireEditor from "./pages/QuestionnaireEditor";
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -86,6 +87,7 @@ function App() {
         <Route path="/bos" element={<BosVisualisatie />} />
         <Route path="/tips" element={<Tips />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/account-gegevens" element={<AccountGegevens />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
       </Routes>

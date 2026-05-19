@@ -29,10 +29,8 @@ export async function createUserDocument(user) {
         totalScore: 0,
       },
       questionnaireAnswers: {
-        food: {},
-        transport: {},
-        energy: {},
-        home: {},
+        profile: {},
+        weekly: {},
       },
     });
   } else {
@@ -53,18 +51,54 @@ export async function createUserDocument(user) {
  * Slaat de ingevulde vragenlijst en berekende footprint op.
  * Deze functie update alleen de data die met de vragenlijst te maken heeft.
  */
-export async function saveQuestionnaire(uid, answers, footprint) {
+export async function saveQuestionnaire(uid, weeklyAnswers, footprint, profileAnswers = null) {
   if (!uid) return;
 
   const userRef = doc(db, "users", uid);
+  const nextQuestionnaireAnswers =
+    profileAnswers === null
+      ? weeklyAnswers
+      : {
+          profile: profileAnswers,
+          weekly: weeklyAnswers,
+        };
 
   await setDoc(
     userRef,
     {
-      questionnaireAnswers: answers,
+      questionnaireAnswers: nextQuestionnaireAnswers,
       latestFootprint: footprint,
       updatedAt: serverTimestamp(),
     },
     { merge: true }
   );
+}
+
+export async function saveUserName(uid, name) {
+  if (!uid) return;
+
+  const cleanedName = String(name || "").trim();
+  const userRef = doc(db, "users", uid);
+
+  await setDoc(
+    userRef,
+    {
+      name: cleanedName || "Gebruiker",
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+export async function getUserName(uid) {
+  if (!uid) return "";
+
+  const userRef = doc(db, "users", uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) {
+    return "";
+  }
+
+  return userSnap.data()?.name || "";
 }

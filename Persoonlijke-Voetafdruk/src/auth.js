@@ -8,6 +8,7 @@ import {
   EmailAuthProvider,
   linkWithCredential,
   signOut,
+  updateProfile,
 } from "firebase/auth";
 
 /**
@@ -55,5 +56,17 @@ export async function logoutGebruiker() {
  * Geeft de huidige gebruiker terug.
  */
 export function getCurrentUser() {
+  return auth.currentUser;
+}
+
+export async function updateCurrentUserName(name) {
+  if (!auth.currentUser) {
+    throw new Error("Geen huidige gebruiker gevonden.");
+  }
+
+  await updateProfile(auth.currentUser, {
+    displayName: String(name || "").trim() || null,
+  });
+
   return auth.currentUser;
 }

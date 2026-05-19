@@ -13,7 +13,7 @@ function WekelijkseActiviteitGeschiedenis() {
   const railRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const weeklyHistory = useMemo(
-    () => buildWeeklyOverviewItems(getStoredWeeklyResults()).slice(1),
+    () => buildWeeklyOverviewItems(getStoredWeeklyResults()).slice(1).reverse(),
     []
   )
 

@@ -3,16 +3,17 @@
 }
 
 :root {
-  --page-bg: #f4f4f1;
-  --card-soft: #f7f6f0;
-  --card-mint: #e7f3e8;
-  --card-cream: #f5f1e6;
-  --card-sage: #edf4ea;
+  --page-bg: #e7ede4;
+  --card-soft: #f9fbf7;
+  --card-mint: #edf6ec;
+  --card-cream: #fbf7ee;
+  --card-sage: #f0f6ed;
   --text-main: #1f2d20;
   --text-muted: #5f705f;
   --brand-dark: #1f6b2a;
   --brand-darker: #174f20;
-  --shadow-soft: 0 12px 28px rgba(31, 45, 32, 0.08);
+  --shadow-soft: 0 14px 30px rgba(31, 45, 32, 0.09);
+  --card-border: rgba(31, 45, 32, 0.08);
 }
 
 body {
@@ -49,6 +50,9 @@ body {
   flex-direction: column;
   height: calc(100dvh - 32px);
   overflow: hidden;
+  background:
+    radial-gradient(circle at top center, rgba(255, 255, 255, 0.34), transparent 38%),
+    linear-gradient(180deg, #eef3ea 0%, var(--page-bg) 100%);
 }
 
 .home-page,
@@ -174,7 +178,8 @@ body {
   margin-bottom: 20px;
   padding: 20px;
   border-radius: 24px;
-  background: linear-gradient(180deg, #f8fbf6 0%, #e9f2e5 100%);
+  background: linear-gradient(180deg, #fcfdfb 0%, #eff5eb 100%);
+  border: 1px solid var(--card-border);
   box-shadow: var(--shadow-soft);
 }
 
@@ -575,7 +580,7 @@ body {
 
 .info-card {
   background: var(--card-soft);
-  border: none;
+  border: 1px solid var(--card-border);
   border-radius: 24px;
   padding: 20px;
   text-align: left;
@@ -591,7 +596,7 @@ body {
 }
 
 .daily-widget-card {
-  background: linear-gradient(180deg, #f1f6ee 0%, #e8f1e4 100%);
+  background: linear-gradient(180deg, #fbfdf9 0%, #edf5e9 100%);
   min-height: 196px;
 }
 
@@ -1012,6 +1017,7 @@ body {
 
 .tip-card {
   background: var(--card-cream);
+  border: 1px solid var(--card-border);
   border-radius: 24px;
   padding: 20px;
   box-shadow: var(--shadow-soft);
@@ -1063,6 +1069,7 @@ body {
   padding: 20px;
   border-radius: 24px;
   background: var(--card-cream);
+  border: 1px solid var(--card-border);
   box-shadow: var(--shadow-soft);
 }
 
@@ -1457,7 +1464,8 @@ body {
 }
 
 .impact-widget {
-  background: linear-gradient(180deg, #eef5ec 0%, #e3eee0 100%);
+  background: linear-gradient(180deg, #fbfdf9 0%, #eaf3e7 100%);
+  border: 1px solid var(--card-border);
   border-radius: 24px;
   padding: 22px;
   margin-bottom: 18px;
@@ -1913,6 +1921,7 @@ body {
 .calculator-card {
   width: auto;
   background: var(--card-soft);
+  border: 1px solid var(--card-border);
   border-radius: 24px;
   padding: 20px;
   box-shadow: var(--shadow-soft);
@@ -3862,6 +3871,72 @@ body {
   margin-bottom: 18px;
 }
 
+.profile-auth-banner {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fbf7ee 0%, #f4ecd9 100%);
+  border: 1px solid rgba(123, 76, 26, 0.14);
+}
+
+.profile-auth-banner.logged-in {
+  background: linear-gradient(180deg, #f2f9f1 0%, #e2f0e1 100%);
+  border-color: rgba(31, 107, 42, 0.14);
+}
+
+.profile-auth-kicker {
+  display: block;
+  margin-bottom: 6px;
+  color: #7b4c1a;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.profile-auth-banner.logged-in .profile-auth-kicker {
+  color: var(--brand-dark);
+}
+
+.profile-auth-banner strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 17px;
+  font-family: var(--font-display);
+}
+
+.profile-auth-banner p {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.profile-name-editor {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(31, 45, 32, 0.08);
+  text-align: center;
+}
+
+.profile-name-save {
+  margin-top: 14px;
+}
+
+.profile-account-button {
+  width: auto;
+  min-width: 220px;
+  margin: 0 auto;
+}
+
+.profile-name-message,
+.profile-summary-text {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 .profile-hero-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3965,6 +4040,10 @@ body {
   color: var(--brand-dark) !important;
   font-size: 12px !important;
   font-weight: 800;
+}
+
+.profile-register-button {
+  margin-top: 12px;
 }
 
 .home-questionnaire-card {
