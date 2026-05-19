@@ -12,7 +12,7 @@ import {
   getPersonalInsight,
 } from "../utils/impactInsights"
 import {
-  getLatestWeeklyAnswers,pih         
+  getLatestWeeklyAnswers,         
   getProfileAnswers,
   hasCompletedProfileQuestionnaire,
 } from "../utils/questionnaireStorage"

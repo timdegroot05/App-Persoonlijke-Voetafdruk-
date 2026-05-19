@@ -61,15 +61,20 @@ export function showAppNotification({ title, body, tag, requireInteraction = fal
     return false
   }
 
-  new Notification(title, {
-    body,
-    tag,
-    icon: "/vite.svg",
-    requireInteraction,
-    silent: false,
-  })
+  try {
+    new Notification(title, {
+      body,
+      tag,
+      icon: "/vite.svg",
+      requireInteraction,
+      silent: false,
+    })
 
-  return true
+    return true
+  } catch (error) {
+    console.warn("Notificatie kon niet worden getoond:", error)
+    return false
+  }
 }
 
 export async function sendTestNotification() {
@@ -85,14 +90,14 @@ export async function sendTestNotification() {
     second: "2-digit",
   })
 
-  showAppNotification({
+  const wasShown = showAppNotification({
     title: "Persoonlijke Voetafdruk",
     body: `Testmelding verzonden om ${timestamp}.`,
     tag: `notification-test-${Date.now()}`,
     requireInteraction: true,
   })
 
-  return { permission, timestamp }
+  return { permission, timestamp, wasShown }
 }
 
 export function maybeShowWeeklyCheckinNotification(weekInfo) {
@@ -122,7 +127,13 @@ export function maybeShowWeeklyCheckinNotification(weekInfo) {
 export function maybeShowDailyTipNotification(tip) {
   const settings = getNotificationSettings()
 
-  if (!settings.dailyTip || !tip?.title || !tip?.body) {
+  if (
+    !settings.dailyTip ||
+    !tip?.title ||
+    !tip?.body ||
+    !isNotificationSupported() ||
+    Notification.permission !== "granted"
+  ) {
     return false
   }
 

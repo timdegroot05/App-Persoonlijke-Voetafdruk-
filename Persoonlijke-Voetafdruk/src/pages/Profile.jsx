@@ -102,7 +102,11 @@ function Profile() {
     setNotificationPermission(permission)
 
     if (permission === "granted") {
-      setNotificationStatusText(`Testmelding verzonden om ${testResult.timestamp}.`)
+      setNotificationStatusText(
+        testResult.wasShown
+          ? `Testmelding verzonden om ${testResult.timestamp}.`
+          : "Browser gaf toestemming, maar kon de melding niet tonen."
+      )
       setNotificationPreview({
         title: "Persoonlijke Voetafdruk",
         body: `Testmelding verzonden om ${testResult.timestamp}.`,
