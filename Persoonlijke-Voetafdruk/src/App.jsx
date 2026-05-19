@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Welcome from "./pages/Welcome";
@@ -35,8 +35,6 @@ import Register from "./pages/Register"
 import "./App.css";
 
 function App() {
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     async function setupUser() {
       try {
@@ -49,17 +47,11 @@ function App() {
         console.log("User klaar:", user.uid);
       } catch (error) {
         console.error("Fout bij auth setup:", error);
-      } finally {
-        setLoading(false);
       }
     }
 
     setupUser();
   }, []);
-
-  if (loading) {
-    return <p>Laden...</p>;
-  }
 
   return (
     <>
