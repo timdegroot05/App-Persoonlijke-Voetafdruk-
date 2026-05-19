@@ -2476,6 +2476,118 @@ body {
   background: linear-gradient(180deg, #eef8ee 0%, #ddf0df 100%);
 }
 
+.notification-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.notification-card-top,
+.notification-status-row,
+.notification-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.notification-card-top {
+  align-items: flex-start;
+}
+
+.notification-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(31, 107, 42, 0.1);
+  color: var(--brand-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-card-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.notification-status-row,
+.notification-toggle {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.notification-status-row span,
+.notification-toggle small {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.notification-status-row strong {
+  color: var(--text-main);
+  font-size: 13px;
+  font-family: var(--font-display);
+}
+
+.notification-toggle span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.notification-toggle strong {
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.notification-toggle input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--brand-dark);
+  flex-shrink: 0;
+}
+
+.notification-helper-text {
+  margin: -4px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.notification-preview {
+  padding: 14px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #eef7ee 0%, #e1f0e2 100%);
+  border: 1px solid rgba(31, 107, 42, 0.12);
+}
+
+.notification-preview span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--brand-dark);
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+}
+
+.notification-preview strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.notification-preview p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .profile-register-button {
   margin-top: 12px;
 }
