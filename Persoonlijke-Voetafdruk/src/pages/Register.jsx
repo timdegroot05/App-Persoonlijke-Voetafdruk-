@@ -5,7 +5,10 @@ import AppHeader from "../components/AppHeader";
 import { registreerNaVragenlijst } from "../auth";
 import { saveQuestionnaire } from "../userService";
 import { calculateImpact } from "../utils/calculateImpact";
-import { questions } from "../data/questions";
+import {
+  getLatestWeeklyAnswers,
+  getProfileAnswers,
+} from "../utils/questionnaireStorage";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -40,17 +43,18 @@ function Register() {
     try {
       const user = await registreerNaVragenlijst(email, password);
 
-      const answers = JSON.parse(localStorage.getItem("answers")) || [];
-      const result = calculateImpact(answers, questions);
+      const profileAnswers = getProfileAnswers() || {};
+      const weeklyAnswers = getLatestWeeklyAnswers() || {};
+      const result = calculateImpact(profileAnswers, weeklyAnswers);
       const totalScore = Math.max(0, Math.round(100 - result.total));
 
       const footprint = {
-        dailyCo2: result.total / 7,
-        weeklyCo2: result.total,
+        dailyCo2: Number((result.total / 7).toFixed(2)),
+        weeklyCo2: Number(result.total.toFixed(2)),
         totalScore,
       };
 
-      await saveQuestionnaire(user.uid, answers, footprint);
+      await saveQuestionnaire(user.uid, weeklyAnswers, footprint, profileAnswers);
       navigate("/home");
     } catch (err) {
       setError("Registratie mislukt. Probeer een ander e-mailadres.");

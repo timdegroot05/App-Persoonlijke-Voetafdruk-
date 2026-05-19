@@ -1126,12 +1126,6 @@ function Home() {
           </div>
         </div>
         <p className="home-fact-text">{facts[activeFactIndex]}</p>
-        <div className="home-fact-progress" aria-hidden="true">
-          <span
-            className="home-fact-progress-fill"
-            style={{ width: `${factTimerProgress}%` }}
-          />
-        </div>
       </section>
 
     </div>

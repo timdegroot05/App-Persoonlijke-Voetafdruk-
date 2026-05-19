@@ -1,12 +1,16 @@
-import { useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import AppHeader from "../components/AppHeader"
 import BottomNav from "../components/BottomNav"
 import { LuBell, LuLeaf } from "react-icons/lu"
-import { buildImpactSnapshot, getImpactHistory, getFocusLabel } from "../utils/impactInsights"
+import { logoutGebruiker } from "../auth"
+import { watchAuthState } from "../authState"
+import { getUserName } from "../userService"
 import {
   getProfileAnswers,
+  getProfileUsername,
   getWeeklyEntry,
+  saveProfileUsername,
 } from "../utils/questionnaireStorage"
 import { initialProfileQuestions } from "../data/questionnaires"
 import { getWeeklyCheckinWeekInfo } from "../utils/weeklyResults"
@@ -21,11 +25,8 @@ import {
 
 function Profile() {
   const navigate = useNavigate()
-  const profileAnswers = getProfileAnswers()
-  const activeCheckinWeek = getWeeklyCheckinWeekInfo()
-  const latestWeeklyAnswers = getWeeklyEntry(activeCheckinWeek.weekStart)?.answers || {}
-  const weeklyGoal = Number(localStorage.getItem("weekly-goal")) || 150
-  const history = useMemo(() => getImpactHistory(), [])
+  const [currentUser, setCurrentUser] = useState(null)
+  const [username, setUsername] = useState(() => getProfileUsername())
   const [notificationSettings, setNotificationSettings] = useState(() =>
     getNotificationSettings()
   )
@@ -34,39 +35,43 @@ function Profile() {
   )
   const [notificationStatusText, setNotificationStatusText] = useState("")
   const [notificationPreview, setNotificationPreview] = useState(null)
+  const profileAnswers = getProfileAnswers()
+  const activeCheckinWeek = getWeeklyCheckinWeekInfo()
 
-  const snapshot = useMemo(() => {
-    if (Object.keys(profileAnswers).length === 0 && Object.keys(latestWeeklyAnswers).length === 0) {
-      return null
+  useEffect(() => {
+    return watchAuthState((user) => {
+      setCurrentUser(user)
+    })
+  }, [])
+
+  useEffect(() => {
+    async function loadStoredUserName() {
+      if (!currentUser?.uid || currentUser.isAnonymous) {
+        return
+      }
+
+      try {
+        const storedName = await getUserName(currentUser.uid)
+
+        if (storedName) {
+          saveProfileUsername(storedName)
+          setUsername(storedName)
+        }
+      } catch (error) {
+        console.error("Fout bij ophalen gebruikersnaam:", error)
+      }
     }
 
-    return buildImpactSnapshot(profileAnswers, latestWeeklyAnswers)
-  }, [latestWeeklyAnswers, profileAnswers])
+    loadStoredUserName()
+  }, [currentUser])
 
-  const weeklyEmission = snapshot?.weeklyEmission ?? 86.8
-  const score = snapshot?.totalScore ?? 52
-  const focusLabel = getFocusLabel(snapshot?.dominantCategory ?? "energie")
-  const savedKg = Math.max(0, Number((weeklyGoal - weeklyEmission).toFixed(1)))
-  const ecoPoints = Math.max(40, Math.round(score * 2 + savedKg * 3 + history.length * 8))
-  const ecoLevel = Math.max(1, Math.floor(ecoPoints / 120) + 1)
-  const categoryBadges = [
-    {
-      name: "Transport badge",
-      unlocked: (snapshot?.categories?.transport ?? 999) <= 10,
-    },
-    {
-      name: "Voeding badge",
-      unlocked: (snapshot?.categories?.voeding ?? 999) <= 8,
-    },
-    {
-      name: "Energie badge",
-      unlocked: (snapshot?.categories?.energie ?? 999) <= 9,
-    },
-    {
-      name: "Bosbouwer",
-      unlocked: savedKg >= 20,
-    },
-  ]
+  const hasLinkedAccount = Boolean(currentUser && !currentUser.isAnonymous)
+  const displayName = username || currentUser?.displayName || "Gebruiker"
+  const accountLabel = hasLinkedAccount
+    ? currentUser.email || "Ingelogd account"
+    : currentUser
+      ? "Anonieme sessie"
+      : "Niet ingelogd"
   const notificationSupported = isNotificationSupported()
   const notificationPermissionLabel = {
     granted: "Toegestaan",
@@ -130,30 +135,24 @@ function Profile() {
 
       <div className="tips-content">
         <section className="calculator-card profile-hero-card">
-          <p className="section-label dark">Jouw status</p>
-          <h1 className="calculator-title">Level {ecoLevel}</h1>
-          <p className="calculator-text">
-            Je profiel bundelt je huidige score, focus en de badges die je al
-            hebt vrijgespeeld.
-          </p>
+          <p className="section-label dark">Profiel</p>
+          <h1 className="calculator-title">{displayName}</h1>
 
-          <div className="profile-hero-grid">
-            <div className="profile-hero-stat">
-              <span>XP</span>
-              <strong>{ecoPoints}</strong>
-            </div>
-            <div className="profile-hero-stat">
-              <span>Focus</span>
-              <strong>{focusLabel}</strong>
-            </div>
-            <div className="profile-hero-stat">
-              <span>Weekdoel</span>
-              <strong>{weeklyGoal} kg</strong>
-            </div>
-            <div className="profile-hero-stat">
-              <span>Historie</span>
-              <strong>{history.length} metingen</strong>
-            </div>
+          <div className={`profile-auth-banner${hasLinkedAccount ? " logged-in" : ""}`}>
+            <span className="profile-auth-kicker">
+              {hasLinkedAccount ? "Ingelogd" : "Accountstatus"}
+            </span>
+            <strong>{accountLabel}</strong>
+          </div>
+
+          <div className="profile-name-editor">
+            <button
+              type="button"
+              className="goal-edit-button profile-account-button"
+              onClick={() => navigate("/account-gegevens")}
+            >
+              Bewerk accountgegevens
+            </button>
           </div>
         </section>
 
@@ -231,9 +230,6 @@ function Profile() {
         <section className="calculator-card">
           <p className="section-label dark">Opgeslagen profiel</p>
           <h2 className="calculator-title">Gegevens</h2>
-          <p className="calculator-text">
-            Deze gegevens worden in je profiel bewaard en je kunt ze later altijd aanpassen.
-          </p>
 
           <div className="daily-widget-legend">
             {initialProfileQuestions.map((question) => {
@@ -261,16 +257,32 @@ function Profile() {
           >
             Bewerk profielvragen
           </button>
+
+          {hasLinkedAccount ? (
+            <button
+              type="button"
+              className="secondary-button profile-register-button"
+              onClick={async () => {
+                await logoutGebruiker()
+                navigate("/login")
+              }}
+            >
+              Uitloggen
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="primary-button result-button profile-register-button"
+              onClick={() => navigate("/register")}
+            >
+              Account aanmaken
+            </button>
+          )}
         </section>
 
         <section className="calculator-card">
           <p className="section-label dark">Wekelijkse check-in</p>
           <h2 className="calculator-title">Deze week</h2>
-          <p className="calculator-text">
-            {Object.keys(latestWeeklyAnswers).length > 0
-              ? "Je wekelijkse antwoorden zijn opgeslagen en kunnen opnieuw worden aangepast."
-              : "Je hebt voor deze week nog geen vragenlijst ingevuld."}
-          </p>
 
           <button
             type="button"
@@ -283,16 +295,6 @@ function Profile() {
           >
             Bewerk wekelijkse vragen
           </button>
-        </section>
-
-        <section className="tips-list profile-badges-list">
-          {categoryBadges.map((badge) => (
-            <article key={badge.name} className={`tips-list-card profile-badge-card${badge.unlocked ? " unlocked" : ""}`}>
-              <p className="section-label dark">Badge</p>
-              <h2>{badge.name}</h2>
-              <p>{badge.unlocked ? "Ontgrendeld" : "Nog niet vrijgespeeld"}</p>
-            </article>
-          ))}
         </section>
       </div>
 
