@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import BottomNav from "../components/BottomNav"
 import AppHeader from "../components/AppHeader"
 import { LuTrees } from "react-icons/lu"
-import { buildImpactSnapshot, getFocusLabel } from "../utils/impactInsights"
+import { buildImpactSnapshot } from "../utils/impactInsights"
 import {
   compareWeeklyResults,
   formatWeekRangeLabel,
@@ -447,7 +447,6 @@ function BosVisualisatie() {
     return buildForestScene(forestProgress.treeCount)
   }, [forestProgress.treeCount])
 
-  const focusLabel = getFocusLabel(snapshot?.dominantCategory ?? "energie")
   const focusCategory = snapshot?.dominantCategory ?? "energie"
   const advice = getAdviceForCategory(snapshot?.dominantCategory ?? "energie")
   const recommendedActivity = getRecommendedActivity(focusCategory)
@@ -663,6 +662,14 @@ function BosVisualisatie() {
             </button>
           </div>
         </div>
+
+        <button
+          type="button"
+          className="forest-game-link-button"
+          onClick={() => navigate("/bos-game")}
+        >
+          Speel Red het bos
+        </button>
       </div>
 
       <BottomNav />
