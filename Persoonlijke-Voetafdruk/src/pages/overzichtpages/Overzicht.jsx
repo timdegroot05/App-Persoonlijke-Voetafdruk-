@@ -14,6 +14,7 @@ import {
   formatWeekRangeLabel,
   getStoredWeeklyResults,
 } from "../../utils/weeklyResults"
+import { getAugmentedWeeklyResults } from "../../utils/customActivities"
 
 function Overzicht() {
   const navigate = useNavigate()
@@ -24,7 +25,7 @@ function Overzicht() {
     [profileAnswers, weeklyAnswers]
   )
   const weeklyHistory = useMemo(
-    () => buildWeeklyOverviewItems(getStoredWeeklyResults()),
+    () => buildWeeklyOverviewItems(getAugmentedWeeklyResults()),
     []
   )
   const latestWeeklyActivity = weeklyHistory[0] ?? null

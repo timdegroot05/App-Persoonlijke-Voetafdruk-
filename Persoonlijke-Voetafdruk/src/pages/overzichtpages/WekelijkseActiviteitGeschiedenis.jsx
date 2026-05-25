@@ -6,14 +6,14 @@ import AppHeader from "../../components/AppHeader"
 import {
   buildWeeklyOverviewItems,
   formatWeekRangeLabel,
-  getStoredWeeklyResults,
 } from "../../utils/weeklyResults"
+import { getAugmentedWeeklyResults } from "../../utils/customActivities"
 
 function WekelijkseActiviteitGeschiedenis() {
   const railRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const weeklyHistory = useMemo(
-    () => buildWeeklyOverviewItems(getStoredWeeklyResults()).slice(1).reverse(),
+    () => buildWeeklyOverviewItems(getAugmentedWeeklyResults()).slice(1).reverse(),
     []
   )
 
