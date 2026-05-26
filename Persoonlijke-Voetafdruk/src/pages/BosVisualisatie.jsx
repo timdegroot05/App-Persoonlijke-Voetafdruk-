@@ -1,156 +1,111 @@
-import { useMemo, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useEffect, useMemo, useState } from "react"
 import BottomNav from "../components/BottomNav"
 import AppHeader from "../components/AppHeader"
 import { LuTrees } from "react-icons/lu"
+import { watchAuthState } from "../authState"
+import { getUserQuestionnaireData } from "../userService"
 import { buildImpactSnapshot } from "../utils/impactInsights"
-import {
-  compareWeeklyResults,
-  formatWeekRangeLabel,
-  getStoredWeeklyResults,
-  getWeekInfoFromKey,
-} from "../utils/weeklyResults"
 
-const MAX_TREES = 5
-const MIN_TREES = 1
 const DEFAULT_WEEKLY_GOAL = 150
-const FULL_FOREST_MARGIN_RATIO = 0.45
-const TREE_STEP_PERCENTAGE = 20
+const MAX_SCENE_TREES = 34
+const MAX_SCENE_PLANTS = 46
+
+const VISUAL_MODES = [
+  { id: "animated", label: "Animatie" },
+  { id: "calm", label: "Rustig" },
+  { id: "game", label: "Game" },
+  { id: "classic", label: "Klassiek" },
+]
 
 const TEST_SCENARIOS = [
   {
     id: "high",
     label: "Hoge uitstoot",
-    helper: "1 plantje",
-    emissionRatio: 1.18,
+    emissionRatio: 1.85,
+    forestScore: 18,
     dominantCategory: "transport",
+    spikeKg: 42,
   },
   {
     id: "good",
     label: "Normaal",
-    helper: "3 bomen",
-    emissionRatio: 0.75,
+    emissionRatio: 0.92,
+    forestScore: 58,
     dominantCategory: "energie",
+    spikeKg: 0,
   },
   {
     id: "great",
     label: "Lage uitstoot",
-    helper: "vol bos",
-    emissionRatio: 0.5,
+    emissionRatio: 0.55,
+    forestScore: 92,
     dominantCategory: "voeding",
+    spikeKg: 0,
   },
 ]
 
-const FOREST_LEVELS = [
+const DEFAULT_FOREST_PREVIEW_SCORE = 58
+
+const UPGRADE_CATALOG = [
   {
-    name: "Start",
-    badge: "Begin",
-    motivation:
-      "Je bos is nog klein. Minder uitstoot geeft straks meer groei.",
+    id: "mixed-grove",
+    title: "Gemengd bos",
+    description: "Ontgrendelt meer boomsoorten.",
+    scoreRequired: 30,
+    maxLevel: 3,
+    treeBonus: 3,
+    plantBonus: 1,
   },
   {
-    name: "Bezig",
-    badge: "Groei",
-    motivation:
-      "Je bent op weg. Elke kleine verbetering helpt.",
+    id: "flower-meadow",
+    title: "Bloemenveld",
+    description: "Voegt bloemen, varens en kleur toe.",
+    scoreRequired: 45,
+    maxLevel: 3,
+    treeBonus: 1,
+    plantBonus: 7,
   },
   {
-    name: "Groen",
-    badge: "Goed",
-    motivation:
-      "Je zit onder je doel. Je bos groeit verder.",
+    id: "water-pond",
+    title: "Waterpoel",
+    description: "Maakt herstel sneller zichtbaar.",
+    scoreRequired: 58,
+    maxLevel: 2,
+    treeBonus: 2,
+    plantBonus: 4,
   },
   {
-    name: "Mooi bos",
-    badge: "Sterk",
-    motivation:
-      "Goede week. Je ziet duidelijk verschil.",
-  },
-  {
-    name: "Vol bos",
-    badge: "Top",
-    motivation:
-      "Je zit ruim onder je doel. Je bos is vol.",
+    id: "wildlife",
+    title: "Dierenplek",
+    description: "Trekt leven aan bij een gezond bos.",
+    scoreRequired: 72,
+    maxLevel: 2,
+    treeBonus: 1,
+    plantBonus: 3,
   },
 ]
 
-const FOREST_ITEMS = [
-  { type: "small", layer: "front" },
-  { type: "round", layer: "back" },
-  { type: "pine", layer: "front" },
-  { type: "wide", layer: "back" },
-  { type: "tall", layer: "front" },
+const TREE_TYPES = [
+  "oak",
+  "pine",
+  "birch",
+  "round",
+  "willow",
+  "spruce",
+  "sapling",
+  "fruit",
 ]
 
-const GROUND_ITEMS = ["grass-1", "grass-2", "grass-3", "grass-4", "grass-5"]
-
-const CLASSIC_FOREST_ITEMS = ["🌱", "🌿", "🌲", "🌳", "🌲"]
-
-const VISUAL_MODES = [
-  {
-    id: "animated",
-    label: "Animatie",
-  },
-  {
-    id: "calm",
-    label: "Rustig",
-  },
-  {
-    id: "game",
-    label: "Game",
-  },
-  {
-    id: "classic",
-    label: "Oud",
-  },
+const PLANT_TYPES = [
+  "grass",
+  "fern",
+  "flower",
+  "mushroom",
+  "reed",
+  "bush",
+  "clover",
+  "wildflower",
 ]
-
-const ACTIVITY_ACTIONS = [
-  {
-    id: "bike",
-    title: "Fietsrit gekozen",
-    category: "transport",
-    reductionKg: 4,
-    description: "Vervang een korte autorit door fiets of lopen.",
-  },
-  {
-    id: "plantMeal",
-    title: "Plantaardige maaltijd",
-    category: "voeding",
-    reductionKg: 3,
-    description: "Kies vandaag een maaltijd zonder vlees.",
-  },
-  {
-    id: "energy",
-    title: "Energie besparen",
-    category: "energie",
-    reductionKg: 2.5,
-    description: "Zet apparaten uit en douche iets korter.",
-  },
-]
-
-const ADVICE_BY_CATEGORY = {
-  transport: {
-    title: "Pak eerst transport aan",
-    body: "Je grootste winst zit nu in reizen. Eén korte autorit vervangen helpt je bos direct groeien.",
-  },
-  voeding: {
-    title: "Voeding is je snelste kans",
-    body: "Een plantaardige maaltijd is makkelijk te doen en geeft meteen minder CO₂ in je weekscore.",
-  },
-  energie: {
-    title: "Let op energie thuis",
-    body: "Korter douchen, verwarming lager en apparaten uitzetten geven snel resultaat.",
-  },
-  wonen: {
-    title: "Thuis valt winst te halen",
-    body: "Kijk naar verwarming, isolatie en energiegebruik. Kleine aanpassingen tellen mee.",
-  },
-  consumptie: {
-    title: "Koop iets minder nieuw",
-    body: "Tweedehands kiezen of een aankoop uitstellen helpt je voetafdruk direct omlaag.",
-  },
-}
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value))
@@ -178,7 +133,7 @@ function writeStorageItem(key, value) {
   try {
     localStorage.setItem(key, value)
   } catch {
-    // Als localStorage niet beschikbaar is, blijft de demo lokaal in het scherm werken.
+    // De pagina blijft bruikbaar als localStorage niet beschikbaar is.
   }
 }
 
@@ -209,9 +164,6 @@ function getDataForForest() {
     return {
       profileAnswers: profileAnswers || {},
       weeklyAnswers,
-      sourceLabel: hasWeeklyData
-        ? "Profiel + laatste weekmeting"
-        : "Alleen profielgegevens",
       weekKey: weeklyEntry?.weekKey || "geen weekmeting",
       hasRealData: true,
     }
@@ -220,9 +172,46 @@ function getDataForForest() {
   return {
     profileAnswers: hasLegacyData ? legacyAnswers : {},
     weeklyAnswers: {},
-    sourceLabel: hasLegacyData ? "Oude answers fallback" : "Standaard fallback",
-    weekKey: hasLegacyData ? "oude opslag" : "nog geen meting",
+    weekKey: hasLegacyData ? "oude opslag" : "demo",
     hasRealData: hasLegacyData,
+  }
+}
+
+function getObjectOrEmpty(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {}
+}
+
+function getAccountDataForForest(userData) {
+  const questionnaireAnswers = getObjectOrEmpty(userData?.questionnaireAnswers)
+  const hasStructuredAnswers =
+    "profile" in questionnaireAnswers || "weekly" in questionnaireAnswers
+  const profileAnswers = getObjectOrEmpty(questionnaireAnswers.profile)
+  const weeklyAnswers = hasStructuredAnswers
+    ? getObjectOrEmpty(questionnaireAnswers.weekly)
+    : getObjectOrEmpty(questionnaireAnswers)
+  const latestFootprint = getObjectOrEmpty(userData?.latestFootprint)
+  const hasProfileData = Object.keys(profileAnswers).length > 0
+  const hasWeeklyData = Object.keys(weeklyAnswers).length > 0
+  const hasFootprintData = getSafeNumber(latestFootprint.weeklyCo2) > 0
+
+  return {
+    profileAnswers,
+    weeklyAnswers,
+    latestFootprint,
+    weekKey: "account",
+    hasRealData: hasProfileData || hasWeeklyData || hasFootprintData,
+    sourceLabel: "Accountdata",
+  }
+}
+
+function getEmptyAccountForestData() {
+  return {
+    profileAnswers: {},
+    weeklyAnswers: {},
+    latestFootprint: {},
+    weekKey: "account",
+    hasRealData: false,
+    sourceLabel: "Nieuw account",
   }
 }
 
@@ -232,7 +221,7 @@ function getWeeklyGoal() {
 
 function getStoredVisualMode() {
   const storedMode = readStorageItem("forest-visual-mode")
-  return VISUAL_MODES.some((mode) => mode.id === storedMode) ? storedMode : "animated"
+  return VISUAL_MODES.some((mode) => mode.id === storedMode) ? storedMode : "game"
 }
 
 function buildSafeImpactSnapshot(profileAnswers, weeklyAnswers) {
@@ -240,6 +229,24 @@ function buildSafeImpactSnapshot(profileAnswers, weeklyAnswers) {
     return buildImpactSnapshot(profileAnswers, weeklyAnswers)
   } catch {
     return buildImpactSnapshot({}, {})
+  }
+}
+
+function applyLatestFootprint(snapshot, latestFootprint) {
+  const weeklyCo2 = getSafeNumber(latestFootprint?.weeklyCo2)
+
+  if (weeklyCo2 <= 0) {
+    return snapshot
+  }
+
+  const weeklyEmission = roundKg(weeklyCo2)
+
+  return {
+    ...snapshot,
+    weeklyEmission,
+    totalImpact: weeklyEmission,
+    dailyEmission: roundKg(weeklyEmission / 7),
+    totalScore: getSafeNumber(latestFootprint?.totalScore, snapshot.totalScore),
   }
 }
 
@@ -257,230 +264,338 @@ function buildScenarioSnapshot(baseSnapshot, weeklyGoal, scenarioId) {
     weeklyEmission,
     totalImpact: weeklyEmission,
     dominantCategory: scenario.dominantCategory,
+    breakdown: {
+      ...baseSnapshot.breakdown,
+      auto_uitstoot: scenario.spikeKg,
+    },
   }
 }
 
-function getVisualState(treeCount) {
-  if (treeCount >= MAX_TREES) {
-    return "full"
-  }
-
-  if (treeCount >= 4) {
-    return "strong"
-  }
-
-  if (treeCount >= 2) {
-    return "growing"
-  }
-
-  return "start"
+function calculateSavedKg({ weeklyEmission, weeklyGoal }) {
+  return roundKg(Math.max(0, weeklyGoal - weeklyEmission))
 }
 
-function getCoachMessage({ savedKg, treeCount }) {
-  if (savedKg <= 0) {
-    return "Je zit nog boven je doel. Begin met één kleine actie."
-  }
-
-  if (treeCount >= MAX_TREES) {
-    return "Goed bezig. Je bos staat vol."
-  }
-
-  return `Je zit ${savedKg} kg CO₂e onder je doel.`
+function getUpgradeLevelTotal(upgrades) {
+  return Object.values(upgrades).reduce((total, level) => total + getSafeNumber(level), 0)
 }
 
-function calculateForestProgress({ weeklyEmission, weeklyGoal, activityReduction = 0 }) {
-  // Het weekdoel is de basis voor alle verhoudingen. Minimaal 1 voorkomt delen door 0.
-  const safeWeeklyGoal = Math.max(1, weeklyGoal)
-  const safeWeeklyEmission = roundKg(weeklyEmission - activityReduction)
-  const emissionRatio = safeWeeklyEmission / safeWeeklyGoal
-  const isAboveGoal = emissionRatio > 1
-  const savedKg = roundKg(safeWeeklyGoal - safeWeeklyEmission)
-  const excessKg = roundKg(safeWeeklyEmission - safeWeeklyGoal)
+function getUpgradeBonus(upgrades, key) {
+  return UPGRADE_CATALOG.reduce((total, upgrade) => {
+    const level = getSafeNumber(upgrades[upgrade.id])
+    return total + getSafeNumber(upgrade[key]) * level
+  }, 0)
+}
 
-  // De marge onder het doel wordt vertaald naar bosgroei. Bij 45% marge is het bos vol.
-  const marginRatio = clamp(1 - emissionRatio, 0, FULL_FOREST_MARGIN_RATIO)
-  const forestScore = Math.round((marginRatio / FULL_FOREST_MARGIN_RATIO) * 100)
+function calculateForestScore({ previewScore }) {
+  return Math.round(clamp(getSafeNumber(previewScore, DEFAULT_FOREST_PREVIEW_SCORE), 0, 100))
+}
 
-  // Boven het doel blijft er altijd 1 zaailing staan; onder het doel groeit het bos in stappen.
-  const treeCount = isAboveGoal
-    ? MIN_TREES
-    : clamp(
-        Math.max(MIN_TREES, Math.ceil(forestScore / TREE_STEP_PERCENTAGE)),
-        MIN_TREES,
-        MAX_TREES
-      )
+function getForestStatus(forestScore) {
+  if (forestScore <= 25) {
+    return {
+      id: "damaged",
+      label: "Beschadigd bos",
+      badge: "Schade",
+      text: "Je bos heeft herstel nodig.",
+    }
+  }
 
-  const nextTreeTargetScore =
-    treeCount >= MAX_TREES ? 100 : treeCount * TREE_STEP_PERCENTAGE
-  const nextTreeTargetMarginRatio =
-    (nextTreeTargetScore / 100) * FULL_FOREST_MARGIN_RATIO
-  const extraMarginNeeded = Math.max(0, nextTreeTargetMarginRatio - marginRatio)
-  const kgUntilNextTree = roundKg(excessKg + extraMarginNeeded * safeWeeklyGoal)
-  const progressPercentage =
-    treeCount >= MAX_TREES ? 100 : Math.max(isAboveGoal ? 8 : 12, forestScore)
+  if (forestScore <= 45) {
+    return {
+      id: "recovery",
+      label: "Herstelmodus",
+      badge: "Herstel",
+      text: "Je bos herstelt langzaam.",
+    }
+  }
+
+  if (forestScore <= 70) {
+    return {
+      id: "normal",
+      label: "Normaal bos",
+      badge: "Stabiel",
+      text: "Je bos is stabiel.",
+    }
+  }
+
+  if (forestScore <= 90) {
+    return {
+      id: "healthy",
+      label: "Gezond bos",
+      badge: "Gezond",
+      text: "Je bos groeit goed.",
+    }
+  }
 
   return {
-    weeklyEmission: safeWeeklyEmission,
-    weeklyGoal: roundKg(safeWeeklyGoal),
-    savedKg,
-    marginText:
-      savedKg > 0
-        ? `${savedKg} kg onder doel`
-        : `${excessKg} kg boven doel`,
-    treeCount,
-    level: FOREST_LEVELS[treeCount - 1] || FOREST_LEVELS[0],
-    visualState: getVisualState(treeCount),
-    kgUntilNextTree,
-    coachMessage: getCoachMessage({ savedKg, treeCount }),
-    progressPercentage,
-    forestPoints: forestScore,
+    id: "strong",
+    label: "Sterk groeiend bos",
+    badge: "Groei",
+    text: "Je bos zit vol leven.",
   }
 }
 
-function buildForestScene(treeCount) {
+function getForestVisualState({ forestScore, upgrades }) {
+  const upgradeLevels = getUpgradeLevelTotal(upgrades)
+  const treeBonus = getUpgradeBonus(upgrades, "treeBonus")
+  const plantBonus = getUpgradeBonus(upgrades, "plantBonus")
+  const treeCount = Math.round(3 + forestScore * 0.31 + treeBonus)
+  const plantCount = Math.round(5 + forestScore * 0.42 + plantBonus)
+  const meadowLevel = getSafeNumber(upgrades["flower-meadow"])
+  const waterLevel = getSafeNumber(upgrades["water-pond"])
+  const wildlifeLevel = getSafeNumber(upgrades.wildlife)
+  const damagedPatches =
+    forestScore <= 25 ? 8 : forestScore <= 45 ? 5 : forestScore <= 70 ? 2 : 0
+
   return {
-    trees: FOREST_ITEMS.slice(0, treeCount),
-    classicTrees: CLASSIC_FOREST_ITEMS.slice(0, treeCount),
-    groundItems: GROUND_ITEMS.slice(0, Math.max(2, treeCount)),
+    treeCount: clamp(treeCount, 5, MAX_SCENE_TREES),
+    plantCount: clamp(plantCount, 8, MAX_SCENE_PLANTS),
+    treeSpecies: clamp(3 + Math.floor(forestScore / 18) + upgradeLevels, 3, TREE_TYPES.length),
+    plantSpecies: clamp(3 + Math.floor(forestScore / 20) + meadowLevel, 3, PLANT_TYPES.length),
+    flowerBoost: meadowLevel * 4,
+    pondCount: waterLevel,
+    animalCount: forestScore >= 70 ? clamp(1 + wildlifeLevel, 1, 5) : wildlifeLevel > 0 ? 1 : 0,
+    lightBeams: forestScore >= 68 ? clamp(Math.floor(forestScore / 22), 2, 5) : 0,
+    damagedPatches,
+    statusId: getForestStatus(forestScore).id,
   }
 }
 
-function getStoredForestActivities(weekKey) {
-  const activities = readJsonStorage("forest-activities", [])
-
-  if (!Array.isArray(activities)) {
-    return []
+function getRecoveryMessage({ forestScore, hasAccountData }) {
+  if (forestScore >= 71) {
+    return "Veel groen en groei."
   }
 
-  return activities.filter((activity) => activity.weekKey === weekKey)
-}
-
-function saveForestActivitiesForWeek(weekKey, nextWeekActivities) {
-  const activities = readJsonStorage("forest-activities", [])
-  const otherWeeks = Array.isArray(activities)
-    ? activities.filter((activity) => activity.weekKey !== weekKey)
-    : []
-
-  writeStorageItem(
-    "forest-activities",
-    JSON.stringify([...nextWeekActivities, ...otherWeeks].slice(0, 24))
-  )
-}
-
-function getAdviceForCategory(category) {
-  return ADVICE_BY_CATEGORY[category] || {
-    title: "Kies één kleine actie",
-    body: "Begin met iets simpels. Een kleine duurzame keuze kan je bos al laten groeien.",
+  if (forestScore <= 45) {
+    return "Rustig herstellen."
   }
+
+  return hasAccountData ? "Gebaseerd op accountdata." : "Voorbeeldweergave."
 }
 
-function getRecommendedActivity(category) {
-  return ACTIVITY_ACTIONS.find((activity) => activity.category === category) || ACTIVITY_ACTIONS[0]
-}
+function createSceneItem(index, typePool, layer = "mid") {
+  const x = 5 + ((index * 17 + layer.length * 11) % 90)
+  const depth = index % 3
+  const type = typePool[index % typePool.length]
 
-function getWeekLabel(weekKey) {
-  try {
-    const weekInfo = getWeekInfoFromKey(weekKey)
-    return formatWeekRangeLabel(weekInfo.weekStart, weekInfo.weekEnd)
-  } catch {
-    return "Geen weekdata"
+  return {
+    id: `${layer}-${type}-${index}`,
+    type,
+    layer,
+    x,
+    y: depth,
+    scale: Number((0.76 + ((index * 7) % 9) / 20 + depth * 0.07).toFixed(2)),
+    delay: `${(index % 12) * 55}ms`,
   }
 }
 
-function getComparisonText(weeklyResults, currentEmission, currentWeekKey) {
-  const previousWeek = weeklyResults.find((week) => week.weekStart !== currentWeekKey)
-
-  if (!previousWeek) {
-    return "Nog geen vorige week"
-  }
-
-  const comparison = compareWeeklyResults(
-    { totalEmission: currentEmission },
-    previousWeek
+function buildForestScene(visualState) {
+  const treeTypes = TREE_TYPES.slice(0, visualState.treeSpecies)
+  const plantTypes = PLANT_TYPES.slice(0, visualState.plantSpecies)
+  const backTrees = Math.floor(visualState.treeCount * 0.34)
+  const midTrees = Math.floor(visualState.treeCount * 0.36)
+  const frontTrees = visualState.treeCount - backTrees - midTrees
+  const classicTileCount = Math.round(
+    clamp(10 + visualState.treeCount * 0.7 + visualState.plantCount * 0.35, 14, 48)
   )
 
-  if (!comparison || comparison.trend === "equal") {
-    return "Gelijk gebleven"
+  return {
+    treesBack: Array.from({ length: backTrees }, (_, index) =>
+      createSceneItem(index, treeTypes, "back")
+    ),
+    treesMid: Array.from({ length: midTrees }, (_, index) =>
+      createSceneItem(index + backTrees, treeTypes, "mid")
+    ),
+    treesFront: Array.from({ length: frontTrees }, (_, index) =>
+      createSceneItem(index + backTrees + midTrees, treeTypes, "front")
+    ),
+    plants: Array.from(
+      { length: visualState.plantCount + visualState.flowerBoost },
+      (_, index) => createSceneItem(index, plantTypes, "plant")
+    ),
+    patches: Array.from({ length: visualState.damagedPatches }, (_, index) => ({
+      id: `patch-${index}`,
+      x: 9 + ((index * 19) % 80),
+      y: 74 + (index % 2) * 10,
+    })),
+    ponds: Array.from({ length: visualState.pondCount }, (_, index) => ({
+      id: `pond-${index}`,
+      x: index === 0 ? 70 : 22,
+      y: index === 0 ? 77 : 84,
+    })),
+    animals: Array.from({ length: visualState.animalCount }, (_, index) => ({
+      id: `animal-${index}`,
+      x: 14 + ((index * 21) % 72),
+      y: 73 + (index % 3) * 7,
+      type: index % 2 === 0 ? "rabbit" : "bird",
+    })),
+    lightBeams: Array.from({ length: visualState.lightBeams }, (_, index) => ({
+      id: `light-${index}`,
+      x: 14 + index * 18,
+    })),
+    classicTiles: Array.from({ length: classicTileCount }, (_, index) => {
+      const tileTypes = ["tree", "pine", "grass", "sapling", "flower", "mushroom", "bush", "water"]
+      return {
+        id: `retro-${index}`,
+        type: tileTypes[index % Math.min(tileTypes.length, visualState.plantSpecies + 3)],
+      }
+    }),
+  }
+}
+
+function calculateEmissionForestScore({ weeklyEmission, weeklyGoal, hasRealData }) {
+  if (!hasRealData || weeklyEmission <= 0) {
+    return DEFAULT_FOREST_PREVIEW_SCORE
   }
 
-  const difference = Math.abs(comparison.difference)
+  const ratio = weeklyEmission / Math.max(1, weeklyGoal)
 
-  return comparison.trend === "lower"
-    ? `${difference} kg minder`
-    : `${difference} kg meer`
+  if (ratio >= 1.5) return 18
+  if (ratio >= 1.15) return 34
+  if (ratio >= 0.9) return 58
+  if (ratio >= 0.7) return 76
+  return 92
+}
+
+function getPreviewForestScore({ activeScenario, weeklyEmission, weeklyGoal, hasRealData }) {
+  if (activeScenario === "real") {
+    return calculateEmissionForestScore({ weeklyEmission, weeklyGoal, hasRealData })
+  }
+
+  return TEST_SCENARIOS.find((scenario) => scenario.id === activeScenario)?.forestScore ??
+    DEFAULT_FOREST_PREVIEW_SCORE
+}
+
+function getEcosystemMetrics({ forestScore, upgrades }) {
+  const meadowLevel = getSafeNumber(upgrades["flower-meadow"])
+  const waterLevel = getSafeNumber(upgrades["water-pond"])
+  const wildlifeLevel = getSafeNumber(upgrades.wildlife)
+  const mixedLevel = getSafeNumber(upgrades["mixed-grove"])
+
+  return [
+    {
+      id: "biodiversity",
+      label: "Biodiversiteit",
+      value: Math.round(clamp(forestScore * 0.64 + meadowLevel * 10 + wildlifeLevel * 9 + mixedLevel * 6, 8, 100)),
+    },
+    {
+      id: "water",
+      label: "Water",
+      value: Math.round(clamp(forestScore * 0.52 + waterLevel * 18, 10, 100)),
+    },
+    {
+      id: "soil",
+      label: "Bodem",
+      value: Math.round(clamp(forestScore * 0.58, 8, 100)),
+    },
+    {
+      id: "growth",
+      label: "Groei",
+      value: Math.round(clamp(forestScore * 0.7 + mixedLevel * 6 + meadowLevel * 5, 8, 100)),
+    },
+  ]
 }
 
 function BosVisualisatie() {
-  const navigate = useNavigate()
   const [activeScenario, setActiveScenario] = useState("real")
   const [visualMode, setVisualMode] = useState(getStoredVisualMode)
-  const forestData = useMemo(() => getDataForForest(), [])
-  const [appliedActivities, setAppliedActivities] = useState(() =>
-    getStoredForestActivities(forestData.weekKey)
-  )
+  const [isModeMenuOpen, setIsModeMenuOpen] = useState(false)
+  const [isChillProgressOpen, setIsChillProgressOpen] = useState(false)
+  const forestUpgrades = useMemo(() => ({}), [])
+  const [accountForestData, setAccountForestData] = useState(null)
+  const [accountDataStatus, setAccountDataStatus] = useState("local")
+  const localForestData = useMemo(() => getDataForForest(), [])
   const weeklyGoal = useMemo(() => getWeeklyGoal(), [])
-  const weeklyResults = useMemo(() => getStoredWeeklyResults(), [])
+  const usesAccountScope = accountDataStatus === "account" || accountDataStatus === "empty"
+  const forestData = usesAccountScope
+    ? accountForestData || getEmptyAccountForestData()
+    : localForestData
+  const hasAccountData = accountDataStatus === "account"
+  const dataLabel = hasAccountData ? "Account" : forestData.hasRealData ? "Lokaal" : "Voorbeeld"
+
+  useEffect(() => {
+    let isActive = true
+
+    const unsubscribe = watchAuthState((user) => {
+      if (!isActive) {
+        return
+      }
+
+      if (!user || user.isAnonymous) {
+        setAccountForestData(null)
+        setAccountDataStatus("local")
+        return
+      }
+
+      setAccountDataStatus("loading")
+
+      getUserQuestionnaireData(user.uid)
+        .then((userData) => {
+          if (!isActive) {
+            return
+          }
+
+          const nextForestData = getAccountDataForForest(userData)
+          setAccountForestData(nextForestData)
+          setAccountDataStatus(nextForestData.hasRealData ? "account" : "empty")
+        })
+        .catch((error) => {
+          if (!isActive) {
+            return
+          }
+
+          console.warn("Firebase bosdata laden mislukt:", error)
+          setAccountForestData(null)
+          setAccountDataStatus("error")
+        })
+    })
+
+    return () => {
+      isActive = false
+      unsubscribe()
+    }
+  }, [])
 
   const realSnapshot = useMemo(() => {
-    return buildSafeImpactSnapshot(forestData.profileAnswers, forestData.weeklyAnswers)
-  }, [forestData.profileAnswers, forestData.weeklyAnswers])
+    return applyLatestFootprint(
+      buildSafeImpactSnapshot(forestData.profileAnswers, forestData.weeklyAnswers),
+      forestData.latestFootprint
+    )
+  }, [forestData.latestFootprint, forestData.profileAnswers, forestData.weeklyAnswers])
 
   const snapshot = useMemo(() => {
     return buildScenarioSnapshot(realSnapshot, weeklyGoal, activeScenario)
   }, [activeScenario, realSnapshot, weeklyGoal])
 
-  const activityReduction = useMemo(() => {
-    return roundKg(
-      appliedActivities.reduce((total, activity) => total + getSafeNumber(activity.reductionKg), 0)
-    )
-  }, [appliedActivities])
-
-  const forestProgress = useMemo(() => {
-    return calculateForestProgress({
-      weeklyEmission: snapshot?.weeklyEmission,
-      weeklyGoal,
-      activityReduction,
-    })
-  }, [activityReduction, snapshot, weeklyGoal])
-
-  const { trees, classicTrees, groundItems } = useMemo(() => {
-    return buildForestScene(forestProgress.treeCount)
-  }, [forestProgress.treeCount])
-
-  const focusCategory = snapshot?.dominantCategory ?? "energie"
-  const advice = getAdviceForCategory(snapshot?.dominantCategory ?? "energie")
-  const recommendedActivity = getRecommendedActivity(focusCategory)
-  const weekLabel = getWeekLabel(forestData.weekKey)
-  const comparisonText = getComparisonText(
-    weeklyResults,
-    forestProgress.weeklyEmission,
-    forestData.weekKey
-  )
-  const applyActivity = (activity) => {
-    if (appliedActivities.some((item) => item.id === activity.id)) {
-      return
-    }
-
-    const nextActivities = [
-      ...appliedActivities,
-      {
-        ...activity,
-        weekKey: forestData.weekKey,
-        completedAt: new Date().toISOString(),
-      },
-    ]
-
-    setAppliedActivities(nextActivities)
-    saveForestActivitiesForWeek(forestData.weekKey, nextActivities)
-  }
-
-  const resetActivities = () => {
-    setAppliedActivities([])
-    saveForestActivitiesForWeek(forestData.weekKey, [])
-  }
+  const totalEmission = roundKg(snapshot?.weeklyEmission)
+  const savedKg = calculateSavedKg({ weeklyEmission: totalEmission, weeklyGoal })
+  const upgradeLevels = getUpgradeLevelTotal(forestUpgrades)
+  const previewForestScore = getPreviewForestScore({
+    activeScenario,
+    weeklyEmission: totalEmission,
+    weeklyGoal,
+    hasRealData: forestData.hasRealData,
+  })
+  const forestScore = calculateForestScore({
+    previewScore: previewForestScore,
+  })
+  const forestStatus = getForestStatus(forestScore)
+  const visualState = getForestVisualState({ forestScore, upgrades: forestUpgrades })
+  const scene = buildForestScene(visualState)
+  const forestLevel = clamp(Math.floor(forestScore / 20) + 1 + upgradeLevels, 1, 20)
+  const currentVisualMode = VISUAL_MODES.find((mode) => mode.id === visualMode) || VISUAL_MODES[0]
+  const ecosystemMetrics = getEcosystemMetrics({
+    forestScore,
+    upgrades: forestUpgrades,
+  })
+  const recoveryMessage = getRecoveryMessage({
+    forestScore,
+    hasAccountData,
+  })
 
   const changeVisualMode = (mode) => {
     setVisualMode(mode)
+    setIsModeMenuOpen(false)
     writeStorageItem("forest-visual-mode", mode)
   }
 
@@ -489,97 +604,215 @@ function BosVisualisatie() {
       <AppHeader title="Bos" icon={<LuTrees />} />
 
       <div className="calculator-card forest-card">
-        <p className="section-label dark">CO₂-bos</p>
-        <h1 className="calculator-title">Jouw bos</h1>
+        <p className="section-label dark">Bosvisualisatie</p>
+        <h1 className="calculator-title">Mijn bos</h1>
         <p className="calculator-text">
-          Minder uitstoot betekent meer bomen.
+          Eerste versie van je bos op basis van duurzame keuzes.
         </p>
 
-        <div className="forest-section-heading">
-          <h2 className="forest-subtitle">Weergave</h2>
-          <div className="forest-mode-toggle" aria-label="Kies bosweergave">
-            {VISUAL_MODES.map((mode) => (
-              <button
-                key={mode.id}
-                type="button"
-                className={`forest-mode-button${visualMode === mode.id ? " active" : ""}`}
-                onClick={() => changeVisualMode(mode.id)}
-              >
-                {mode.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <div className="forest-view-dropdown">
+          <button
+            type="button"
+            className="forest-mode-select"
+            aria-expanded={isModeMenuOpen}
+            aria-haspopup="listbox"
+            onClick={() => setIsModeMenuOpen((open) => !open)}
+          >
+            <span>Weergave</span>
+            <strong>{currentVisualMode.label}</strong>
+          </button>
 
-        <div
-          className={`forest-visual ${visualMode} forest-density-${forestProgress.treeCount} forest-state-${forestProgress.visualState}`}
-          aria-label={`Bosvisualisatie met ${forestProgress.treeCount} van maximaal ${MAX_TREES} bomen`}
-        >
-          <div className="forest-sky" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-          </div>
-
-          {visualMode === "classic" ? (
-            <div className="forest-emoji-line">
-              {classicTrees.map((item, index) => (
-                <span
-                  key={`${item}-${index}`}
-                  className="forest-emoji-tree"
-                  style={{ "--tree-index": index }}
+          {isModeMenuOpen && (
+            <div className="forest-mode-menu" role="listbox" aria-label="Kies bosweergave">
+              {VISUAL_MODES.map((mode) => (
+                <button
+                  key={mode.id}
+                  type="button"
+                  className={`forest-mode-option${visualMode === mode.id ? " active" : ""}`}
+                  onClick={() => changeVisualMode(mode.id)}
+                  role="option"
+                  aria-selected={visualMode === mode.id}
                 >
-                  {item}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <div className="forest-tree-line">
-              {trees.map((item, index) => (
-                <div
-                  key={`${item.type}-${index}`}
-                  className={`forest-tree ${item.type} ${item.layer}`}
-                  style={{ "--tree-index": index }}
-                >
-                  <span className="forest-tree-leaves" />
-                  <span className="forest-tree-trunk" />
-                </div>
+                  <strong>{mode.label}</strong>
+                </button>
               ))}
             </div>
           )}
+        </div>
 
-          <div className="forest-ground" aria-hidden="true">
-            <div className="forest-ground-top" />
-            <div className="forest-ground-details">
-              {groundItems.map((item, index) => (
-                <span key={`${item}-${index}`} className={`forest-grass ${item}`} />
+        <div
+          className={`forest-visual forest-world ${visualMode} forest-state-${forestStatus.id}`}
+          aria-label={`Bosvisualisatie met forestScore ${forestScore} van 100 en ${visualState.treeCount} bomen`}
+        >
+          {visualMode === "classic" ? (
+            <div className="forest-retro-grid" aria-hidden="true">
+              {scene.classicTiles.map((tile) => (
+                <span key={tile.id} className={`forest-retro-tile ${tile.type}`} />
               ))}
             </div>
+          ) : (
+            <>
+              <div className="forest-world-sky" aria-hidden="true">
+                <span className="forest-world-sun" />
+                {scene.lightBeams.map((beam) => (
+                  <span
+                    key={beam.id}
+                    className="forest-light-beam"
+                    style={{ left: `${beam.x}%` }}
+                  />
+                ))}
+                <span className="forest-cloud cloud-1" />
+                <span className="forest-cloud cloud-2" />
+              </div>
+
+              <div className="forest-world-layer back" aria-hidden="true">
+                {scene.treesBack.map((tree) => (
+                  <span
+                    key={tree.id}
+                    className={`forest-rich-tree ${tree.type}`}
+                    style={{
+                      left: `${tree.x}%`,
+                      "--tree-scale": tree.scale,
+                      "--tree-delay": tree.delay,
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="forest-world-layer mid" aria-hidden="true">
+                {scene.treesMid.map((tree) => (
+                  <span
+                    key={tree.id}
+                    className={`forest-rich-tree ${tree.type}`}
+                    style={{
+                      left: `${tree.x}%`,
+                      "--tree-scale": tree.scale,
+                      "--tree-delay": tree.delay,
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="forest-world-layer front" aria-hidden="true">
+                {scene.treesFront.map((tree) => (
+                  <span
+                    key={tree.id}
+                    className={`forest-rich-tree ${tree.type}`}
+                    style={{
+                      left: `${tree.x}%`,
+                      "--tree-scale": tree.scale,
+                      "--tree-delay": tree.delay,
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="forest-floor-details" aria-hidden="true">
+                {scene.patches.map((patch) => (
+                  <span
+                    key={patch.id}
+                    className="forest-soil-patch"
+                    style={{ left: `${patch.x}%`, top: `${patch.y}%` }}
+                  />
+                ))}
+                {scene.ponds.map((pond) => (
+                  <span
+                    key={pond.id}
+                    className="forest-pond"
+                    style={{ left: `${pond.x}%`, top: `${pond.y}%` }}
+                  />
+                ))}
+                {scene.plants.map((plant) => (
+                  <span
+                    key={plant.id}
+                    className={`forest-rich-plant ${plant.type}`}
+                    style={{
+                      left: `${plant.x}%`,
+                      top: `${74 + (plant.y % 3) * 7}%`,
+                      "--plant-scale": plant.scale,
+                      "--plant-delay": plant.delay,
+                    }}
+                  />
+                ))}
+                {scene.animals.map((animal) => (
+                  <span
+                    key={animal.id}
+                    className={`forest-critter ${animal.type}`}
+                    style={{ left: `${animal.x}%`, top: `${animal.y}%` }}
+                  />
+                ))}
+              </div>
+
+            </>
+          )}
+        </div>
+
+        <div className="forest-status-panel">
+          <span>Bosstatus</span>
+          <strong>{forestStatus.text}</strong>
+          <p>{recoveryMessage}</p>
+        </div>
+
+        <div className="forest-main-result forest-impact-stats">
+          <div>
+            <span>Losse weekuitstoot</span>
+            <strong>{totalEmission} kg</strong>
+          </div>
+          <div>
+            <span>Doel</span>
+            <strong>{roundKg(weeklyGoal)} kg</strong>
+          </div>
+          <div>
+            <span>Bespaard</span>
+            <strong>{savedKg} kg</strong>
+          </div>
+          <div>
+            <span>Data</span>
+            <strong>{dataLabel}</strong>
           </div>
         </div>
 
-        <p className="forest-visual-caption">
-          Minder uitstoot is meer bos.
-        </p>
+        <div className={`forest-chill-progress${isChillProgressOpen ? " open" : ""}`}>
+          <button
+            type="button"
+            className="forest-chill-toggle"
+            aria-expanded={isChillProgressOpen}
+            onClick={() => setIsChillProgressOpen((open) => !open)}
+          >
+            <span>Mijn chill progress</span>
+            <strong>Level {forestLevel} · {forestScore}/100</strong>
+            <small>{isChillProgressOpen ? "Verberg details" : "Bekijk details"}</small>
+          </button>
 
-        <div className="forest-main-result">
-          <div>
-            <span>Bomen</span>
-            <strong>{forestProgress.treeCount}/5 bomen</strong>
-          </div>
-          <div>
-            <span>Uitstoot</span>
-            <strong>{forestProgress.weeklyEmission} kg</strong>
-          </div>
-        </div>
+          {isChillProgressOpen && (
+            <div className="forest-chill-content">
+              <div className="forest-score-panel">
+                <div className="forest-score-ring" style={{ "--forest-score": `${forestScore}%` }}>
+                  <strong>{forestScore}</strong>
+                  <span>/100</span>
+                </div>
+                <div>
+                  <span>{forestStatus.label}</span>
+                  <strong>{visualState.treeCount} bomen · {visualState.plantCount} plantjes</strong>
+                  <p>
+                    Databron: {dataLabel}.
+                  </p>
+                </div>
+              </div>
 
-        <div className="forest-tree-meter" aria-label={`${forestProgress.treeCount} van 5 bomen`}>
-          {Array.from({ length: MAX_TREES }).map((_, index) => (
-            <span
-              key={index}
-              className={index < forestProgress.treeCount ? "filled" : ""}
-            />
-          ))}
+              <div className="forest-ecosystem-grid" aria-label="Ecosysteemwaarden">
+                {ecosystemMetrics.map((metric) => (
+                  <div key={metric.id} className={`forest-ecosystem-card${metric.reverse ? " reverse" : ""}`}>
+                    <span>{metric.label}</span>
+                    <strong>{metric.value}</strong>
+                    <div className="forest-ecosystem-track">
+                      <i style={{ width: `${metric.value}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="forest-example-panel" aria-label="Voorbeeld bekijken">
@@ -604,72 +837,6 @@ function BosVisualisatie() {
             ))}
           </div>
         </div>
-
-        <div className="forest-data-strip">
-          <div>
-            <span>Week</span>
-            <strong>{weekLabel}</strong>
-          </div>
-          <div>
-            <span>Vergelijking</span>
-            <strong>{comparisonText}</strong>
-          </div>
-        </div>
-
-        <div className="forest-simple-action">
-          <button
-            type="button"
-            className={`forest-action-card${
-              appliedActivities.some((item) => item.id === recommendedActivity.id)
-                ? " completed"
-                : ""
-            }`}
-            onClick={() => applyActivity(recommendedActivity)}
-            disabled={appliedActivities.some((item) => item.id === recommendedActivity.id)}
-          >
-            <span>{recommendedActivity.title}</span>
-            <strong>-{recommendedActivity.reductionKg} kg CO₂e</strong>
-            <small>
-              {appliedActivities.some((item) => item.id === recommendedActivity.id)
-                ? "Deze actie telt mee."
-                : recommendedActivity.description}
-            </small>
-          </button>
-          {activityReduction > 0 && (
-            <button type="button" className="forest-reset-button" onClick={resetActivities}>
-              Reset acties
-            </button>
-          )}
-        </div>
-
-        <div className="forest-advice-card simple">
-          <span>Tip</span>
-          <strong>{advice.title}</strong>
-          <p>{advice.body}</p>
-          <div className="forest-advice-actions">
-            <button
-              type="button"
-              onClick={() =>
-                navigate("/activiteiten", {
-                  state: { focusCategory },
-                })
-              }
-            >
-              Meer acties
-            </button>
-            <button type="button" onClick={() => navigate("/tips")}>
-              Tips
-            </button>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className="forest-game-link-button"
-          onClick={() => navigate("/bos-game")}
-        >
-          Speel Red het bos
-        </button>
       </div>
 
       <BottomNav />

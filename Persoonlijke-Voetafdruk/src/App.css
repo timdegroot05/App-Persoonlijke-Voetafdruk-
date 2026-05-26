@@ -2887,8 +2887,8 @@ body {
   padding: 15px;
   border-radius: 18px;
   background: #ffffff;
-  border: 1px solid rgba(31, 45, 32, 0.06);
-  box-shadow: 0 8px 18px rgba(31, 45, 32, 0.06);
+  border: 1px solid var(--forest-border);
+  box-shadow: var(--forest-panel-shadow);
 }
 
 .forest-advice-card span {
@@ -3186,16 +3186,20 @@ body {
 
 /* Simpele productstijl voor BosVisualisatie */
 .forest-page {
+  --forest-border: rgba(67, 119, 63, 0.16);
+  --forest-border-strong: rgba(42, 102, 51, 0.22);
+  --forest-panel-shadow: 0 10px 22px rgba(31, 63, 35, 0.06);
   background: var(--page-bg);
 }
 
 .forest-card {
   background: var(--card-soft);
-  border: 0;
-  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--forest-border-strong);
+  box-shadow: 0 18px 34px rgba(31, 63, 35, 0.09);
 }
 
 .forest-page .calculator-title {
+  margin: 2px 0 12px;
   color: var(--text-main);
   font-size: 28px;
 }
@@ -3582,7 +3586,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin: 0 0 12px;
+  margin: 18px 0;
 }
 
 .forest-main-result div {
@@ -3590,8 +3594,8 @@ body {
   padding: 16px 14px;
   border-radius: 18px;
   background: #ffffff;
-  border: 1px solid rgba(31, 45, 32, 0.06);
-  box-shadow: 0 8px 18px rgba(31, 45, 32, 0.05);
+  border: 1px solid var(--forest-border);
+  box-shadow: var(--forest-panel-shadow);
 }
 
 .forest-main-result span {
@@ -3710,12 +3714,12 @@ body {
 }
 
 .forest-example-panel {
-  margin: 12px 0;
-  padding: 12px;
+  margin: 18px 0;
+  padding: 14px;
   border-radius: 18px;
   background: #ffffff;
-  border: 1px solid rgba(31, 45, 32, 0.06);
-  box-shadow: 0 8px 18px rgba(31, 45, 32, 0.05);
+  border: 1px solid var(--forest-border);
+  box-shadow: var(--forest-panel-shadow);
 }
 
 .forest-example-panel > span {
@@ -3777,14 +3781,15 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin: -4px 0 14px;
+  margin: 0 0 18px;
 }
 
 .forest-data-strip div {
   min-width: 0;
-  padding: 10px 11px;
+  padding: 12px 11px;
   border-radius: 14px;
-  background: #eef5ea;
+  background: #f2f7ee;
+  border: 1px solid rgba(67, 119, 63, 0.1);
 }
 
 .forest-data-strip span {
@@ -3847,6 +3852,1459 @@ body {
   font-weight: 900;
   cursor: pointer;
   box-shadow: 0 10px 18px rgba(31, 107, 42, 0.16);
+}
+
+.forest-state-damaged {
+  background: linear-gradient(180deg, #eef0d9 0%, #d9dfbf 58%, #8c9b63 100%);
+  filter: saturate(0.82);
+}
+
+.forest-state-recovery {
+  background: linear-gradient(180deg, #eaf5dd 0%, #cfe6bc 58%, #7da961 100%);
+}
+
+.forest-state-normal {
+  background: linear-gradient(180deg, #e2f5ef 0%, #bfe8c7 58%, #64a060 100%);
+}
+
+.forest-state-healthy {
+  background: linear-gradient(180deg, #d8f4ff 0%, #a9e2bf 56%, #3f9654 100%);
+}
+
+.forest-state-damaged .forest-tree {
+  opacity: 0.78;
+  filter: grayscale(0.28);
+}
+
+.forest-state-recovery .forest-tree {
+  filter: saturate(0.95);
+}
+
+.forest-state-healthy .forest-tree,
+.forest-state-strong .forest-tree {
+  filter: drop-shadow(0 10px 10px rgba(31, 63, 35, 0.12));
+}
+
+.forest-state-damaged .forest-tree-leaves {
+  background: #6f8347;
+  box-shadow:
+    -12px 8px 0 #819151,
+    12px 8px 0 #8b9d5d,
+    0 -8px 0 #9cab68;
+}
+
+.forest-state-recovery .forest-tree-leaves {
+  background: #3f8f45;
+  box-shadow:
+    -12px 8px 0 #5da75a,
+    12px 8px 0 #75b968,
+    0 -8px 0 #97cc7d;
+}
+
+.forest-state-normal .forest-tree-leaves,
+.forest-state-healthy .forest-tree-leaves {
+  background: #268a42;
+  box-shadow:
+    -12px 8px 0 #3fa34f,
+    12px 8px 0 #57b85c,
+    0 -8px 0 #75c96f;
+}
+
+.forest-recovery-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.forest-damaged-patch,
+.forest-sprout,
+.forest-flower,
+.forest-animal {
+  position: absolute;
+  display: block;
+}
+
+.forest-damaged-patch {
+  bottom: 58px;
+  width: 34px;
+  height: 14px;
+  border-radius: 999px;
+  background: rgba(103, 81, 53, 0.42);
+  transform: rotate(-5deg);
+}
+
+.forest-damaged-patch.patch-1 {
+  left: 18%;
+}
+
+.forest-damaged-patch.patch-2 {
+  left: 44%;
+  width: 42px;
+  transform: rotate(4deg);
+}
+
+.forest-damaged-patch.patch-3 {
+  right: 14%;
+  width: 30px;
+}
+
+.forest-damaged-patch.patch-4 {
+  left: 7%;
+  bottom: 74px;
+  width: 28px;
+}
+
+.forest-sprout {
+  bottom: 70px;
+  width: 12px;
+  height: 20px;
+  border-radius: 999px 999px 0 0;
+  background: #2f8c42;
+  transform-origin: bottom center;
+  animation: forestGameGrow 0.42s ease both;
+}
+
+.forest-sprout::before,
+.forest-sprout::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  width: 12px;
+  height: 8px;
+  border-radius: 999px 999px 999px 0;
+  background: #66b85f;
+}
+
+.forest-sprout::before {
+  right: 6px;
+  transform: rotate(-30deg);
+}
+
+.forest-sprout::after {
+  left: 6px;
+  transform: rotate(30deg) scaleX(-1);
+}
+
+.forest-sprout.sprout-1 {
+  left: 18%;
+}
+
+.forest-sprout.sprout-2 {
+  left: 39%;
+  bottom: 82px;
+}
+
+.forest-sprout.sprout-3 {
+  right: 24%;
+}
+
+.forest-sprout.sprout-4 {
+  right: 9%;
+  bottom: 88px;
+}
+
+.forest-flower {
+  bottom: 75px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffd45f;
+  box-shadow:
+    -4px 0 0 #ef8aa3,
+    4px 0 0 #ef8aa3,
+    0 -4px 0 #ef8aa3,
+    0 4px 0 #ef8aa3,
+    0 11px 0 -3px #236d35;
+  animation: forestGameGrow 0.35s ease both;
+}
+
+.forest-flower.flower-1 {
+  left: 14%;
+}
+
+.forest-flower.flower-2 {
+  left: 33%;
+  bottom: 91px;
+}
+
+.forest-flower.flower-3 {
+  left: 55%;
+}
+
+.forest-flower.flower-4 {
+  right: 18%;
+  bottom: 86px;
+}
+
+.forest-flower.flower-5 {
+  left: 73%;
+}
+
+.forest-flower.flower-6 {
+  right: 7%;
+  bottom: 96px;
+}
+
+.forest-animal {
+  bottom: 76px;
+  width: 24px;
+  height: 13px;
+  border-radius: 999px;
+  background: #f1d08a;
+  box-shadow: 7px -4px 0 -2px #f1d08a;
+}
+
+.forest-animal::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  width: 4px;
+  height: 8px;
+  border-radius: 999px;
+  background: #7b5a33;
+  box-shadow: 9px 0 0 #7b5a33;
+}
+
+.forest-animal.animal-1 {
+  left: 24%;
+}
+
+.forest-animal.animal-2 {
+  right: 20%;
+  bottom: 92px;
+  transform: scaleX(-1);
+}
+
+.forest-status-panel,
+.forest-score-panel,
+.forest-recovery-actions {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid var(--forest-border);
+  box-shadow: var(--forest-panel-shadow);
+}
+
+.forest-status-panel span,
+.forest-score-panel > div:last-child span,
+.forest-recovery-actions-header span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.forest-status-panel strong,
+.forest-score-panel > div:last-child strong,
+.forest-recovery-actions-header strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.forest-status-panel p,
+.forest-score-panel p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.forest-status-panel small {
+  display: block;
+  margin-top: 8px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.forest-score-panel {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 14px;
+  background: #f8fbf4;
+}
+
+.forest-score-ring {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #ffffff 0 57%, transparent 58%),
+    conic-gradient(var(--brand-dark) var(--forest-score), rgba(31, 107, 42, 0.12) 0);
+}
+
+.forest-score-ring strong {
+  color: var(--brand-dark);
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.forest-score-ring span {
+  margin-top: -18px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.forest-impact-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.forest-chill-progress {
+  margin: 18px 0;
+}
+
+.forest-chill-toggle {
+  position: relative;
+  width: 100%;
+  min-height: 72px;
+  border: 1px solid var(--forest-border-strong);
+  border-radius: 20px;
+  padding: 14px 46px 14px 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 250, 239, 0.96)),
+    #ffffff;
+  color: var(--text-main);
+  text-align: left;
+  box-shadow: var(--forest-panel-shadow);
+  cursor: pointer;
+}
+
+.forest-chill-toggle::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  border-right: 2px solid var(--brand-dark);
+  border-bottom: 2px solid var(--brand-dark);
+  transform: translateY(-70%) rotate(45deg);
+  transition: transform 0.18s ease;
+}
+
+.forest-chill-toggle[aria-expanded="true"]::after {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.forest-chill-toggle span,
+.forest-chill-toggle strong,
+.forest-chill-toggle small {
+  display: block;
+}
+
+.forest-chill-toggle span {
+  color: var(--brand-dark);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.forest-chill-toggle strong {
+  margin-top: 4px;
+  color: var(--text-main);
+  font-size: 17px;
+  line-height: 1.15;
+}
+
+.forest-chill-toggle small {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.forest-chill-content {
+  margin-top: 12px;
+  padding-top: 2px;
+}
+
+.forest-chill-content .forest-score-panel:first-child {
+  margin-top: 0;
+}
+
+.forest-chill-content .forest-recovery-actions:last-child {
+  margin-bottom: 0;
+}
+
+.forest-recovery-actions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.forest-recovery-actions-header span,
+.forest-recovery-actions-header strong {
+  margin: 0;
+}
+
+.forest-recovery-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.forest-recovery-button {
+  min-width: 0;
+  min-height: 96px;
+  border: 0;
+  border-radius: 16px;
+  padding: 10px 8px;
+  background: #eef5ea;
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+}
+
+.forest-recovery-button span,
+.forest-recovery-button strong,
+.forest-recovery-button small {
+  display: block;
+}
+
+.forest-recovery-button span {
+  min-height: 30px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.forest-recovery-button strong {
+  margin: 4px 0;
+  color: var(--brand-dark);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.forest-recovery-button small {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.forest-recovery-button.completed,
+.forest-recovery-button:disabled {
+  cursor: default;
+  opacity: 0.68;
+}
+
+.forest-view-dropdown {
+  position: relative;
+  margin: 22px 0 12px;
+}
+
+.forest-mode-select {
+  position: relative;
+  width: 100%;
+  min-height: 56px;
+  border: 0;
+  border-radius: 18px;
+  padding: 12px 44px 12px 14px;
+  background: #ffffff;
+  color: var(--text-main);
+  text-align: left;
+  border: 1px solid var(--forest-border);
+  box-shadow: var(--forest-panel-shadow);
+  cursor: pointer;
+}
+
+.forest-mode-select::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--brand-dark);
+  border-bottom: 2px solid var(--brand-dark);
+  transform: translateY(-65%) rotate(45deg);
+  transition: transform 0.18s ease;
+}
+
+.forest-mode-select[aria-expanded="true"]::after {
+  transform: translateY(-25%) rotate(225deg);
+}
+
+.forest-mode-select span,
+.forest-mode-select strong {
+  display: block;
+}
+
+.forest-mode-select span {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.forest-mode-select strong {
+  margin-top: 3px;
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.forest-mode-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(31, 45, 32, 0.08);
+  box-shadow: 0 16px 30px rgba(31, 45, 32, 0.16);
+}
+
+.forest-mode-option {
+  min-height: 42px;
+  border: 0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: #f5f9f0;
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+}
+
+.forest-mode-option strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+.forest-mode-option.active {
+  background: var(--brand-dark);
+  color: #ffffff;
+}
+
+.forest-world {
+  height: 390px;
+  min-height: 390px;
+  margin-bottom: 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(42, 102, 51, 0.16);
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 226, 138, 0.7) 0 32px, transparent 33px),
+    linear-gradient(180deg, #d8f2ff 0%, #b9e4bf 50%, #5f9d54 51%, #34743a 100%);
+}
+
+.forest-world.calm {
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 237, 178, 0.62) 0 28px, transparent 29px),
+    linear-gradient(180deg, #e5f5ee 0%, #cce8cf 52%, #6ba65d 53%, #3b7a42 100%);
+}
+
+.forest-world.game {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 82%, rgba(245, 236, 190, 0.55) 0 21%, transparent 22%),
+    radial-gradient(circle at 18% 16%, rgba(255, 222, 120, 0.7) 0 30px, transparent 31px),
+    linear-gradient(180deg, #dff3ff 0%, #b8e8be 52%, #5fa25b 53%, #2e713a 100%);
+  background-size: 28px 28px, 28px 28px, 100% 100%, 100% 100%, 100% 100%;
+}
+
+.forest-world.game::after {
+  content: "";
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 64px;
+  z-index: 4;
+  height: 46px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(246, 232, 180, 0.72) 0 42%, transparent 44%);
+  pointer-events: none;
+}
+
+.forest-world.classic {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px),
+    linear-gradient(180deg, #d9efd1 0%, #a3c97b 54%, #6d9a52 100%);
+  background-size: 24px 24px, 24px 24px, 100% 100%;
+}
+
+.forest-state-damaged.forest-world {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(242, 218, 141, 0.48) 0 28px, transparent 29px),
+    linear-gradient(180deg, #e5e9cf 0%, #d1d9b5 50%, #8d9b62 51%, #5f7044 100%);
+}
+
+.forest-state-damaged .forest-rich-tree {
+  opacity: 0.62;
+  filter: grayscale(0.45) saturate(0.72);
+}
+
+.forest-state-damaged .forest-rich-plant {
+  opacity: 0.45;
+}
+
+.forest-state-damaged .forest-cloud {
+  opacity: 0.48;
+}
+
+.forest-state-damaged .forest-world-sun {
+  opacity: 0.62;
+}
+
+.forest-state-recovery.forest-world {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 232, 144, 0.56) 0 30px, transparent 31px),
+    linear-gradient(180deg, #e6f2dd 0%, #c8e3b7 51%, #78a95e 52%, #3c7a42 100%);
+}
+
+.forest-state-recovery .forest-rich-tree {
+  opacity: 0.82;
+}
+
+.forest-state-recovery .forest-rich-plant {
+  opacity: 0.74;
+}
+
+.forest-state-healthy.forest-world,
+.forest-state-strong.forest-world {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 229, 132, 0.78) 0 34px, transparent 35px),
+    linear-gradient(180deg, #d3f1ff 0%, #a6dfbc 50%, #529c4e 51%, #236d36 100%);
+}
+
+.forest-state-healthy .forest-rich-tree,
+.forest-state-strong .forest-rich-tree {
+  filter: drop-shadow(0 8px 10px rgba(31, 63, 35, 0.12));
+}
+
+.forest-state-healthy .forest-rich-plant,
+.forest-state-strong .forest-rich-plant {
+  filter: saturate(1.08);
+}
+
+.forest-world.game.forest-state-damaged,
+.forest-world.game.forest-state-recovery {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 82%, rgba(232, 222, 172, 0.48) 0 21%, transparent 22%),
+    radial-gradient(circle at 18% 16%, rgba(245, 220, 132, 0.55) 0 29px, transparent 30px),
+    linear-gradient(180deg, #e7edd9 0%, #c7ddae 52%, #78985c 53%, #3f6f3d 100%);
+  background-size: 28px 28px, 28px 28px, 100% 100%, 100% 100%, 100% 100%;
+}
+
+.forest-world.game.forest-state-healthy,
+.forest-world.game.forest-state-strong {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 82%, rgba(249, 238, 181, 0.56) 0 22%, transparent 23%),
+    radial-gradient(circle at 18% 16%, rgba(255, 229, 132, 0.78) 0 34px, transparent 35px),
+    linear-gradient(180deg, #d3f1ff 0%, #a6dfbc 50%, #529c4e 51%, #236d36 100%);
+  background-size: 28px 28px, 28px 28px, 100% 100%, 100% 100%, 100% 100%;
+}
+
+.forest-world.classic.forest-state-damaged,
+.forest-world.classic.forest-state-recovery {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 1px, transparent 1px),
+    linear-gradient(180deg, #e3e9cf 0%, #bfd1a2 54%, #748a52 100%);
+  background-size: 24px 24px, 24px 24px, 100% 100%;
+}
+
+.forest-world.classic.forest-state-healthy,
+.forest-world.classic.forest-state-strong {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px),
+    linear-gradient(180deg, #d2efdc 0%, #91cf7b 54%, #3f873f 100%);
+  background-size: 24px 24px, 24px 24px, 100% 100%;
+}
+
+.forest-world-sky,
+.forest-world-layer,
+.forest-floor-details,
+.forest-game-targets {
+  position: absolute;
+  inset: 0;
+}
+
+.forest-world-sky {
+  z-index: 1;
+  pointer-events: none;
+}
+
+.forest-world-layer {
+  pointer-events: none;
+}
+
+.forest-world-layer.back {
+  z-index: 2;
+  opacity: 0.72;
+}
+
+.forest-world-layer.mid {
+  z-index: 3;
+  opacity: 0.92;
+}
+
+.forest-world-layer.front {
+  z-index: 5;
+}
+
+.forest-floor-details {
+  z-index: 7;
+  pointer-events: none;
+}
+
+.forest-world-sun {
+  position: absolute;
+  top: 22px;
+  left: 28px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #ffe187;
+  box-shadow: 0 0 0 14px rgba(255, 225, 135, 0.23);
+}
+
+.forest-world.animated .forest-world-sun {
+  animation: forestSunGlow 3.6s ease-in-out infinite alternate;
+}
+
+.forest-world.calm .forest-cloud,
+.forest-world.calm .forest-world-sun {
+  animation: none;
+}
+
+.forest-world.calm .forest-cloud {
+  opacity: 0.42;
+}
+
+.forest-light-beam {
+  position: absolute;
+  top: 0;
+  width: 34px;
+  height: 260px;
+  background: linear-gradient(180deg, rgba(255, 244, 177, 0.36), transparent 78%);
+  transform: skewX(-16deg);
+  transform-origin: top center;
+}
+
+.forest-cloud {
+  position: absolute;
+  width: 44px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow:
+    14px 2px 0 rgba(255, 255, 255, 0.58),
+    -10px 4px 0 rgba(255, 255, 255, 0.5);
+}
+
+.forest-cloud.cloud-1 {
+  top: 48px;
+  right: 48px;
+  animation: forestDrift 7s ease-in-out infinite alternate;
+}
+
+.forest-cloud.cloud-2 {
+  top: 84px;
+  left: 90px;
+  transform: scale(0.72);
+  opacity: 0.64;
+  animation: forestDrift 9s ease-in-out infinite alternate-reverse;
+}
+
+.forest-rich-tree {
+  position: absolute;
+  bottom: 74px;
+  width: calc(36px * var(--tree-scale));
+  height: calc(96px * var(--tree-scale));
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+  animation: forestTreeRise 0.48s ease both, forestTreeSway 3.4s ease-in-out infinite alternate;
+  animation-delay: var(--tree-delay), calc(var(--tree-delay) + 400ms);
+}
+
+.forest-world.calm .forest-rich-tree {
+  animation: forestTreeRise 0.42s ease both;
+}
+
+.forest-world.game .forest-rich-tree {
+  animation: forestTreeRise 0.42s ease both;
+  filter: drop-shadow(0 6px 8px rgba(31, 63, 35, 0.18));
+}
+
+.forest-world-layer.back .forest-rich-tree {
+  bottom: 126px;
+  transform: translateX(-50%) scale(0.84);
+}
+
+.forest-world-layer.mid .forest-rich-tree {
+  bottom: 102px;
+}
+
+.forest-rich-tree::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 18%;
+  height: 48%;
+  border-radius: 999px 999px 4px 4px;
+  background: #7b5434;
+  transform: translateX(-50%);
+}
+
+.forest-rich-tree::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 34%;
+  width: 100%;
+  height: 58%;
+  border-radius: 50% 50% 44% 44%;
+  background: #2f8c42;
+  box-shadow:
+    -13px 9px 0 #45a551,
+    13px 10px 0 #5ab95c,
+    0 -9px 0 #78c96e;
+  transform: translateX(-50%);
+}
+
+.forest-rich-tree.pine::after,
+.forest-rich-tree.spruce::after {
+  width: 0;
+  height: 0;
+  bottom: 26%;
+  border-left: calc(21px * var(--tree-scale)) solid transparent;
+  border-right: calc(21px * var(--tree-scale)) solid transparent;
+  border-bottom: calc(82px * var(--tree-scale)) solid #23733c;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: 0 calc(18px * var(--tree-scale)) 0 calc(-4px * var(--tree-scale)) #2f8c42;
+}
+
+.forest-rich-tree.birch::before {
+  background:
+    linear-gradient(90deg, #e9e2cd 0 68%, #3c3126 69% 75%, #e9e2cd 76%);
+}
+
+.forest-rich-tree.birch::after {
+  background: #8fcf68;
+  box-shadow:
+    -12px 8px 0 #76bd5f,
+    12px 8px 0 #a4d979,
+    0 -9px 0 #c2e58e;
+}
+
+.forest-rich-tree.round::after {
+  width: 112%;
+  height: 56%;
+  border-radius: 50%;
+}
+
+.forest-rich-tree.willow::after {
+  width: 120%;
+  height: 72%;
+  border-radius: 48% 48% 60% 60%;
+  background: #3f9b50;
+  box-shadow:
+    -10px 12px 0 #61b466,
+    10px 12px 0 #77c36e,
+    0 25px 0 -8px #5fac65;
+}
+
+.forest-rich-tree.sapling {
+  height: calc(56px * var(--tree-scale));
+  width: calc(24px * var(--tree-scale));
+}
+
+.forest-rich-tree.sapling::after {
+  bottom: 42%;
+  width: 80%;
+  height: 42%;
+}
+
+.forest-rich-tree.fruit::after {
+  background: #3f984a;
+  box-shadow:
+    -12px 8px 0 #58ae56,
+    12px 8px 0 #72bf63,
+    0 -9px 0 #8fd46e,
+    -6px 18px 0 -5px #f17b73,
+    9px 15px 0 -5px #f2c451;
+}
+
+.forest-state-damaged .forest-rich-tree::after {
+  filter: grayscale(0.38) saturate(0.78);
+}
+
+.forest-rich-plant,
+.forest-soil-patch,
+.forest-pond,
+.forest-critter {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.forest-rich-plant {
+  width: calc(14px * var(--plant-scale));
+  height: calc(18px * var(--plant-scale));
+  transform-origin: bottom center;
+  animation: forestPlantPop 0.36s ease both;
+  animation-delay: var(--plant-delay);
+}
+
+.forest-world.calm .forest-rich-plant {
+  animation: forestPlantPop 0.28s ease both;
+}
+
+.forest-world.animated .forest-rich-plant,
+.forest-world.game .forest-rich-plant {
+  animation:
+    forestPlantPop 0.36s ease both,
+    grassWiggle 1.8s ease-in-out infinite alternate;
+  animation-delay: var(--plant-delay), calc(var(--plant-delay) + 350ms);
+}
+
+.forest-rich-plant.grass {
+  border-radius: 12px 12px 0 0;
+  background: #4f8b42;
+}
+
+.forest-rich-plant.fern {
+  width: calc(22px * var(--plant-scale));
+  height: calc(16px * var(--plant-scale));
+  border-radius: 50% 50% 0 0;
+  background: #2d7f3d;
+  box-shadow:
+    -8px 2px 0 -2px #57a65a,
+    8px 2px 0 -2px #57a65a;
+}
+
+.forest-rich-plant.flower,
+.forest-rich-plant.wildflower {
+  width: calc(9px * var(--plant-scale));
+  height: calc(9px * var(--plant-scale));
+  border-radius: 50%;
+  background: #ffd45f;
+  box-shadow:
+    -5px 0 0 #ef8aa3,
+    5px 0 0 #ef8aa3,
+    0 -5px 0 #ef8aa3,
+    0 5px 0 #ef8aa3,
+    0 13px 0 -4px #236d35;
+}
+
+.forest-rich-plant.wildflower {
+  background: #fff2a6;
+  box-shadow:
+    -5px 0 0 #8db3f3,
+    5px 0 0 #8db3f3,
+    0 -5px 0 #8db3f3,
+    0 5px 0 #8db3f3,
+    0 13px 0 -4px #236d35;
+}
+
+.forest-rich-plant.mushroom {
+  width: calc(18px * var(--plant-scale));
+  height: calc(16px * var(--plant-scale));
+  border-radius: 999px 999px 4px 4px;
+  background: #d85d55;
+  box-shadow: inset 6px 4px 0 rgba(255, 255, 255, 0.4);
+}
+
+.forest-rich-plant.reed {
+  width: calc(6px * var(--plant-scale));
+  height: calc(28px * var(--plant-scale));
+  border-radius: 999px;
+  background: #356f3b;
+  box-shadow:
+    7px 3px 0 #558f49,
+    -6px 6px 0 #558f49;
+}
+
+.forest-rich-plant.bush {
+  width: calc(26px * var(--plant-scale));
+  height: calc(18px * var(--plant-scale));
+  border-radius: 999px 999px 8px 8px;
+  background: #3f914a;
+  box-shadow:
+    -8px 3px 0 #58a759,
+    8px 3px 0 #67b765;
+}
+
+.forest-rich-plant.clover {
+  width: calc(10px * var(--plant-scale));
+  height: calc(10px * var(--plant-scale));
+  border-radius: 50%;
+  background: #6abf55;
+  box-shadow:
+    -6px 0 0 #6abf55,
+    6px 0 0 #6abf55,
+    0 -6px 0 #6abf55;
+}
+
+.forest-soil-patch {
+  z-index: 1;
+  width: 44px;
+  height: 15px;
+  border-radius: 999px;
+  background: rgba(100, 78, 50, 0.42);
+}
+
+.forest-pond {
+  z-index: 2;
+  width: 58px;
+  height: 24px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 38%, rgba(255, 255, 255, 0.55) 0 5px, transparent 6px),
+    #65b7d4;
+  box-shadow: 0 0 0 5px rgba(86, 141, 87, 0.24);
+}
+
+.forest-critter {
+  z-index: 6;
+  width: 24px;
+  height: 14px;
+}
+
+.forest-critter.rabbit {
+  border-radius: 999px;
+  background: #f0d6a1;
+  box-shadow: 8px -5px 0 -2px #f0d6a1;
+}
+
+.forest-critter.rabbit::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 12px;
+  width: 4px;
+  height: 12px;
+  border-radius: 999px;
+  background: #f0d6a1;
+  box-shadow: 5px 1px 0 #f0d6a1;
+}
+
+.forest-critter.bird {
+  width: 28px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4f7fb9;
+}
+
+.forest-critter.bird::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 3px;
+  width: 16px;
+  height: 7px;
+  border-radius: 999px 0 999px 999px;
+  background: #86a7d8;
+}
+
+.forest-game-targets {
+  z-index: 9;
+}
+
+.forest-target {
+  position: absolute;
+  width: 78px;
+  min-height: 40px;
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text-main);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.1;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.42),
+    0 10px 18px rgba(31, 45, 32, 0.18);
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+  animation: forestTargetPulse 1.8s ease-in-out infinite alternate;
+}
+
+.forest-target span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.forest-target.done,
+.forest-target:disabled {
+  opacity: 0.68;
+  cursor: default;
+  animation: none;
+}
+
+.forest-target.sapling {
+  background: #e0f2d8;
+}
+
+.forest-target.water {
+  background: #d9f0fa;
+}
+
+.forest-target.clean {
+  background: #f4edd9;
+}
+
+.forest-retro-grid {
+  position: absolute;
+  inset: 18px 12px 24px;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-auto-rows: minmax(30px, 1fr);
+  gap: 5px;
+  align-content: end;
+  padding: 8px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+.forest-retro-tile {
+  position: relative;
+  display: block;
+  min-height: 30px;
+  overflow: hidden;
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent),
+    #8fc46f;
+  animation: forestEmojiPop 0.36s ease both;
+}
+
+.forest-retro-tile::before,
+.forest-retro-tile::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.forest-retro-tile.tree::before,
+.forest-retro-tile.pine::before {
+  bottom: 3px;
+  width: 6px;
+  height: 16px;
+  border-radius: 4px 4px 2px 2px;
+  background: #73502f;
+}
+
+.forest-retro-tile.tree::after {
+  bottom: 12px;
+  width: 23px;
+  height: 21px;
+  border-radius: 50%;
+  background: #2f8c42;
+  box-shadow:
+    -7px 5px 0 #58aa57,
+    7px 5px 0 #4d9b50;
+}
+
+.forest-retro-tile.pine::after {
+  bottom: 10px;
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-bottom: 32px solid #286f3b;
+}
+
+.forest-retro-tile.sapling::after {
+  bottom: 7px;
+  width: 10px;
+  height: 22px;
+  border-radius: 999px 999px 0 0;
+  background: #3f9447;
+  box-shadow:
+    -7px 8px 0 -2px #69b35c,
+    7px 8px 0 -2px #69b35c;
+}
+
+.forest-retro-tile.grass::after,
+.forest-retro-tile.bush::after {
+  bottom: 5px;
+  width: 25px;
+  height: 13px;
+  border-radius: 999px 999px 5px 5px;
+  background: #4d9848;
+  box-shadow:
+    -9px 4px 0 -2px #66aa58,
+    9px 4px 0 -2px #66aa58;
+}
+
+.forest-retro-tile.flower::after,
+.forest-retro-tile.mushroom::after {
+  bottom: 13px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffd45f;
+  box-shadow:
+    -5px 0 0 #ef8aa3,
+    5px 0 0 #ef8aa3,
+    0 10px 0 -3px #2f7f3f;
+}
+
+.forest-retro-tile.water {
+  background:
+    radial-gradient(circle at 35% 44%, rgba(255, 255, 255, 0.55) 0 4px, transparent 5px),
+    #78bfd3;
+}
+
+.forest-upgrade-panel {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid var(--forest-border);
+  box-shadow: var(--forest-panel-shadow);
+}
+
+.forest-mission-panel {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid var(--forest-border);
+  box-shadow: var(--forest-panel-shadow);
+}
+
+.forest-mission-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.forest-mission-header span,
+.forest-next-upgrade span,
+.forest-ecosystem-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.forest-mission-header strong,
+.forest-next-upgrade strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.forest-mission-track,
+.forest-ecosystem-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(31, 107, 42, 0.12);
+}
+
+.forest-mission-track span,
+.forest-ecosystem-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8ccf58 0%, #1f6b2a 100%);
+  transition: width 0.3s ease;
+}
+
+.forest-mission-panel p,
+.forest-next-upgrade p {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.forest-ecosystem-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.forest-ecosystem-card {
+  min-width: 0;
+  padding: 12px 10px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid var(--forest-border);
+  box-shadow: var(--forest-panel-shadow);
+}
+
+.forest-ecosystem-card strong {
+  display: block;
+  margin: 4px 0 8px;
+  color: var(--text-main);
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.forest-ecosystem-card.reverse .forest-ecosystem-track i {
+  background: linear-gradient(90deg, #d8a958 0%, #8c6a37 100%);
+}
+
+.forest-next-upgrade {
+  margin: 0 0 14px;
+  padding: 12px;
+  border-radius: 16px;
+  background: #f8fbf4;
+  border: 1px solid rgba(67, 119, 63, 0.12);
+}
+
+.forest-upgrade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.forest-upgrade-card {
+  min-width: 0;
+  min-height: 112px;
+  border: 0;
+  border-radius: 16px;
+  padding: 11px 10px;
+  background: #eef5ea;
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+}
+
+.forest-upgrade-card span,
+.forest-upgrade-card strong,
+.forest-upgrade-card small {
+  display: block;
+}
+
+.forest-upgrade-card span {
+  min-height: 30px;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.forest-upgrade-card strong {
+  margin: 5px 0;
+  color: var(--brand-dark);
+  font-size: 15px;
+}
+
+.forest-upgrade-card small {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.forest-upgrade-card.maxed {
+  background: #dff0d8;
+}
+
+.forest-upgrade-card:disabled {
+  cursor: default;
+  opacity: 0.64;
+}
+
+@keyframes forestTreeRise {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(26px) scale(0.72);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes forestTreeSway {
+  from {
+    rotate: -1deg;
+  }
+
+  to {
+    rotate: 1.2deg;
+  }
+}
+
+@keyframes forestPlantPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(10px) scale(0.72);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes forestTargetPulse {
+  from {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+
+  to {
+    transform: translate(-50%, -50%) translateY(-5px);
+  }
+}
+
+@keyframes forestDrift {
+  from {
+    transform: translateX(-8px);
+  }
+
+  to {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes forestSunGlow {
+  from {
+    box-shadow: 0 0 0 12px rgba(255, 225, 135, 0.18);
+    transform: scale(0.98);
+  }
+
+  to {
+    box-shadow: 0 0 0 18px rgba(255, 225, 135, 0.28);
+    transform: scale(1.03);
+  }
 }
 
 .forest-advice-card.simple {

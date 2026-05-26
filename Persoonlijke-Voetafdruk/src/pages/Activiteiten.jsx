@@ -1,23 +1,122 @@
 import "./activiteiten.css"
 import { useEffect, useMemo, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { FiActivity } from "react-icons/fi"
+import {
+  FiActivity,
+  FiArrowRight,
+  FiCheckCircle,
+  FiMap,
+  FiShoppingBag,
+  FiTarget,
+  FiZap,
+} from "react-icons/fi"
+import { LuLeaf, LuTrees } from "react-icons/lu"
 import BottomNav from "../components/BottomNav"
 import AppHeader from "../components/AppHeader"
 import { buildImpactSnapshot } from "../utils/impactInsights"
 import { getLatestWeeklyAnswers, getProfileAnswers } from "../utils/questionnaireStorage"
 
+const ACTIVITY_PROGRESS_KEY = "activity-progress"
+
+const ACTION_CARDS = [
+  {
+    id: "food",
+    category: "voeding",
+    title: "Plantaardige maaltijd",
+    body: "Vervang vandaag 1 maaltijd door een plantaardige keuze.",
+    route: "/foodTasks",
+    estimateKg: 2.4,
+    icon: LuLeaf,
+  },
+  {
+    id: "transport",
+    category: "transport",
+    title: "Groene rit",
+    body: "Pak fiets, lopen of OV voor 1 korte rit.",
+    route: "/transportTasks",
+    estimateKg: 3.1,
+    icon: FiMap,
+  },
+  {
+    id: "energy",
+    category: "energie",
+    title: "Energie reset",
+    body: "Zet apparaten uit stand-by en douche korter.",
+    route: "/energyTasks",
+    estimateKg: 1.7,
+    icon: FiZap,
+  },
+  {
+    id: "consumption",
+    category: "consumptie",
+    title: "Koop-pauze",
+    body: "Stel 1 niet-noodzakelijke aankoop uit.",
+    route: "/tips",
+    estimateKg: 4.5,
+    icon: FiShoppingBag,
+  },
+]
+
+const FOCUS_COPY = {
+  transport: {
+    title: "Begin bij transport",
+    body: "Hier pak je deze week waarschijnlijk de snelste winst.",
+  },
+  voeding: {
+    title: "Begin bij voeding",
+    body: "Een kleine eetkeuze kan meteen verschil maken.",
+  },
+  wonen: {
+    title: "Begin thuis",
+    body: "Kies een actie rond verwarming, douchen of stroom.",
+  },
+  energie: {
+    title: "Begin bij energie",
+    body: "Een korte energiebesparing is vandaag haalbaar.",
+  },
+  consumptie: {
+    title: "Begin bij kopen",
+    body: "Minder nieuw kopen geeft snel rust in je voetafdruk.",
+  },
+}
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function getStoredActivityProgress() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ACTIVITY_PROGRESS_KEY))
+    return saved && typeof saved === "object" ? saved : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveActivityProgress(progress) {
+  try {
+    localStorage.setItem(ACTIVITY_PROGRESS_KEY, JSON.stringify(progress))
+  } catch {
+    // De pagina blijft bruikbaar zonder localStorage.
+  }
+}
+
 function Activiteiten() {
   const navigate = useNavigate()
   const location = useLocation()
+  const todayKey = getTodayKey()
   const [isGoalEditorOpen, setIsGoalEditorOpen] = useState(false)
+  const [activityProgress, setActivityProgress] = useState(getStoredActivityProgress)
   const [weeklyGoal, setWeeklyGoal] = useState(() => {
     const savedGoal = Number(localStorage.getItem("weekly-goal"))
-    return Number.isFinite(savedGoal) && savedGoal >= 0 ? savedGoal : 0
+    return Number.isFinite(savedGoal) && savedGoal >= 0 ? savedGoal : 150
   })
   const [goalDraft, setGoalDraft] = useState(() => String(weeklyGoal))
-  const profileAnswers = getProfileAnswers()
-  const weeklyAnswers = getLatestWeeklyAnswers()
+  const profileAnswers = useMemo(() => getProfileAnswers(), [])
+  const weeklyAnswers = useMemo(() => getLatestWeeklyAnswers(), [])
+  const completedToday = Array.isArray(activityProgress[todayKey])
+    ? activityProgress[todayKey]
+    : []
 
   const currentSnapshot = useMemo(() => {
     if (Object.keys(profileAnswers).length === 0 && Object.keys(weeklyAnswers).length === 0) {
@@ -41,36 +140,24 @@ function Activiteiten() {
     : weeklyEmission <= weeklyGoal
       ? "Op schema"
       : "Boven je doel"
-  const dailyGoal = Number((weeklyGoal / 7).toFixed(1))
-  const stretchGoal = Math.max(40, weeklyGoal - 20)
-  const focusCategory = location.state?.focusCategory ?? null
-  const focusCopy = {
-    transport: {
-      title: "Begin bij transport",
-      body: "Kies een kleine actie rond reizen of verplaatsing voor de meeste directe winst.",
-    },
-    voeding: {
-      title: "Begin bij voeding",
-      body: "Kies een kleine actie rond eten om snel verschil te maken in je voetafdruk.",
-    },
-    wonen: {
-      title: "Begin bij wonen",
-      body: "Kies een kleine actie thuis om deze week direct op energie en verbruik te besparen.",
-    },
-    energie: {
-      title: "Begin bij energie",
-      body: "Kies een kleine energiebesparing die je meteen thuis kunt toepassen.",
-    },
-    consumptie: {
-      title: "Begin bij consumptie",
-      body: "Kies een kleine actie rond kopen of gebruiken om je impact te verlagen.",
-    },
-  }
-  const activeFocus = focusCopy[focusCategory] ?? {
+  const focusCategory = location.state?.focusCategory ?? currentSnapshot?.dominantCategory ?? null
+  const activeFocus = FOCUS_COPY[focusCategory] ?? {
     title: "Kies 1 kleine actie met direct effect",
-    body:
-      "Begin bij transport of voeding. Dat zijn meestal de snelste plekken om winst te pakken in je persoonlijke voetafdruk.",
+    body: "Begin klein en houd je voortgang vandaag simpel bij.",
   }
+  const sortedActions = useMemo(() => {
+    return [...ACTION_CARDS].sort((a, b) => {
+      if (a.category === focusCategory) return -1
+      if (b.category === focusCategory) return 1
+      return b.estimateKg - a.estimateKg
+    })
+  }, [focusCategory])
+  const completedCount = completedToday.length
+  const completedImpact = ACTION_CARDS
+    .filter((action) => completedToday.includes(action.id))
+    .reduce((total, action) => total + action.estimateKg, 0)
+  const actionProgress = Math.round((completedCount / ACTION_CARDS.length) * 100)
+  const nextAction = sortedActions.find((action) => !completedToday.includes(action.id)) || sortedActions[0]
 
   useEffect(() => {
     localStorage.setItem("weekly-goal", String(weeklyGoal))
@@ -90,31 +177,68 @@ function Activiteiten() {
     setIsGoalEditorOpen(false)
   }
 
+  const toggleAction = (actionId) => {
+    setActivityProgress((current) => {
+      const todaysActions = current[todayKey] || []
+      const nextToday = todaysActions.includes(actionId)
+        ? todaysActions.filter((id) => id !== actionId)
+        : [...todaysActions, actionId]
+      const nextProgress = {
+        ...current,
+        [todayKey]: nextToday,
+      }
+
+      saveActivityProgress(nextProgress)
+      return nextProgress
+    })
+  }
+
   return (
     <div className="activiteiten-page">
       <AppHeader title="Acties" icon={<FiActivity />} />
 
       <div className="activiteiten-content">
         <header className="activiteiten-header">
-          <h1>Kies je impact vandaag</h1>
-          <p>Kleine acties, groot verschil</p>
+          <p className="section-label dark">Actiehub</p>
+          <h1>Vandaag verlagen</h1>
+          <p>Kies kleine acties die passen bij je week.</p>
         </header>
 
         <section className="progress-box">
-          <p>2 acties voltooid vandaag</p>
+          <div className="progress-box-top">
+            <div>
+              <span>Vandaag</span>
+              <strong>{completedCount}/{ACTION_CARDS.length} acties</strong>
+            </div>
+            <div className="progress-impact-badge">
+              -{completedImpact.toFixed(1)} kg
+            </div>
+          </div>
 
           <div className="progress-wrapper">
             <div className="progress-bar">
-              <div className="progress-fill"></div>
+              <div className="progress-fill" style={{ width: `${actionProgress}%` }} />
             </div>
-            <span className="progress-text">40/100</span>
+            <span className="progress-text">{actionProgress}%</span>
           </div>
         </section>
 
         <section className="actie-focus-card">
-          <p className="section-label dark">Deze weekfocus</p>
+          <div className="actie-focus-heading">
+            <FiTarget />
+            <span>Deze weekfocus</span>
+          </div>
           <h2>{activeFocus.title}</h2>
           <p>{activeFocus.body}</p>
+          {nextAction ? (
+            <button
+              type="button"
+              className="actie-focus-button"
+              onClick={() => toggleAction(nextAction.id)}
+            >
+              Doe: {nextAction.title}
+            </button>
+          ) : null}
         </section>
 
         <section className="actie-focus-card activiteit-goal-card">
@@ -138,19 +262,6 @@ function Activiteiten() {
                 : "Doelen zijn optioneel"}
             </span>
           </div>
-
-          {hasWeeklyGoal ? (
-            <div className="goal-metrics-grid">
-              <div className="goal-metric-card">
-                <span>Dagdoel</span>
-                <strong>{dailyGoal} kg</strong>
-              </div>
-              <div className="goal-metric-card">
-                <span>Stretch</span>
-                <strong>{stretchGoal} kg</strong>
-              </div>
-            </div>
-          ) : null}
 
           <button
             type="button"
@@ -206,30 +317,54 @@ function Activiteiten() {
           ) : null}
         </section>
 
-        <section className="cards">
-          <div className="actie-card food">
-            <h2>Voedsel</h2>
-            <p>Plantaardig lekkers</p>
-            <button onClick={() => navigate("/foodTasks")}>
-              Ontdek taken →
-            </button>
-          </div>
+        <section className="activity-action-list" aria-label="Acties voor vandaag">
+          {sortedActions.map((action) => {
+            const Icon = action.icon
+            const completed = completedToday.includes(action.id)
 
-          <div className="actie-card transport">
-            <h2>Transport</h2>
-            <p>Groenere reizen</p>
-            <button onClick={() => navigate("/transportTasks")}>
-              Ontdek taken →
-            </button>
-          </div>
+            return (
+              <article
+                key={action.id}
+                className={`activity-action-card${completed ? " completed" : ""}`}
+              >
+                <button
+                  type="button"
+                  className="activity-check-button"
+                  onClick={() => toggleAction(action.id)}
+                  aria-label={`${action.title} ${completed ? "ongedaan maken" : "afvinken"}`}
+                >
+                  <FiCheckCircle />
+                </button>
+                <div className="activity-action-icon">
+                  <Icon />
+                </div>
+                <div className="activity-action-copy">
+                  <span>{action.category}</span>
+                  <strong>{action.title}</strong>
+                  <p>{action.body}</p>
+                  <small>-{action.estimateKg} kg CO2e geschat</small>
+                </div>
+                <button
+                  type="button"
+                  className="activity-open-button"
+                  onClick={() => navigate(action.route)}
+                  aria-label={`${action.title} openen`}
+                >
+                  <FiArrowRight />
+                </button>
+              </article>
+            )
+          })}
+        </section>
 
-          <div className="actie-card energy">
-            <h2>Energie</h2>
-            <p>Slim verbruik</p>
-            <button onClick={() => navigate("/energyTasks")}>
-              Ontdek taken →
-            </button>
+        <section className="activity-forest-link">
+          <div>
+            <span>Mijn bos</span>
+            <strong>Bekijk je visuele impact</strong>
           </div>
+          <button type="button" onClick={() => navigate("/bos")}>
+            <LuTrees />
+          </button>
         </section>
       </div>
 

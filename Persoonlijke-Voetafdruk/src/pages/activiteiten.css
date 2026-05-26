@@ -1,9 +1,14 @@
 .activiteiten-page {
+  --activity-border: rgba(67, 119, 63, 0.16);
+  --activity-border-strong: rgba(42, 102, 51, 0.22);
+  --activity-shadow: 0 10px 22px rgba(31, 63, 35, 0.07);
   height: calc(100dvh - 32px);
   padding: 0;
   box-sizing: border-box;
   color: #1f2d20;
-  background: var(--page-bg);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(198, 229, 184, 0.62), transparent 34%),
+    var(--page-bg);
   border-radius: 30px;
   width: min(360px, calc(100vw - 24px));
   overflow: hidden;
@@ -16,38 +21,76 @@
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: 22px;
+  padding: 20px 18px 18px;
+}
+
+.activiteiten-header {
+  margin-bottom: 18px;
 }
 
 .activiteiten-header h1 {
-  margin: 0;
-  font-size: 32px;
-  line-height: 1.2;
+  margin: 2px 0 10px;
+  font-size: 28px;
+  line-height: 1.08;
   color: #1f2d20;
   font-family: var(--font-display);
 }
 
 .activiteiten-header p {
-  margin: 8px 0 0;
-  font-size: 16px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
   opacity: 0.9;
   color: #506250;
 }
 
 .progress-box {
-  margin-top: 22px;
+  margin-top: 0;
   background: linear-gradient(180deg, #1f6b2a 0%, #174f20 100%);
-  padding: 18px;
+  padding: 16px;
   border-radius: 22px;
   color: white;
   box-shadow: 0 18px 32px rgba(22, 53, 28, 0.16);
+}
+
+.progress-box-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.progress-box-top span {
+  display: block;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.progress-box-top strong {
+  display: block;
+  margin-top: 3px;
+  color: #ffffff;
+  font-size: 18px;
+  line-height: 1.15;
+}
+
+.progress-impact-badge {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .progress-wrapper {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .progress-text {
@@ -58,16 +101,37 @@
 
 .actie-focus-card {
   margin-top: 18px;
-  padding: 18px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, #f7faf4 0%, #ebf3e7 100%);
-  box-shadow: 0 12px 24px rgba(31, 45, 32, 0.08);
+  padding: 16px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid var(--activity-border);
+  box-shadow: var(--activity-shadow);
+}
+
+.actie-focus-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: var(--brand-dark);
+}
+
+.actie-focus-heading svg {
+  width: 17px;
+  height: 17px;
+}
+
+.actie-focus-heading span {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .actie-focus-card h2 {
   margin: 0;
   color: #1f2d20;
-  font-size: 24px;
+  font-size: 21px;
   line-height: 1.25;
   font-family: var(--font-display);
 }
@@ -78,8 +142,168 @@
   line-height: 1.5;
 }
 
+.actie-focus-button {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--brand-dark);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.activity-action-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.activity-action-card {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid var(--activity-border);
+  box-shadow: var(--activity-shadow);
+}
+
+.activity-action-card.completed {
+  background: #eef7ea;
+  border-color: rgba(31, 107, 42, 0.2);
+}
+
+.activity-check-button,
+.activity-open-button,
+.activity-forest-link button {
+  display: grid;
+  place-items: center;
+  border: 0;
+  cursor: pointer;
+}
+
+.activity-check-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #eef5ea;
+  color: rgba(31, 107, 42, 0.42);
+}
+
+.activity-action-card.completed .activity-check-button {
+  background: var(--brand-dark);
+  color: #ffffff;
+}
+
+.activity-action-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: #f2f7ee;
+  color: var(--brand-dark);
+}
+
+.activity-action-icon svg,
+.activity-check-button svg,
+.activity-open-button svg,
+.activity-forest-link button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.activity-action-copy {
+  min-width: 0;
+}
+
+.activity-action-copy span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.activity-action-copy strong {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+.activity-action-copy p {
+  margin: 4px 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.activity-action-copy small {
+  color: var(--brand-dark);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.activity-open-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #eef5ea;
+  color: var(--brand-dark);
+}
+
+.activity-forest-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #f7faf4 0%, #ebf3e7 100%);
+  border: 1px solid var(--activity-border);
+  box-shadow: var(--activity-shadow);
+}
+
+.activity-forest-link span,
+.activity-forest-link strong {
+  display: block;
+}
+
+.activity-forest-link span {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.activity-forest-link strong {
+  margin-top: 3px;
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.activity-forest-link button {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--brand-dark);
+  color: #ffffff;
+}
+
 .cards {
-  margin-top: 22px;
+  margin-top: 18px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -102,10 +326,18 @@
   }
 
   .activiteiten-header h1 {
-    font-size: 22px;
+    font-size: 27px;
   }
 
   .actie-focus-card h2 {
-    font-size: 22px;
+    font-size: 20px;
+  }
+
+  .activity-action-card {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .activity-action-icon {
+    display: none;
   }
 }
