@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { FiArrowRight, FiCheckCircle, FiEdit3, FiPlus } from "react-icons/fi"
 import { HiOutlineCalculator } from "react-icons/hi"
 import { LuLeaf } from "react-icons/lu"
-import BottomNav from "../components/BottomNav"
-import AppHeader from "../components/AppHeader"
+import MobilePageShell from "../components/MobilePageShell"
 import {
   buildImpactSnapshot,
   getFocusLabel,
@@ -643,10 +642,12 @@ function Home() {
   }
 
   return (
-  <div className="home-page">
-    <AppHeader title="Impact" icon={<LuLeaf />} />
-
-    <div className="home-content">
+  <MobilePageShell
+    title="Impact"
+    icon={<LuLeaf />}
+    className="home-page"
+    contentClassName="home-content"
+  >
       {showWeeklyReminder ? (
         <section className="home-reminder-card">
           <p className="section-label dark">Wekelijkse reminder</p>
@@ -1262,10 +1263,7 @@ function Home() {
         <p className="home-fact-text">{facts[activeFactIndex]}</p>
       </section>
 
-    </div>
-
-      <BottomNav />
-    </div>
+  </MobilePageShell>
   )
 }
 

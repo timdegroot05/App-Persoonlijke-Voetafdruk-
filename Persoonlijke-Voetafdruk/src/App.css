@@ -14,6 +14,9 @@
   --brand-darker: #174f20;
   --shadow-soft: 0 14px 30px rgba(31, 45, 32, 0.09);
   --card-border: rgba(31, 45, 32, 0.08);
+  --app-shell-width: min(360px, calc(100vw - 24px));
+  --app-shell-height: calc(100dvh - 32px);
+  --app-shell-radius: 30px;
 }
 
 body {
@@ -32,35 +35,59 @@ body {
   padding: 16px 0;
 }
 
-.home-page,
 .app-container,
 .result,
-.calculator-page {
-  width: min(360px, calc(100vw - 24px));
+.calculator-page,
+.welcome-page,
+.profile-page,
+.info-container {
+  width: var(--app-shell-width);
+  height: var(--app-shell-height);
+  max-height: var(--app-shell-height);
   min-height: 640px;
   background: var(--page-bg);
-  border-radius: 30px;
+  border-radius: var(--app-shell-radius);
   padding: 0;
   overflow: hidden;
+  box-sizing: border-box;
   animation: fadeIn 0.3s ease;
+}
+
+.mobile-page-shell {
+  width: var(--app-shell-width);
+  height: var(--app-shell-height);
+  max-height: var(--app-shell-height);
+  min-height: 640px;
+  border-radius: var(--app-shell-radius);
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+}
+
+.mobile-page-shell-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .home-page {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 32px);
   overflow: hidden;
   background:
     radial-gradient(circle at top center, rgba(255, 255, 255, 0.34), transparent 38%),
     linear-gradient(180deg, #eef3ea 0%, var(--page-bg) 100%);
 }
 
-.home-page,
 .app-container,
 .result,
 .calculator-page,
-.welcome-page {
-  max-height: calc(100dvh - 32px);
+.welcome-page,
+.profile-page,
+.info-container {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -1636,7 +1663,6 @@ body {
 .tips-page {
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 32px);
   overflow: hidden;
 }
 
@@ -2281,7 +2307,6 @@ body {
     linear-gradient(180deg, #f5f7ef 0%, #e8f1df 100%);
   display: flex;
   flex-direction: column;
-  height: calc(100dvh - 32px);
   overflow: hidden;
 }
 
@@ -5336,7 +5361,6 @@ body {
 }
 
 .profile-page {
-  height: calc(100dvh - 32px);
   overflow: hidden;
 }
 
@@ -6331,6 +6355,12 @@ body {
 }
 
 @media (max-width: 480px) {
+  :root {
+    --app-shell-width: 100vw;
+    --app-shell-height: 100dvh;
+    --app-shell-radius: 0px;
+  }
+
   #root {
     min-height: 100dvh;
     padding: 0;
@@ -6342,22 +6372,15 @@ body {
   .calculator-page,
   .welcome-page,
   .tips-page,
-  .profile-page {
-    width: 100vw;
-    min-height: 100dvh;
-    height: 100dvh;
-    max-height: 100dvh;
-    border-radius: 0;
+  .profile-page,
+  .forest-page {
+    margin: 0;
   }
 
   .activiteiten-page,
   .overzicht-container,
   .info-container {
-    width: 100vw !important;
-    min-height: 100dvh;
-    height: 100dvh;
-    max-height: 100dvh;
-    border-radius: 0;
+    margin: 0 !important;
   }
 
   .home-header {

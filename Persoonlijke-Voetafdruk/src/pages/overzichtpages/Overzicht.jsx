@@ -1,9 +1,8 @@
 import "./overzicht.css"
-import { useMemo } from "react"
+import { useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { FiBarChart2, FiInfo } from "react-icons/fi"
-import BottomNav from "../../components/BottomNav"
-import AppHeader from "../../components/AppHeader"
+import MobilePageShell from "../../components/MobilePageShell"
 import { buildImpactSnapshot, getFocusLabel } from "../../utils/impactInsights"
 import {
   getLatestWeeklyAnswers,
@@ -12,12 +11,13 @@ import {
 import {
   buildWeeklyOverviewItems,
   formatWeekRangeLabel,
-  getStoredWeeklyResults,
 } from "../../utils/weeklyResults"
 import { getAugmentedWeeklyResults } from "../../utils/customActivities"
 
 function Overzicht() {
   const navigate = useNavigate()
+  const categoryRailRef = useRef(null)
+  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0)
   const profileAnswers = useMemo(() => getProfileAnswers(), [])
   const weeklyAnswers = useMemo(() => getLatestWeeklyAnswers(), [])
   const snapshot = useMemo(
@@ -28,7 +28,56 @@ function Overzicht() {
     () => buildWeeklyOverviewItems(getAugmentedWeeklyResults()),
     []
   )
+  const rawWeeklyResults = useMemo(() => getAugmentedWeeklyResults(), [])
   const latestWeeklyActivity = weeklyHistory[0] ?? null
+  const weeklyEmission = latestWeeklyActivity?.totalEmission ?? snapshot.weeklyEmission
+  const dailyEmission = latestWeeklyActivity
+    ? Number((latestWeeklyActivity.totalEmission / 7).toFixed(1))
+    : snapshot.dailyEmission
+  const totalEmission = useMemo(() => {
+    if (weeklyHistory.length === 0) {
+      return snapshot.weeklyEmission
+    }
+
+    return Number(
+      weeklyHistory.reduce((sum, week) => sum + (Number(week.totalEmission) || 0), 0).toFixed(1)
+    )
+  }, [snapshot.weeklyEmission, weeklyHistory])
+  const averageWeeklyEmission = useMemo(() => {
+    if (weeklyHistory.length === 0) {
+      return snapshot.weeklyEmission
+    }
+
+    const totalWeeklyEmission = weeklyHistory.reduce(
+      (sum, week) => sum + (Number(week.totalEmission) || 0),
+      0
+    )
+
+    return Number((totalWeeklyEmission / weeklyHistory.length).toFixed(1))
+  }, [snapshot.weeklyEmission, weeklyHistory])
+  const yearlyEmission = useMemo(() => {
+    const currentYear = new Date().getFullYear()
+    const yearStart = new Date(Date.UTC(currentYear, 0, 1))
+    const yearEnd = new Date(Date.UTC(currentYear, 11, 31))
+
+    const totalForYear = rawWeeklyResults.reduce((sum, week) => {
+      const weekStart = new Date(`${week.weekStart}T00:00:00Z`)
+      const weekEnd = new Date(`${week.weekEnd}T00:00:00Z`)
+      const overlapStart = weekStart > yearStart ? weekStart : yearStart
+      const overlapEnd = weekEnd < yearEnd ? weekEnd : yearEnd
+
+      if (overlapEnd < overlapStart) {
+        return sum
+      }
+
+      const overlapDays = Math.floor((overlapEnd - overlapStart) / 86400000) + 1
+      const overlapShare = overlapDays / 7
+
+      return sum + (Number(week.totalEmission) || 0) * overlapShare
+    }, 0)
+
+    return Number(totalForYear.toFixed(1))
+  }, [rawWeeklyResults])
   const weeklyOverview = useMemo(() => {
     const entries = latestWeeklyActivity
       ? [
@@ -49,44 +98,58 @@ function Overzicht() {
   const largestCategory = weeklyOverview.find(
     ([category]) => category !== "achtergrondimpact"
   )
-  const weeklyEmission = latestWeeklyActivity?.totalEmission ?? snapshot.weeklyEmission
-  const dailyEmission = latestWeeklyActivity
-    ? Number((latestWeeklyActivity.totalEmission / 7).toFixed(1))
-    : snapshot.dailyEmission
+  const categorySwipeItems = useMemo(
+    () => {
+      const totals = rawWeeklyResults.reduce(
+        (currentTotals, week) => ({
+          wonen: currentTotals.wonen + (Number(week.homeEmission) || 0),
+          transport: currentTotals.transport + (Number(week.transportEmission) || 0),
+          voeding: currentTotals.voeding + (Number(week.foodEmission) || 0),
+          consumptie: currentTotals.consumptie + (Number(week.consumptionEmission) || 0),
+        }),
+        {
+          wonen: 0,
+          transport: 0,
+          voeding: 0,
+          consumptie: 0,
+        }
+      )
+
+      return Object.entries(totals)
+        .map(([category, value]) => ({
+          key: category,
+          label: getFocusLabel(category),
+          value: Number(value.toFixed(1)),
+        }))
+        .sort((first, second) => second.value - first.value)
+    },
+    [rawWeeklyResults]
+  )
+
+  const updateActiveCategoryIndex = (element) => {
+    if (!element) {
+      return
+    }
+
+    const firstCard = element.querySelector(".overzicht-category-swipe-card")
+    if (!firstCard) {
+      return
+    }
+
+    const railGap = Number.parseFloat(window.getComputedStyle(element).columnGap || "0")
+    const cardWidth = firstCard.getBoundingClientRect().width + railGap
+    const nextIndex = Math.round(element.scrollLeft / cardWidth)
+    setActiveCategoryIndex(nextIndex)
+  }
 
   return (
     <div className="overzicht-page">
-      <div className="overzicht-container">
-        <AppHeader title="Overzicht" icon={<FiBarChart2 />} />
-
-        <div className="overview-content">
-        <section className="overzicht-summary-card">
-          <p className="section-label dark">Jouw samenvatting</p>
-          <h2>Je weekimpact in een oogopslag</h2>
-          <div className="overzicht-summary-grid">
-            <div className="overzicht-summary-stat">
-              <span>Dagelijks</span>
-              <strong>{dailyEmission} kg</strong>
-            </div>
-            <div className="overzicht-summary-stat">
-              <span>Wekelijks</span>
-              <strong>{weeklyEmission} kg</strong>
-            </div>
-          </div>
-        </section>
-
-        <div
-          className="overzicht-card overzicht-highlight"
-          onClick={() => navigate("/grootste-categorie")}
-        >
-          <h2>Grootste categorie</h2>
-          <p>
-            {largestCategory
-              ? `${getFocusLabel(largestCategory[0])} met ${Number(largestCategory[1].toFixed(1))} kg CO2e per week`
-              : "Nog geen gegevens beschikbaar"}
-          </p>
-        </div>
-
+      <MobilePageShell
+        title="Overzicht"
+        icon={<FiBarChart2 />}
+        className="overzicht-container"
+        contentClassName="overview-content"
+      >
         <section className="overzicht-card overzicht-week-card">
           <h2>Weekoverzicht</h2>
           <div className="overzicht-week-list">
@@ -113,6 +176,39 @@ function Overzicht() {
             ))}
           </div>
         </section>
+
+        {categorySwipeItems.length > 0 ? (
+          <section className="overzicht-category-swipe-section">
+            <div className="overzicht-history-header">
+              <p className="section-label dark">Uitstoot per categorie</p>
+            </div>
+
+            <div className="home-rail-dots" aria-hidden="true">
+              {categorySwipeItems.map((item, index) => (
+                <span
+                  key={item.key}
+                  className={`home-rail-dot${index === activeCategoryIndex ? " active" : ""}`}
+                />
+              ))}
+            </div>
+
+            <div
+              ref={categoryRailRef}
+              className="overzicht-category-swipe-rail"
+              onScroll={(event) => updateActiveCategoryIndex(event.currentTarget)}
+            >
+              {categorySwipeItems.map((item) => (
+                <article
+                  key={item.key}
+                  className="overzicht-card overzicht-category-swipe-card"
+                >
+                  <span className="overzicht-category-kicker">{item.label}</span>
+                  <strong>{item.value} kg CO2e</strong>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="overzicht-card overzicht-history-card">
           <div className="overzicht-history-header">
@@ -184,10 +280,10 @@ function Overzicht() {
 
           <div
             className="overzicht-card"
-            onClick={() => navigate("/wekelijkse-uitstoot")}
+            onClick={() => navigate("/gemiddelde-jaar")}
           >
-            <h2>Wekelijkse uitstoot</h2>
-            <p>{weeklyEmission} kg CO2e</p>
+            <h2>Jaarlijkse uitstoot</h2>
+            <p>{yearlyEmission} kg CO2e</p>
           </div>
 
           <div
@@ -195,21 +291,18 @@ function Overzicht() {
             onClick={() => navigate("/gemiddelde-week")}
           >
             <h2>Gemiddelde wekelijkse uitstoot</h2>
-            <p>{weeklyEmission} kg CO2e</p>
+            <p>{averageWeeklyEmission} kg CO2e</p>
           </div>
 
           <div
             className="overzicht-card"
-            onClick={() => navigate("/gemiddelde-jaar")}
+            onClick={() => navigate("/wekelijkse-uitstoot")}
           >
-            <h2>Gemiddelde jaarlijkse uitstoot</h2>
-            <p>{Number((weeklyEmission * 52).toFixed(0))} kg CO2e</p>
+            <h2>Totale uitstoot</h2>
+            <p>{totalEmission} kg CO2e</p>
           </div>
         </div>
-        </div>
-
-        <BottomNav />
-      </div>
+      </MobilePageShell>
     </div>
   )
 }

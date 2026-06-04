@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import BottomNav from "../components/BottomNav"
-import AppHeader from "../components/AppHeader"
+import MobilePageShell from "../components/MobilePageShell"
 import { LuTrees } from "react-icons/lu"
 import { watchAuthState } from "../authState"
 import { getUserQuestionnaireData } from "../userService"
@@ -600,9 +599,12 @@ function BosVisualisatie() {
   }
 
   return (
-    <div className="calculator-page forest-page">
-      <AppHeader title="Bos" icon={<LuTrees />} />
-
+    <MobilePageShell
+      title="Bos"
+      icon={<LuTrees />}
+      className="forest-page"
+      contentClassName="forest-page-content"
+    >
       <div className="calculator-card forest-card">
         <p className="section-label dark">Bosvisualisatie</p>
         <h1 className="calculator-title">Mijn bos</h1>
@@ -838,9 +840,7 @@ function BosVisualisatie() {
           </div>
         </div>
       </div>
-
-      <BottomNav />
-    </div>
+    </MobilePageShell>
   )
 }
 

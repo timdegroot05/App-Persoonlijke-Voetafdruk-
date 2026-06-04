@@ -1,5 +1,5 @@
 import "./activiteiten.css"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import {
   FiActivity,
@@ -7,81 +7,156 @@ import {
   FiCheckCircle,
   FiMap,
   FiShoppingBag,
-  FiTarget,
   FiZap,
 } from "react-icons/fi"
 import { LuLeaf, LuTrees } from "react-icons/lu"
-import BottomNav from "../components/BottomNav"
-import AppHeader from "../components/AppHeader"
+import MobilePageShell from "../components/MobilePageShell"
 import { buildImpactSnapshot } from "../utils/impactInsights"
 import { getLatestWeeklyAnswers, getProfileAnswers } from "../utils/questionnaireStorage"
 
 const ACTIVITY_PROGRESS_KEY = "activity-progress"
 
-const ACTION_CARDS = [
+const CATEGORY_ORDER = ["voeding", "consumptie", "transport", "energie"]
+
+const ACTION_GROUPS = [
   {
-    id: "food",
     category: "voeding",
-    title: "Plantaardige maaltijd",
-    body: "Vervang vandaag 1 maaltijd door een plantaardige keuze.",
-    route: "/foodTasks",
-    estimateKg: 2.4,
-    icon: LuLeaf,
+    title: "Voeding",
+    actions: [
+      {
+        id: "food-plant-based",
+        title: "Plantaardige maaltijd",
+        body: "Vervang vandaag 1 maaltijd door een plantaardige keuze.",
+        route: "/foodTasks",
+        estimateKg: 2.4,
+        icon: LuLeaf,
+      },
+      {
+        id: "food-local",
+        title: "Kies lokaal",
+        body: "Koop vandaag groente of fruit van het seizoen.",
+        route: "/foodTasks",
+        estimateKg: 1.6,
+        icon: LuLeaf,
+      },
+      {
+        id: "food-no-waste",
+        title: "Restjesdag",
+        body: "Gebruik wat je al in huis hebt en voorkom voedselverspilling.",
+        route: "/foodTasks",
+        estimateKg: 1.9,
+        icon: LuLeaf,
+      },
+    ],
   },
   {
-    id: "transport",
-    category: "transport",
-    title: "Groene rit",
-    body: "Pak fiets, lopen of OV voor 1 korte rit.",
-    route: "/transportTasks",
-    estimateKg: 3.1,
-    icon: FiMap,
-  },
-  {
-    id: "energy",
-    category: "energie",
-    title: "Energie reset",
-    body: "Zet apparaten uit stand-by en douche korter.",
-    route: "/energyTasks",
-    estimateKg: 1.7,
-    icon: FiZap,
-  },
-  {
-    id: "consumption",
     category: "consumptie",
-    title: "Koop-pauze",
-    body: "Stel 1 niet-noodzakelijke aankoop uit.",
-    route: "/tips",
-    estimateKg: 4.5,
-    icon: FiShoppingBag,
+    title: "Consumptie",
+    actions: [
+      {
+        id: "consumption-pause",
+        title: "Koop-pauze",
+        body: "Stel 1 niet-noodzakelijke aankoop uit.",
+        route: "/tips",
+        estimateKg: 4.5,
+        icon: FiShoppingBag,
+      },
+      {
+        id: "consumption-second-hand",
+        title: "Kies tweedehands",
+        body: "Check eerst of je iets tweedehands kunt vinden.",
+        route: "/tips",
+        estimateKg: 3.2,
+        icon: FiShoppingBag,
+      },
+      {
+        id: "consumption-repair",
+        title: "Repareer iets kleins",
+        body: "Maak iets bruikbaars weer heel in plaats van iets nieuws te kopen.",
+        route: "/tips",
+        estimateKg: 2.7,
+        icon: FiShoppingBag,
+      },
+    ],
+  },
+  {
+    category: "transport",
+    title: "Transport",
+    actions: [
+      {
+        id: "transport-green-trip",
+        title: "Groene rit",
+        body: "Pak fiets, lopen of OV voor 1 korte rit.",
+        route: "/transportTasks",
+        estimateKg: 3.1,
+        icon: FiMap,
+      },
+      {
+        id: "transport-carpool",
+        title: "Rijd samen",
+        body: "Deel vandaag een autorit met iemand anders.",
+        route: "/transportTasks",
+        estimateKg: 2.2,
+        icon: FiMap,
+      },
+      {
+        id: "transport-combine",
+        title: "Combineer ritten",
+        body: "Voorkom een extra rit door je stops te bundelen.",
+        route: "/transportTasks",
+        estimateKg: 1.8,
+        icon: FiMap,
+      },
+    ],
+  },
+  {
+    category: "energie",
+    title: "Energie",
+    actions: [
+      {
+        id: "energy-reset",
+        title: "Energie reset",
+        body: "Zet apparaten uit stand-by en douche korter.",
+        route: "/energyTasks",
+        estimateKg: 1.7,
+        icon: FiZap,
+      },
+      {
+        id: "energy-lights",
+        title: "Lichten uit",
+        body: "Laat vandaag nergens onnodig lampen branden.",
+        route: "/energyTasks",
+        estimateKg: 1.1,
+        icon: FiZap,
+      },
+      {
+        id: "energy-lower-heat",
+        title: "Thermostaat lager",
+        body: "Zet de verwarming vandaag een graadje lager.",
+        route: "/energyTasks",
+        estimateKg: 2.0,
+        icon: FiZap,
+      },
+    ],
   },
 ]
 
-const FOCUS_COPY = {
-  transport: {
-    title: "Begin bij transport",
-    body: "Hier pak je deze week waarschijnlijk de snelste winst.",
-  },
-  voeding: {
-    title: "Begin bij voeding",
-    body: "Een kleine eetkeuze kan meteen verschil maken.",
-  },
-  wonen: {
-    title: "Begin thuis",
-    body: "Kies een actie rond verwarming, douchen of stroom.",
-  },
-  energie: {
-    title: "Begin bij energie",
-    body: "Een korte energiebesparing is vandaag haalbaar.",
-  },
-  consumptie: {
-    title: "Begin bij kopen",
-    body: "Minder nieuw kopen geeft snel rust in je voetafdruk.",
-  },
+function getCurrentWeekKey(date = new Date()) {
+  const currentDate = new Date(date)
+  const day = currentDate.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  currentDate.setHours(0, 0, 0, 0)
+  currentDate.setDate(currentDate.getDate() + diff)
+  return currentDate.toISOString().slice(0, 10)
 }
 
-function getTodayKey() {
-  return new Date().toISOString().slice(0, 10)
+function getStartOfWeek(date = new Date()) {
+  const currentDate = new Date(date)
+  const day = currentDate.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  currentDate.setHours(0, 0, 0, 0)
+  currentDate.setDate(currentDate.getDate() + diff)
+  return currentDate
 }
 
 function getStoredActivityProgress() {
@@ -104,7 +179,11 @@ function saveActivityProgress(progress) {
 function Activiteiten() {
   const navigate = useNavigate()
   const location = useLocation()
-  const todayKey = getTodayKey()
+  const categoryRailRefs = useRef({})
+  const statsRailRef = useRef(null)
+  const currentWeekKey = getCurrentWeekKey()
+  const [activeCategoryIndexes, setActiveCategoryIndexes] = useState({})
+  const [activeStatsIndex, setActiveStatsIndex] = useState(0)
   const [isGoalEditorOpen, setIsGoalEditorOpen] = useState(false)
   const [activityProgress, setActivityProgress] = useState(getStoredActivityProgress)
   const [weeklyGoal, setWeeklyGoal] = useState(() => {
@@ -114,8 +193,8 @@ function Activiteiten() {
   const [goalDraft, setGoalDraft] = useState(() => String(weeklyGoal))
   const profileAnswers = useMemo(() => getProfileAnswers(), [])
   const weeklyAnswers = useMemo(() => getLatestWeeklyAnswers(), [])
-  const completedToday = Array.isArray(activityProgress[todayKey])
-    ? activityProgress[todayKey]
+  const completedThisWeek = Array.isArray(activityProgress[currentWeekKey])
+    ? activityProgress[currentWeekKey]
     : []
 
   const currentSnapshot = useMemo(() => {
@@ -141,23 +220,30 @@ function Activiteiten() {
       ? "Op schema"
       : "Boven je doel"
   const focusCategory = location.state?.focusCategory ?? currentSnapshot?.dominantCategory ?? null
-  const activeFocus = FOCUS_COPY[focusCategory] ?? {
-    title: "Kies 1 kleine actie met direct effect",
-    body: "Begin klein en houd je voortgang vandaag simpel bij.",
-  }
-  const sortedActions = useMemo(() => {
-    return [...ACTION_CARDS].sort((a, b) => {
+  const categoryGroups = useMemo(() => {
+    const groups = [...ACTION_GROUPS]
+
+    groups.sort((a, b) => {
       if (a.category === focusCategory) return -1
       if (b.category === focusCategory) return 1
-      return b.estimateKg - a.estimateKg
+      return CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category)
     })
+
+    return groups
   }, [focusCategory])
-  const completedCount = completedToday.length
-  const completedImpact = ACTION_CARDS
-    .filter((action) => completedToday.includes(action.id))
-    .reduce((total, action) => total + action.estimateKg, 0)
-  const actionProgress = Math.round((completedCount / ACTION_CARDS.length) * 100)
-  const nextAction = sortedActions.find((action) => !completedToday.includes(action.id)) || sortedActions[0]
+
+  const activityStats = useMemo(() => {
+    const weeklyCompleted = completedThisWeek.length
+    const totalCompleted = Object.values(activityProgress).reduce(
+      (count, actions) => count + (Array.isArray(actions) ? actions.length : 0),
+      0
+    )
+
+    return {
+      weeklyCompleted,
+      totalCompleted,
+    }
+  }, [activityProgress, completedThisWeek.length])
 
   useEffect(() => {
     localStorage.setItem("weekly-goal", String(weeklyGoal))
@@ -179,13 +265,13 @@ function Activiteiten() {
 
   const toggleAction = (actionId) => {
     setActivityProgress((current) => {
-      const todaysActions = current[todayKey] || []
-      const nextToday = todaysActions.includes(actionId)
-        ? todaysActions.filter((id) => id !== actionId)
-        : [...todaysActions, actionId]
+      const weeklyActions = current[currentWeekKey] || []
+      const nextWeek = weeklyActions.includes(actionId)
+        ? weeklyActions.filter((id) => id !== actionId)
+        : [...weeklyActions, actionId]
       const nextProgress = {
         ...current,
-        [todayKey]: nextToday,
+        [currentWeekKey]: nextWeek,
       }
 
       saveActivityProgress(nextProgress)
@@ -193,52 +279,158 @@ function Activiteiten() {
     })
   }
 
+  const updateActiveCategoryIndex = (category, element) => {
+    if (!element) {
+      return
+    }
+
+    const firstCard = element.querySelector(".activity-category-card")
+    if (!firstCard) {
+      return
+    }
+
+    const railGap = Number.parseFloat(window.getComputedStyle(element).columnGap || "0")
+    const cardWidth = firstCard.getBoundingClientRect().width + railGap
+    const index = Math.round(element.scrollLeft / cardWidth)
+    setActiveCategoryIndexes((current) => ({
+      ...current,
+      [category]: index,
+    }))
+  }
+
+  const updateActiveStatsIndex = (element) => {
+    if (!element) {
+      return
+    }
+
+    const firstCard = element.querySelector(".activity-stats-card")
+    if (!firstCard) {
+      return
+    }
+
+    const railGap = Number.parseFloat(window.getComputedStyle(element).columnGap || "0")
+    const cardWidth = firstCard.getBoundingClientRect().width + railGap
+    const index = Math.round(element.scrollLeft / cardWidth)
+    setActiveStatsIndex(index)
+  }
+
   return (
-    <div className="activiteiten-page">
-      <AppHeader title="Acties" icon={<FiActivity />} />
-
-      <div className="activiteiten-content">
-        <header className="activiteiten-header">
-          <p className="section-label dark">Actiehub</p>
-          <h1>Vandaag verlagen</h1>
-          <p>Kies kleine acties die passen bij je week.</p>
-        </header>
-
-        <section className="progress-box">
-          <div className="progress-box-top">
-            <div>
-              <span>Vandaag</span>
-              <strong>{completedCount}/{ACTION_CARDS.length} acties</strong>
-            </div>
-            <div className="progress-impact-badge">
-              -{completedImpact.toFixed(1)} kg
-            </div>
+    <MobilePageShell
+      title="Acties"
+      icon={<FiActivity />}
+      className="activiteiten-page"
+      contentClassName="activiteiten-content"
+    >
+        <section className="activity-category-rail-section">
+          <div className="activity-category-header">
+            <p className="section-label dark">Verbeteracties</p>
           </div>
 
-          <div className="progress-wrapper">
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: `${actionProgress}%` }} />
-            </div>
-            <span className="progress-text">{actionProgress}%</span>
+          <div className="activity-category-sections">
+            {categoryGroups.map((group) => (
+              <section key={group.category} className="activity-category-section">
+                <div className="activity-category-card-head">
+                  <span>{group.category}</span>
+                </div>
+
+                <div className="activity-category-dots" aria-hidden="true">
+                  {group.actions.map((action, index) => (
+                    <span
+                      key={action.id}
+                      className={`activity-category-dot${
+                        index === (activeCategoryIndexes[group.category] || 0) ? " active" : ""
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <div
+                  ref={(element) => {
+                    categoryRailRefs.current[group.category] = element
+                  }}
+                  className="activity-category-rail"
+                  aria-label={`Horizontaal scrollbare ${group.title.toLowerCase()} acties`}
+                  onScroll={(event) =>
+                    updateActiveCategoryIndex(group.category, event.currentTarget)
+                  }
+                >
+                  {group.actions.map((action) => {
+                    const Icon = action.icon
+                    const completed = completedThisWeek.includes(action.id)
+
+                    return (
+                      <article
+                        key={action.id}
+                        className={`activity-action-card activity-category-card${
+                          completed ? " completed" : ""
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          className="activity-check-button"
+                          onClick={() => toggleAction(action.id)}
+                          aria-label={`${action.title} ${completed ? "ongedaan maken" : "afvinken"}`}
+                        >
+                          <FiCheckCircle />
+                        </button>
+                        <div className="activity-action-icon">
+                          <Icon />
+                        </div>
+                        <div className="activity-action-copy">
+                          <span>{group.category}</span>
+                          <strong>{action.title}</strong>
+                          <p>{action.body}</p>
+                          <small>-{action.estimateKg} kg CO2e geschat</small>
+                        </div>
+                        <button
+                          type="button"
+                          className="activity-open-button"
+                          onClick={() => navigate(action.route)}
+                          aria-label={`${action.title} openen`}
+                        >
+                          <FiArrowRight />
+                        </button>
+                      </article>
+                    )
+                  })}
+                </div>
+              </section>
+            ))}
           </div>
         </section>
 
-        <section className="actie-focus-card">
-          <div className="actie-focus-heading">
-            <FiTarget />
-            <span>Deze weekfocus</span>
+        <section className="activity-stats-section">
+          <div className="activity-category-header">
+            <p className="section-label dark">Voortgang</p>
           </div>
-          <h2>{activeFocus.title}</h2>
-          <p>{activeFocus.body}</p>
-          {nextAction ? (
-            <button
-              type="button"
-              className="actie-focus-button"
-              onClick={() => toggleAction(nextAction.id)}
-            >
-              Doe: {nextAction.title}
-            </button>
-          ) : null}
+
+          <div className="activity-category-dots" aria-hidden="true">
+            {[0, 1].map((index) => (
+              <span
+                key={index}
+                className={`activity-category-dot${index === activeStatsIndex ? " active" : ""}`}
+              />
+            ))}
+          </div>
+
+          <div
+            ref={statsRailRef}
+            className="activity-stats-rail"
+            aria-label="Horizontaal scrollbare actie statistieken"
+            onScroll={(event) => updateActiveStatsIndex(event.currentTarget)}
+          >
+            <section className="activity-stats-card">
+              <span>Deze week</span>
+              <strong>{activityStats.weeklyCompleted}</strong>
+              <p>acties uitgevoerd in de huidige week.</p>
+            </section>
+
+            <section className="activity-stats-card">
+              <span>Totaal</span>
+              <strong>{activityStats.totalCompleted}</strong>
+              <p>acties uitgevoerd sinds je bent begonnen.</p>
+            </section>
+          </div>
         </section>
 
         <section className="actie-focus-card activiteit-goal-card">
@@ -317,46 +509,6 @@ function Activiteiten() {
           ) : null}
         </section>
 
-        <section className="activity-action-list" aria-label="Acties voor vandaag">
-          {sortedActions.map((action) => {
-            const Icon = action.icon
-            const completed = completedToday.includes(action.id)
-
-            return (
-              <article
-                key={action.id}
-                className={`activity-action-card${completed ? " completed" : ""}`}
-              >
-                <button
-                  type="button"
-                  className="activity-check-button"
-                  onClick={() => toggleAction(action.id)}
-                  aria-label={`${action.title} ${completed ? "ongedaan maken" : "afvinken"}`}
-                >
-                  <FiCheckCircle />
-                </button>
-                <div className="activity-action-icon">
-                  <Icon />
-                </div>
-                <div className="activity-action-copy">
-                  <span>{action.category}</span>
-                  <strong>{action.title}</strong>
-                  <p>{action.body}</p>
-                  <small>-{action.estimateKg} kg CO2e geschat</small>
-                </div>
-                <button
-                  type="button"
-                  className="activity-open-button"
-                  onClick={() => navigate(action.route)}
-                  aria-label={`${action.title} openen`}
-                >
-                  <FiArrowRight />
-                </button>
-              </article>
-            )
-          })}
-        </section>
-
         <section className="activity-forest-link">
           <div>
             <span>Mijn bos</span>
@@ -366,10 +518,7 @@ function Activiteiten() {
             <LuTrees />
           </button>
         </section>
-      </div>
-
-      <BottomNav />
-    </div>
+    </MobilePageShell>
   )
 }
 

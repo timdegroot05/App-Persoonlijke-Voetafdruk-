@@ -1,14 +1,15 @@
-import AppHeader from "../components/AppHeader"
-import BottomNav from "../components/BottomNav"
+import MobilePageShell from "../components/MobilePageShell"
 import { LuLeaf } from "react-icons/lu"
 import { factsList, tipsList } from "../data/tips"
 
 function Tips() {
   return (
-    <div className="calculator-page tips-page">
-      <AppHeader title="Tips & Feitjes" icon={<LuLeaf />} />
-
-      <div className="tips-content">
+    <MobilePageShell
+      title="Tips & Feitjes"
+      icon={<LuLeaf />}
+      className="tips-page"
+      contentClassName="tips-content"
+    >
         <section className="calculator-card tips-hero-card">
           <p className="section-label dark">Slimme keuzes</p>
           <h1 className="calculator-title">Tips en feitjes voor minder uitstoot</h1>
@@ -43,10 +44,7 @@ function Tips() {
             </article>
           ))}
         </section>
-      </div>
-
-      <BottomNav />
-    </div>
+    </MobilePageShell>
   )
 }
 
