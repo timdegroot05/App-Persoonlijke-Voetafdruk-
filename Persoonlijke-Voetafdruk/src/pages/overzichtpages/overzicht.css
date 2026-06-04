@@ -6,7 +6,12 @@
 }
 
 .overzicht-container {
+  width: var(--app-shell-width);
+  height: var(--app-shell-height);
+  max-height: var(--app-shell-height);
+  min-height: 640px;
   background: #f4f4f1;
+  border-radius: var(--app-shell-radius);
   padding: 0;
   box-sizing: border-box;
   color: #1f2d20;
