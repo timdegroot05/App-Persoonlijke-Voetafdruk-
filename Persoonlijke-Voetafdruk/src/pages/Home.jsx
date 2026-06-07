@@ -12,7 +12,7 @@ import {
   getPersonalInsight,
 } from "../utils/impactInsights"
 import {
-  getLatestWeeklyAnswers,
+  getLatestWeeklyAnswers,         
   getProfileAnswers,
   hasCompletedProfileQuestionnaire,
 } from "../utils/questionnaireStorage"
@@ -23,7 +23,13 @@ import {
   hasWeeklyResultForWeek,
   shouldShowWeeklyCheckinPopup,
 } from "../utils/weeklyResults"
+import {
+  maybeShowDailyTipNotification,
+  maybeShowWeeklyCheckinNotification,
+} from "../utils/notifications"
+import { factsList, tipsList } from "../data/tips"
 import "../App.css"
+import handFoto from "../assets/HandHandfoto.png"
 
 const forestHeroPhoto = {
   src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
@@ -103,25 +109,8 @@ function Home() {
   const history = useMemo(() => getImpactHistory(), [])
   const latestHistoryEntry = history[0] ?? null
 
-  const sustainabilityTips = [
-    "Eén dag per week vegetarisch eten kan je uitstoot al merkbaar verlagen.",
-    "De fiets pakken voor korte ritten is vaak de duurzaamste keuze.",
-    "Lokale en seizoensproducten hebben meestal een lagere impact.",
-    "Korter douchen bespaart zowel water als energie.",
-    "Apparaten volledig uitzetten helpt sluipverbruik te verminderen.",
-  ]
-
-  const tipOfTheDay =
-    sustainabilityTips[new Date().getDate() % sustainabilityTips.length]
-
-  const facts = [
-    "Plantaardiger eten verlaagt vaak sneller je uitstoot dan je denkt.",
-    "Minder korte autoritten maakt vaak direct het grootste verschil.",
-    "Sluipverbruik thuis zorgt ongemerkt voor extra uitstoot.",
-    "Een treinrit veroorzaakt meestal veel minder CO2 dan dezelfde rit met de auto.",
-    "Goed isoleren thuis verlaagt niet alleen je energierekening maar ook je uitstoot.",
-    "Korte vluchten hebben per kilometer vaak een relatief hoge klimaatimpact.",
-  ]
+  const tipOfTheDay = tipsList[new Date().getDate() % tipsList.length]
+  const facts = factsList
   const personalInsight = getPersonalInsight(currentSnapshot)
   const focusLabel = getFocusLabel(emissionData.dominantCategory)
   const savedKg = Math.max(
@@ -517,6 +506,16 @@ function Home() {
   useEffect(() => {
     setShowWeeklyReminder(shouldShowWeeklyCheckinPopup(weeklyResults))
   }, [weeklyResults])
+
+  useEffect(() => {
+    if (showWeeklyReminder) {
+      maybeShowWeeklyCheckinNotification(activeCheckinWeek)
+    }
+  }, [activeCheckinWeek, showWeeklyReminder])
+
+  useEffect(() => {
+    maybeShowDailyTipNotification(tipOfTheDay)
+  }, [tipOfTheDay])
 
   useEffect(() => {
     const factDurationMs = 5000
@@ -1109,7 +1108,7 @@ function Home() {
           />
           <span className="home-tip-image-badge">Bekijk tips</span>
         </button>
-        <p className="tip-text">{tipOfTheDay}</p>
+        <p className="tip-text">{tipOfTheDay.body}</p>
       </section>
 
       <section className="home-fact-card">
@@ -1127,12 +1126,6 @@ function Home() {
           </div>
         </div>
         <p className="home-fact-text">{facts[activeFactIndex]}</p>
-        <div className="home-fact-progress" aria-hidden="true">
-          <span
-            className="home-fact-progress-fill"
-            style={{ width: `${factTimerProgress}%` }}
-          />
-        </div>
       </section>
 
     </div>

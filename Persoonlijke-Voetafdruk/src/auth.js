@@ -8,6 +8,8 @@ import {
   EmailAuthProvider,
   linkWithCredential,
   signOut,
+  updateProfile,
+  sendEmailVerification,
 } from "firebase/auth";
 
 /**
@@ -33,6 +35,13 @@ export async function registreerNaVragenlijst(email, password) {
   const credential = EmailAuthProvider.credential(email, password);
   const result = await linkWithCredential(user, credential);
 
+  await sendEmailVerification(result.user);
+
+  console.log(
+    "Verificatiemail verstuurd naar:",
+    result.user.email
+  );
+
   return result.user;
 }
 
@@ -55,5 +64,17 @@ export async function logoutGebruiker() {
  * Geeft de huidige gebruiker terug.
  */
 export function getCurrentUser() {
+  return auth.currentUser;
+}
+
+export async function updateCurrentUserName(name) {
+  if (!auth.currentUser) {
+    throw new Error("Geen huidige gebruiker gevonden.");
+  }
+
+  await updateProfile(auth.currentUser, {
+    displayName: String(name || "").trim() || null,
+  });
+
   return auth.currentUser;
 }

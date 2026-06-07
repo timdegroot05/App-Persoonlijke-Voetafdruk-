@@ -108,7 +108,7 @@ function Questionnaire({ mode = "profile" }) {
         return
       }
 
-      navigate("/home")
+      navigate("/result")
     }
   }
 

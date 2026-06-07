@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Welcome from "./pages/Welcome";
@@ -19,10 +19,13 @@ import EnergyTasks from "./pages/tasks/EnergyTasks";
 import Home from "./pages/Home";
 import Calculator from "./pages/Calculator";
 import BosVisualisatie from "./pages/BosVisualisatie";
+import BosMiniGame from "./pages/BosMiniGame";
 import Tips from "./pages/Tips";
 import Profile from "./pages/Profile";
+import AccountGegevens from "./pages/AccountGegevens";
 import QuestionnaireEditor from "./pages/QuestionnaireEditor";
 import ScrollToTop from "./components/ScrollToTop";
+import VerifyEmail from "./pages/VerifyEmail";
 
 import { loginAnoniem } from "./auth";
 import { createUserDocument } from "./userService";
@@ -33,27 +36,23 @@ import Register from "./pages/Register"
 import "./App.css";
 
 function App() {
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     async function setupUser() {
       try {
         const user = await loginAnoniem();
-        await createUserDocument(user);
+        try {
+          await createUserDocument(user);
+        } catch (firestoreError) {
+          console.warn("Firebase profielopslag overgeslagen:", firestoreError);
+        }
         console.log("User klaar:", user.uid);
       } catch (error) {
         console.error("Fout bij auth setup:", error);
-      } finally {
-        setLoading(false);
       }
     }
 
     setupUser();
   }, []);
-
-  if (loading) {
-    return <p>Laden...</p>;
-  }
 
   return (
     <>
@@ -80,10 +79,13 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/calculator" element={<Calculator />} />
         <Route path="/bos" element={<BosVisualisatie />} />
+        <Route path="/bos-game" element={<BosMiniGame />} />
         <Route path="/tips" element={<Tips />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/account-gegevens" element={<AccountGegevens />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
       </Routes>
     </>
   );
