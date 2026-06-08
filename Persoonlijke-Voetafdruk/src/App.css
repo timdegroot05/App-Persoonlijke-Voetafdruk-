@@ -237,6 +237,30 @@ body {
   animation: floatIn 0.55s ease both;
 }
 
+.home-forest-card-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #1f8d3d, #176b2e);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  font-family: var(--font-display);
+  box-shadow: 0 12px 22px rgba(31, 141, 61, 0.18);
+  cursor: pointer;
+}
+
+.home-forest-card-button svg {
+  width: 16px;
+  height: 16px;
+}
+
 .home-feature-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1522,6 +1546,29 @@ body {
   background: linear-gradient(90deg, #67bc73 0%, #9ad5a0 100%);
 }
 
+.home-forest-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 40px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #1f8d3d, #176b2e);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+  font-family: var(--font-display);
+  box-shadow: 0 10px 20px rgba(31, 141, 61, 0.18);
+}
+
+.home-forest-link-button svg {
+  width: 16px;
+  height: 16px;
+}
+
 .impact-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1636,6 +1683,7 @@ body {
 .tips-page {
   display: flex;
   flex-direction: column;
+  gap: 0;
   height: calc(100dvh - 32px);
   overflow: hidden;
 }
@@ -2281,6 +2329,7 @@ body {
     linear-gradient(180deg, #f5f7ef 0%, #e8f1df 100%);
   display: flex;
   flex-direction: column;
+  gap: 0;
   height: calc(100dvh - 32px);
   overflow: hidden;
 }
@@ -4078,6 +4127,7 @@ body {
 }
 
 .forest-status-panel,
+.forest-level-panel,
 .forest-score-panel,
 .forest-recovery-actions {
   margin: 18px 0;
@@ -4089,6 +4139,7 @@ body {
 }
 
 .forest-status-panel span,
+.forest-level-panel span,
 .forest-score-panel > div:last-child span,
 .forest-recovery-actions-header span {
   display: block;
@@ -4100,6 +4151,7 @@ body {
 }
 
 .forest-status-panel strong,
+.forest-level-panel strong,
 .forest-score-panel > div:last-child strong,
 .forest-recovery-actions-header strong {
   display: block;
@@ -4109,6 +4161,7 @@ body {
 }
 
 .forest-status-panel p,
+.forest-level-panel p,
 .forest-score-panel p {
   margin: 6px 0 0;
   color: var(--text-muted);
@@ -4116,13 +4169,21 @@ body {
   line-height: 1.35;
 }
 
-.forest-status-panel small {
+.forest-status-panel small,
+.forest-level-panel small {
   display: block;
   margin-top: 8px;
   color: var(--text-muted);
   font-size: 11px;
   font-weight: 700;
   line-height: 1.35;
+}
+
+.forest-level-panel {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(244, 250, 239, 0.95)),
+    #ffffff;
+  border-color: rgba(47, 117, 58, 0.18);
 }
 
 .forest-score-panel {
@@ -4240,6 +4301,63 @@ body {
   margin-bottom: 0;
 }
 
+.forest-game-progress-card,
+.forest-badge-panel {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(244, 250, 239, 0.96) 70%, rgba(235, 247, 252, 0.9)),
+    #ffffff;
+  border: 1px solid rgba(47, 117, 58, 0.18);
+  box-shadow: var(--forest-panel-shadow);
+}
+
+.forest-game-progress-header,
+.forest-xp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.forest-game-progress-header {
+  margin-bottom: 12px;
+}
+
+.forest-game-progress-header span,
+.forest-xp-row span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.forest-game-progress-header strong,
+.forest-xp-row strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.forest-xp-row {
+  margin: 12px 0 8px;
+}
+
+.forest-xp-track span {
+  background: linear-gradient(90deg, #67abd1 0%, #1f6b2a 100%);
+}
+
+.forest-level-progress p {
+  margin: 10px 0 0;
+  color: var(--brand-dark);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .forest-recovery-actions-header {
   display: flex;
   align-items: center;
@@ -4302,6 +4420,65 @@ body {
 .forest-recovery-button:disabled {
   cursor: default;
   opacity: 0.68;
+}
+
+.forest-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.forest-badge-card {
+  min-height: 82px;
+  padding: 11px 10px;
+  border-radius: 16px;
+  background: #f8fbf4;
+  border: 1px solid rgba(67, 119, 63, 0.14);
+}
+
+.forest-badge-card span,
+.forest-badge-card small {
+  display: block;
+}
+
+.forest-badge-card span {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.forest-badge-card small {
+  margin-top: 7px;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.forest-badge-card.unlocked {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(231, 245, 220, 0.92)),
+    #e7f5dc;
+  border-color: rgba(31, 107, 42, 0.24);
+}
+
+.forest-badge-card.animal.unlocked {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(230, 244, 250, 0.92)),
+    #e6f4fa;
+  border-color: rgba(57, 116, 148, 0.2);
+}
+
+.forest-badge-card.nature.unlocked {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(225, 247, 238, 0.92)),
+    #e1f7ee;
+  border-color: rgba(47, 130, 104, 0.2);
+}
+
+.forest-badge-card.locked {
+  opacity: 0.62;
 }
 
 .forest-view-dropdown {
@@ -4450,6 +4627,36 @@ body {
   background:
     radial-gradient(circle at 18% 16%, rgba(242, 218, 141, 0.48) 0 28px, transparent 29px),
     linear-gradient(180deg, #e5e9cf 0%, #d1d9b5 50%, #8d9b62 51%, #5f7044 100%);
+}
+
+.forest-level-1.forest-world {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(213, 194, 133, 0.38) 0 26px, transparent 27px),
+    linear-gradient(180deg, #cfd6c0 0%, #b8c09d 49%, #8c805c 50%, #5d563f 100%);
+}
+
+.forest-level-2.forest-world {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(244, 220, 140, 0.48) 0 30px, transparent 31px),
+    linear-gradient(180deg, #dbe7d2 0%, #bfd9ad 50%, #7ea35b 51%, #4e783e 100%);
+}
+
+.forest-level-3.forest-world {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 229, 132, 0.72) 0 32px, transparent 33px),
+    linear-gradient(180deg, #d8f0ff 0%, #aee0b8 50%, #5b9e4d 51%, #2d7439 100%);
+}
+
+.forest-level-4.forest-world {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 229, 132, 0.78) 0 34px, transparent 35px),
+    linear-gradient(180deg, #cfeeff 0%, #9bd8be 48%, #529b57 49%, #236d40 100%);
+}
+
+.forest-level-5.forest-world {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(255, 238, 157, 0.86) 0 38px, transparent 39px),
+    linear-gradient(180deg, #c9eeff 0%, #9edcc7 45%, #54a45d 46%, #176a42 100%);
 }
 
 .forest-state-damaged .forest-rich-tree {
@@ -4635,6 +4842,14 @@ body {
   animation: forestDrift 9s ease-in-out infinite alternate-reverse;
 }
 
+.forest-cloud.cloud-3 {
+  top: 128px;
+  right: 118px;
+  transform: scale(0.58);
+  opacity: 0.42;
+  animation: forestDriftLong 12s ease-in-out infinite alternate;
+}
+
 .forest-rich-tree {
   position: absolute;
   bottom: 74px;
@@ -4763,7 +4978,14 @@ body {
 .forest-rich-plant,
 .forest-soil-patch,
 .forest-pond,
-.forest-critter {
+.forest-stump,
+.forest-river,
+.forest-waterfall,
+.forest-floating-leaf,
+.forest-pollen,
+.forest-critter,
+.forest-game-sprout,
+.forest-game-sparkle {
   position: absolute;
   transform: translate(-50%, -50%);
 }
@@ -4866,12 +5088,74 @@ body {
     0 -6px 0 #6abf55;
 }
 
+.forest-game-sprout {
+  z-index: 7;
+  width: calc(22px * var(--sprout-scale));
+  height: calc(28px * var(--sprout-scale));
+  transform-origin: bottom center;
+  animation: forestSproutGrow 0.44s ease both, grassWiggle 2.1s ease-in-out infinite alternate;
+  animation-delay: var(--sprout-delay), calc(var(--sprout-delay) + 420ms);
+}
+
+.forest-game-sprout::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 4px;
+  height: 22px;
+  border-radius: 999px;
+  background: #2f7d3e;
+  transform: translateX(-50%);
+}
+
+.forest-game-sprout::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 11px;
+  width: 14px;
+  height: 12px;
+  border-radius: 999px 999px 999px 3px;
+  background: #7fc86d;
+  box-shadow: 10px 3px 0 #5cad59;
+  transform: translateX(-72%) rotate(-12deg);
+}
+
+.forest-game-sparkle {
+  z-index: 4;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 239, 154, 0.9);
+  box-shadow:
+    0 0 0 5px rgba(255, 239, 154, 0.14),
+    0 0 18px rgba(255, 239, 154, 0.45);
+  animation: forestSparkle 1.8s ease-in-out infinite;
+  animation-delay: var(--sparkle-delay);
+}
+
 .forest-soil-patch {
   z-index: 1;
   width: 44px;
   height: 15px;
   border-radius: 999px;
   background: rgba(100, 78, 50, 0.42);
+}
+
+.forest-stump {
+  z-index: 3;
+  width: calc(25px * var(--stump-scale));
+  height: calc(18px * var(--stump-scale));
+  border-radius: 45% 45% 8px 8px;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(230, 178, 112, 0.62) 0 5px, transparent 6px),
+    #875d38;
+  box-shadow:
+    inset 0 -5px 0 rgba(74, 50, 30, 0.18),
+    0 5px 9px rgba(51, 45, 31, 0.18);
+  animation: forestStumpPop 0.32s ease both;
+  animation-delay: var(--stump-delay);
 }
 
 .forest-pond {
@@ -4885,10 +5169,66 @@ body {
   box-shadow: 0 0 0 5px rgba(86, 141, 87, 0.24);
 }
 
+.forest-river {
+  left: 52%;
+  bottom: -24px;
+  z-index: 2;
+  width: 45%;
+  height: 132px;
+  border-radius: 50% 50% 0 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.4), transparent 18% 82%, rgba(255, 255, 255, 0.28)),
+    #65bdd8;
+  box-shadow:
+    inset 0 10px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 6px rgba(47, 117, 79, 0.16);
+  transform: translateX(-50%) rotate(-8deg);
+  animation: forestRiverFlow 2.2s ease-in-out infinite alternate;
+}
+
+.forest-waterfall {
+  top: 166px;
+  z-index: 4;
+  width: 42px;
+  height: 128px;
+  border-radius: 999px 999px 18px 18px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.72), rgba(103, 190, 220, 0.78), rgba(255, 255, 255, 0.58)),
+    #76c8df;
+  box-shadow:
+    0 0 0 5px rgba(255, 255, 255, 0.18),
+    0 12px 20px rgba(31, 76, 62, 0.16);
+  animation: forestWaterfall 0.92s linear infinite;
+}
+
+.forest-floating-leaf {
+  z-index: 6;
+  width: calc(11px * var(--leaf-scale));
+  height: calc(7px * var(--leaf-scale));
+  border-radius: 999px 999px 999px 2px;
+  background: #8bc861;
+  opacity: 0.72;
+  animation: forestLeafFloat 5.8s ease-in-out infinite;
+  animation-delay: var(--leaf-delay);
+}
+
+.forest-pollen {
+  z-index: 4;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 235, 150, 0.76);
+  box-shadow: 0 0 10px rgba(255, 235, 150, 0.34);
+  animation: forestPollenDrift 4.6s ease-in-out infinite;
+  animation-delay: var(--pollen-delay);
+}
+
 .forest-critter {
   z-index: 6;
   width: 24px;
   height: 14px;
+  animation: forestAnimalAppear 0.5s ease both, forestAnimalIdle 3.4s ease-in-out infinite alternate;
+  animation-delay: var(--animal-delay), calc(var(--animal-delay) + 520ms);
 }
 
 .forest-critter.rabbit {
@@ -4925,6 +5265,94 @@ body {
   height: 7px;
   border-radius: 999px 0 999px 999px;
   background: #86a7d8;
+}
+
+.forest-critter.butterfly {
+  width: 18px;
+  height: 14px;
+  background: #3e6f3e;
+}
+
+.forest-critter.butterfly::before,
+.forest-critter.butterfly::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  width: 12px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ef8aa3;
+  animation: forestButterflyWing 0.9s ease-in-out infinite alternate;
+}
+
+.forest-critter.butterfly::before {
+  right: 8px;
+}
+
+.forest-critter.butterfly::after {
+  left: 8px;
+  background: #ffd45f;
+}
+
+.forest-critter.fox {
+  width: 34px;
+  height: 16px;
+  border-radius: 999px;
+  background: #c76b32;
+  box-shadow: 18px 1px 0 -5px #e28a45;
+}
+
+.forest-critter.fox::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: -8px;
+  width: 13px;
+  height: 14px;
+  border-radius: 45% 45% 50% 50%;
+  background: #d5793c;
+  clip-path: polygon(0 100%, 50% 0, 100% 100%);
+}
+
+.forest-critter.owl {
+  width: 22px;
+  height: 26px;
+  border-radius: 50% 50% 45% 45%;
+  background: #7c623f;
+  box-shadow: inset 6px 5px 0 rgba(255, 226, 165, 0.42);
+}
+
+.forest-critter.owl::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 7px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #1f2d20;
+  box-shadow: 8px 0 0 #1f2d20;
+}
+
+.forest-critter.deer {
+  width: 36px;
+  height: 18px;
+  border-radius: 999px;
+  background: #b6814b;
+  box-shadow: 18px -8px 0 -6px #b6814b;
+}
+
+.forest-critter.deer::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: -14px;
+  width: 2px;
+  height: 16px;
+  background: #6e4a2b;
+  box-shadow:
+    -6px 3px 0 #6e4a2b,
+    6px 3px 0 #6e4a2b;
 }
 
 .forest-game-targets {
@@ -5151,6 +5579,69 @@ body {
   line-height: 1.35;
 }
 
+.forest-mission-system {
+  display: grid;
+  gap: 12px;
+}
+
+.forest-mission-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.forest-mission-button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  min-height: 58px;
+  border: 1px solid rgba(67, 119, 63, 0.14);
+  border-radius: 15px;
+  padding: 10px 12px;
+  background: #f8fbf4;
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+}
+
+.forest-mission-button span,
+.forest-mission-button strong,
+.forest-mission-button small {
+  display: block;
+}
+
+.forest-mission-button span {
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.forest-mission-button strong {
+  color: var(--brand-dark);
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+.forest-mission-button small {
+  grid-column: 1 / -1;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.forest-mission-button.completed,
+.forest-mission-button:disabled {
+  background: #dff0d8;
+  cursor: default;
+  opacity: 0.78;
+}
+
+.forest-week-track span {
+  background: linear-gradient(90deg, #67abd1 0%, #2f7d53 100%);
+}
+
 .forest-ecosystem-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5192,6 +5683,10 @@ body {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+.forest-upgrade-grid.compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .forest-upgrade-card {
@@ -5241,6 +5736,26 @@ body {
   opacity: 0.64;
 }
 
+.forest-upgrade-card.compact {
+  min-height: 84px;
+  cursor: default;
+  border: 1px solid rgba(67, 119, 63, 0.14);
+}
+
+.forest-upgrade-card.compact span {
+  min-height: auto;
+  font-size: 12px;
+}
+
+.forest-upgrade-card.compact strong {
+  margin: 7px 0 3px;
+  font-size: 18px;
+}
+
+.forest-upgrade-card.compact small {
+  font-size: 10px;
+}
+
 @keyframes forestTreeRise {
   from {
     opacity: 0;
@@ -5275,6 +5790,123 @@ body {
   }
 }
 
+@keyframes forestSproutGrow {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(12px) scale(0.45);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes forestSparkle {
+  0%,
+  100% {
+    opacity: 0.24;
+    transform: translate(-50%, -50%) scale(0.72);
+  }
+
+  45% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.24);
+  }
+}
+
+@keyframes forestStumpPop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(8px) scale(0.72);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes forestRiverFlow {
+  from {
+    filter: brightness(0.98);
+    background-position: 0 0;
+  }
+
+  to {
+    filter: brightness(1.08);
+    background-position: 18px 0;
+  }
+}
+
+@keyframes forestWaterfall {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 0 18px;
+  }
+}
+
+@keyframes forestLeafFloat {
+  0%,
+  100% {
+    opacity: 0.24;
+    transform: translate(-50%, -50%) translateY(0) rotate(-8deg) scale(var(--leaf-scale));
+  }
+
+  50% {
+    opacity: 0.78;
+    transform: translate(-50%, -50%) translateY(14px) rotate(14deg) scale(var(--leaf-scale));
+  }
+}
+
+@keyframes forestPollenDrift {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: translate(-50%, -50%) translate(0, 0);
+  }
+
+  50% {
+    opacity: 0.72;
+    transform: translate(-50%, -50%) translate(14px, -9px);
+  }
+}
+
+@keyframes forestAnimalAppear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(10px) scale(0.72);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes forestAnimalIdle {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: 5px -2px;
+  }
+}
+
+@keyframes forestButterflyWing {
+  from {
+    transform: scaleX(0.82) rotate(-4deg);
+  }
+
+  to {
+    transform: scaleX(1.08) rotate(5deg);
+  }
+}
+
 @keyframes forestTargetPulse {
   from {
     transform: translate(-50%, -50%) translateY(0);
@@ -5292,6 +5924,16 @@ body {
 
   to {
     transform: translateX(10px);
+  }
+}
+
+@keyframes forestDriftLong {
+  from {
+    transform: translateX(-14px) scale(0.58);
+  }
+
+  to {
+    transform: translateX(18px) scale(0.58);
   }
 }
 
@@ -5333,6 +5975,20 @@ body {
   .forest-cue small {
     font-size: 9px;
   }
+
+  .forest-game-progress-header,
+  .forest-recovery-actions-header {
+    align-items: flex-start;
+  }
+
+  .forest-recovery-action-grid,
+  .forest-badge-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .forest-recovery-button {
+    min-height: 76px;
+  }
 }
 
 .profile-page {
@@ -5342,13 +5998,13 @@ body {
 
 /* Red het bos mini-game */
 .forest-game-page {
-  min-height: 100dvh;
-  padding-bottom: 96px;
+  min-height: 0;
+  padding-bottom: 0;
   background:
     radial-gradient(circle at 18% 8%, rgba(184, 223, 151, 0.34), transparent 28%),
     var(--page-bg);
-  gap: 12px;
-  overflow-y: auto;
+  gap: 0;
+  overflow: hidden;
 }
 
 .forest-game-shell {
@@ -6622,4 +7278,773 @@ body {
   width: 100%;
   padding: 8px 0 0;
   font-size: 14px;
+}
+
+/* Eco Island / Forest Builder */
+.eco-builder-card {
+  position: relative;
+  overflow: visible;
+}
+
+.forest-game-world {
+  position: relative;
+  min-height: 430px;
+  margin: 20px 0 18px;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(42, 102, 51, 0.16);
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 232, 134, 0.66) 0 34px, transparent 35px),
+    linear-gradient(180deg, #cfefff 0%, #bce7d0 44%, #80b968 100%);
+  box-shadow:
+    inset 0 -30px 54px rgba(31, 81, 43, 0.16),
+    0 18px 34px rgba(31, 45, 32, 0.12);
+}
+
+.forest-game-world.state-damaged {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(219, 201, 136, 0.42) 0 30px, transparent 31px),
+    linear-gradient(180deg, #bfc9c7 0%, #b9c3a9 45%, #837957 100%);
+}
+
+.forest-game-world.state-vulnerable {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(239, 216, 138, 0.5) 0 32px, transparent 33px),
+    linear-gradient(180deg, #d7eadf 0%, #c2ddbd 45%, #719d5c 100%);
+}
+
+.forest-game-world.state-healthy {
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 238, 145, 0.82) 0 38px, transparent 39px),
+    linear-gradient(180deg, #c8edff 0%, #a8e1c5 43%, #55a85f 100%);
+}
+
+.eco-sky,
+.eco-island {
+  position: absolute;
+  inset: 0;
+}
+
+.eco-cloud,
+.eco-flyer,
+.eco-particle {
+  position: absolute;
+  pointer-events: none;
+}
+
+.eco-cloud {
+  width: 52px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow:
+    16px 2px 0 rgba(255, 255, 255, 0.54),
+    -12px 5px 0 rgba(255, 255, 255, 0.46);
+  animation: ecoCloudDrift 11s ease-in-out infinite alternate;
+}
+
+.eco-cloud.cloud-a {
+  top: 54px;
+  right: 42px;
+}
+
+.eco-cloud.cloud-b {
+  top: 112px;
+  left: 42px;
+  opacity: 0.6;
+  transform: scale(0.72);
+  animation-duration: 14s;
+  animation-direction: alternate-reverse;
+}
+
+.eco-flyer {
+  z-index: 6;
+  width: 18px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4d7cb7;
+  box-shadow: -8px 1px 0 -3px #88a9d8;
+  animation: ecoFlyAcross 13s linear infinite;
+}
+
+.eco-flyer.flyer-a {
+  top: 78px;
+  left: -20px;
+}
+
+.eco-flyer.flyer-b {
+  top: 148px;
+  left: -40px;
+  opacity: 0.7;
+  transform: scale(0.72);
+  animation-duration: 18s;
+  animation-delay: 3s;
+}
+
+.forest-game-world.state-damaged .eco-flyer {
+  display: none;
+}
+
+.eco-particle {
+  z-index: 5;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 238, 150, 0.74);
+  box-shadow: 0 0 14px rgba(255, 238, 150, 0.36);
+  animation: ecoParticleFloat 4.8s ease-in-out infinite;
+}
+
+.eco-particle.particle-a {
+  left: 24%;
+  top: 32%;
+}
+
+.eco-particle.particle-b {
+  left: 72%;
+  top: 28%;
+  animation-delay: 1s;
+}
+
+.eco-particle.particle-c {
+  left: 56%;
+  top: 52%;
+  animation-delay: 2s;
+}
+
+.forest-game-world.state-damaged .eco-particle {
+  opacity: 0.22;
+}
+
+.eco-island {
+  display: grid;
+  place-items: end center;
+  padding: 96px 18px 24px;
+}
+
+.eco-grid {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  width: min(100%, 334px);
+  padding: 14px;
+  border-radius: 42% 42% 36% 36%;
+  background:
+    radial-gradient(ellipse at 50% 72%, rgba(105, 83, 49, 0.16) 0 36%, transparent 37%),
+    #6eac56;
+  box-shadow:
+    inset 0 -18px 0 rgba(50, 101, 46, 0.18),
+    0 24px 38px rgba(31, 55, 31, 0.22);
+}
+
+.forest-game-world.level-1 .eco-grid {
+  background: #8d815d;
+}
+
+.forest-game-world.state-damaged .eco-grid {
+  filter: saturate(0.78);
+}
+
+.eco-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  min-width: 0;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent),
+    #77b65b;
+  box-shadow:
+    inset 0 -4px 0 rgba(31, 83, 39, 0.13),
+    0 4px 8px rgba(31, 45, 32, 0.08);
+}
+
+.eco-tile.soil {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent),
+    #a58b61;
+}
+
+.eco-tile.dry {
+  background:
+    radial-gradient(circle at 34% 42%, rgba(94, 73, 48, 0.28) 0 7px, transparent 8px),
+    #8b7a58;
+}
+
+.eco-tile.grass {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.17), transparent),
+    #72b957;
+}
+
+.eco-tile.flower {
+  background:
+    radial-gradient(circle at 68% 28%, #ffd45f 0 4px, transparent 5px),
+    radial-gradient(circle at 30% 68%, #ef8aa3 0 4px, transparent 5px),
+    #78bd5e;
+}
+
+.eco-tile.water {
+  background:
+    radial-gradient(circle at 34% 38%, rgba(255, 255, 255, 0.5) 0 6px, transparent 7px),
+    #68bfda;
+}
+
+.eco-object {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: ecoObjectGrow 0.45s ease both;
+}
+
+.eco-object:active {
+  transform: scale(0.92);
+}
+
+.eco-object span,
+.eco-object span::before,
+.eco-object span::after {
+  content: "";
+  display: block;
+}
+
+.eco-object.stump span {
+  width: 24px;
+  height: 16px;
+  border-radius: 45% 45% 7px 7px;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(232, 180, 112, 0.72) 0 5px, transparent 6px),
+    #875d38;
+}
+
+.eco-object.rock span {
+  width: 26px;
+  height: 19px;
+  border-radius: 55% 45% 45% 50%;
+  background: #8f9388;
+  box-shadow: inset 6px 4px 0 rgba(255, 255, 255, 0.16);
+}
+
+.eco-object.grass span,
+.eco-object.shrub span {
+  width: 34px;
+  height: 20px;
+  border-radius: 999px 999px 8px 8px;
+  background: #3f914a;
+  box-shadow:
+    -10px 4px 0 -2px #66aa58,
+    10px 4px 0 -2px #66aa58;
+}
+
+.eco-object.sprout span {
+  width: 5px;
+  height: 30px;
+  border-radius: 999px;
+  background: #2f7d3e;
+  box-shadow:
+    -8px 11px 0 -2px #7fc86d,
+    8px 13px 0 -2px #5cad59;
+}
+
+.eco-object.young-tree span,
+.eco-object.tree span,
+.eco-object.rare-tree span {
+  position: relative;
+  width: 12px;
+  height: 34px;
+  border-radius: 999px;
+  background: #7b5434;
+}
+
+.eco-object.young-tree span::before,
+.eco-object.tree span::before,
+.eco-object.rare-tree span::before {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  width: 38px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2f8c42;
+  box-shadow:
+    -10px 8px 0 #45a551,
+    10px 9px 0 #5ab95c,
+    0 -8px 0 #78c96e;
+  transform: translateX(-50%);
+}
+
+.eco-object.young-tree span::before {
+  width: 28px;
+  height: 28px;
+}
+
+.eco-object.rare-tree span::before {
+  background: #2f8c75;
+  box-shadow:
+    -10px 8px 0 #58b88f,
+    10px 9px 0 #89cf78,
+    0 -8px 0 #d2e78f;
+}
+
+.eco-object.flower span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ffd45f;
+  box-shadow:
+    -6px 0 0 #ef8aa3,
+    6px 0 0 #ef8aa3,
+    0 -6px 0 #ef8aa3,
+    0 6px 0 #ef8aa3,
+    0 15px 0 -4px #236d35;
+}
+
+.eco-object.butterfly span,
+.eco-object.bird span {
+  width: 18px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4f7fb9;
+  animation: ecoAnimalIdle 1.7s ease-in-out infinite alternate;
+}
+
+.eco-object.butterfly span {
+  width: 7px;
+  height: 12px;
+  background: #335c37;
+  box-shadow:
+    -8px 0 0 1px #ef8aa3,
+    8px 0 0 1px #ffd45f;
+}
+
+.eco-object.pond span {
+  width: 38px;
+  height: 22px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 38%, rgba(255, 255, 255, 0.6) 0 5px, transparent 6px),
+    #65bdd8;
+}
+
+.eco-object.river span {
+  width: 48px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #65bdd8, #a7e4f1, #65bdd8);
+  animation: ecoWaterFlow 1.2s linear infinite;
+}
+
+.eco-object.fox span,
+.eco-object.owl span {
+  width: 32px;
+  height: 16px;
+  border-radius: 999px;
+  background: #c76b32;
+  box-shadow: 16px 1px 0 -5px #e28a45;
+  animation: ecoAnimalIdle 2.2s ease-in-out infinite alternate;
+}
+
+.eco-object.owl span {
+  width: 24px;
+  height: 26px;
+  border-radius: 50% 50% 45% 45%;
+  background: #7c623f;
+  box-shadow: inset 6px 5px 0 rgba(255, 226, 165, 0.42);
+}
+
+.eco-object.smoke span {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(111, 118, 111, 0.75);
+  box-shadow:
+    11px -9px 0 -4px rgba(111, 118, 111, 0.5),
+    -10px -5px 0 -5px rgba(111, 118, 111, 0.48);
+  animation: ecoSmokePulse 2s ease-in-out infinite alternate;
+}
+
+.eco-status-card,
+.eco-panel {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(47, 117, 58, 0.16);
+  box-shadow: var(--forest-panel-shadow);
+}
+
+.eco-status-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.eco-status-card span,
+.eco-panel-header span,
+.eco-next-reward span,
+.eco-xp-row span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.eco-status-card strong,
+.eco-panel-header strong,
+.eco-next-reward strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.eco-status-card p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.eco-impact-stats {
+  margin-top: 14px;
+}
+
+.eco-panel-header,
+.eco-xp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.eco-progress-track {
+  height: 12px;
+  margin: 12px 0 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(31, 107, 42, 0.12);
+}
+
+.eco-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8ccf58 0%, #1f6b2a 100%);
+  transition: width 0.32s ease;
+}
+
+.eco-xp-row {
+  margin-bottom: 12px;
+}
+
+.eco-next-reward {
+  padding: 12px;
+  border-radius: 16px;
+  background: #f8fbf4;
+  border: 1px solid rgba(67, 119, 63, 0.12);
+}
+
+.eco-collect-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--brand-dark);
+  color: #ffffff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.eco-collect-button:disabled {
+  color: var(--text-muted);
+  background: #edf4e9;
+  cursor: default;
+}
+
+.eco-missions {
+  display: grid;
+  gap: 12px;
+}
+
+.eco-mission-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.eco-mission {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  min-height: 52px;
+  border: 1px solid rgba(67, 119, 63, 0.14);
+  border-radius: 16px;
+  padding: 10px 12px;
+  background: #f8fbf4;
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+}
+
+.eco-mission span {
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.eco-mission strong {
+  color: var(--brand-dark);
+  font-size: 13px;
+}
+
+.eco-mission.completed,
+.eco-mission:disabled {
+  background: #dff0d8;
+  cursor: default;
+  opacity: 0.78;
+}
+
+.eco-object-info {
+  position: relative;
+  z-index: 15;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -6px 0 16px;
+  padding: 14px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(47, 117, 58, 0.18);
+  box-shadow: 0 16px 30px rgba(31, 45, 32, 0.14);
+  animation: ecoCardPop 0.22s ease both;
+}
+
+.eco-object-info span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.eco-object-info strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.eco-object-info p {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.eco-object-info button {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #edf4e9;
+  color: var(--brand-dark);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.eco-unlock-popup {
+  position: absolute;
+  top: 128px;
+  left: 50%;
+  z-index: 30;
+  width: min(84%, 310px);
+  padding: 16px 42px 16px 16px;
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(232, 248, 221, 0.98)),
+    #ffffff;
+  border: 1px solid rgba(47, 117, 58, 0.22);
+  box-shadow: 0 20px 40px rgba(31, 45, 32, 0.2);
+  transform: translateX(-50%);
+  animation: ecoUnlockPop 0.35s ease both;
+}
+
+.eco-unlock-popup button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #edf4e9;
+  color: var(--brand-dark);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.eco-unlock-popup span,
+.eco-unlock-popup small {
+  display: block;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.eco-unlock-popup strong {
+  display: block;
+  margin: 4px 0;
+  color: var(--brand-dark);
+  font-size: 18px;
+}
+
+.eco-unlock-popup small {
+  line-height: 1.35;
+  text-transform: none;
+}
+
+@keyframes ecoObjectGrow {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.54);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ecoCloudDrift {
+  from {
+    translate: -14px 0;
+  }
+
+  to {
+    translate: 18px 0;
+  }
+}
+
+@keyframes ecoFlyAcross {
+  from {
+    transform: translateX(-40px);
+  }
+
+  to {
+    transform: translateX(430px);
+  }
+}
+
+@keyframes ecoParticleFloat {
+  0%,
+  100% {
+    opacity: 0.24;
+    transform: translateY(0) scale(0.75);
+  }
+
+  50% {
+    opacity: 0.86;
+    transform: translate(12px, -18px) scale(1.08);
+  }
+}
+
+@keyframes ecoAnimalIdle {
+  from {
+    translate: 0 0;
+  }
+
+  to {
+    translate: 4px -3px;
+  }
+}
+
+@keyframes ecoWaterFlow {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 20px 0;
+  }
+}
+
+@keyframes ecoSmokePulse {
+  from {
+    opacity: 0.42;
+    transform: translateY(2px) scale(0.9);
+  }
+
+  to {
+    opacity: 0.78;
+    transform: translateY(-6px) scale(1.08);
+  }
+}
+
+@keyframes ecoCardPop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ecoUnlockPop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-12px) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 420px) {
+  .forest-game-world {
+    min-height: 390px;
+    border-radius: 24px;
+  }
+
+  .eco-island {
+    padding: 92px 10px 20px;
+  }
+
+  .eco-grid {
+    width: min(100%, 310px);
+    gap: 4px;
+    padding: 12px;
+  }
+
+  .eco-tile {
+    border-radius: 10px;
+  }
+
+  .eco-status-card {
+    grid-template-columns: 1fr;
+  }
+
+  .eco-object-info {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }

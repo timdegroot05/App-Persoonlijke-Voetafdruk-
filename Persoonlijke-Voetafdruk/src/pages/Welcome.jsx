@@ -1,10 +1,17 @@
 import { useNavigate } from "react-router-dom"
+import { useEffect } from "react"
 import { FiArrowRight, FiBarChart2, FiCompass } from "react-icons/fi"
 import { LuLeaf } from "react-icons/lu"
 import { hasCompletedProfileQuestionnaire } from "../utils/questionnaireStorage"
 
 function Welcome() {
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (hasCompletedProfileQuestionnaire()) {
+      navigate("/home", { replace: true })
+    }
+  }, [navigate])
 
   const openNextStep = () => {
     if (!hasCompletedProfileQuestionnaire()) {

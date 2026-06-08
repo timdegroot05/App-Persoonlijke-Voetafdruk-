@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { FiHelpCircle } from "react-icons/fi"
 import { useLocation, useNavigate } from "react-router-dom"
 import {
@@ -28,10 +28,13 @@ function Questionnaire({ mode = "profile" }) {
   const navigate = useNavigate()
   const location = useLocation()
   const questionnaireSource = mode === "weekly" ? weeklyQuestions : initialProfileQuestions
-  const categoryOrder =
-    mode === "weekly"
-      ? ["voeding", "transport", "consumptie", "energie"]
-      : ["wonen", "energie", "transport"]
+  const categoryOrder = useMemo(
+    () =>
+      mode === "weekly"
+        ? ["voeding", "transport", "consumptie", "energie"]
+        : ["wonen", "energie", "transport"],
+    [mode]
+  )
   const activeWeekInfo =
     mode === "weekly"
       ? location.state?.weekKey
@@ -60,17 +63,20 @@ function Questionnaire({ mode = "profile" }) {
     [visibleQuestions]
   )
   const [currentQuestion, setCurrentQuestion] = useState(0)
+  const currentQuestionIndex = Math.min(
+    currentQuestion,
+    Math.max(0, visibleQuestions.length - 1)
+  )
 
-  const currentCategory = visibleQuestions[currentQuestion]?.category || "energie"
-
-  useEffect(() => {
-    if (currentQuestion > visibleQuestions.length - 1) {
-      setCurrentQuestion(Math.max(0, visibleQuestions.length - 1))
-    }
-  }, [currentQuestion, visibleQuestions.length])
+  const currentCategory = visibleQuestions[currentQuestionIndex]?.category || "energie"
 
   const selectAnswer = (answer) => {
-    const current = visibleQuestions[currentQuestion]
+    const current = visibleQuestions[currentQuestionIndex]
+
+    if (!current) {
+      return
+    }
+
     const newAnswers = {
       ...answers,
       [current.id]: {
@@ -86,8 +92,8 @@ function Questionnaire({ mode = "profile" }) {
 
     setAnswers(newAnswers)
 
-    if (currentQuestion < nextVisibleQuestions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1)
+    if (currentQuestionIndex < nextVisibleQuestions.length - 1) {
+      setCurrentQuestion(currentQuestionIndex + 1)
     } else {
       if (mode === "weekly") {
         saveWeeklyAnswers(newAnswers, activeWeekInfo.weekStart)
@@ -108,13 +114,15 @@ function Questionnaire({ mode = "profile" }) {
         return
       }
 
-      navigate("/home")
+      navigate("/result", {
+        state: { profileResult: true },
+      })
     }
   }
 
   const previousQuestion = () => {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1)
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestion(currentQuestionIndex - 1)
     }
   }
 
@@ -123,11 +131,12 @@ function Questionnaire({ mode = "profile" }) {
       <AppHeader
         title={mode === "weekly" ? "Wekelijkse vragenlijst" : "Startvragenlijst"}
         icon={<FiHelpCircle />}
+        rightContent={mode === "profile" ? null : undefined}
       />
 
       <div className="page-section questionnaire-intro">
         <p className="section-label dark">
-          Stap {currentQuestion + 1} van {visibleQuestions.length}
+          Stap {currentQuestionIndex + 1} van {visibleQuestions.length}
         </p>
         <h1 className="questionnaire-title">
           {mode === "weekly"
@@ -139,18 +148,18 @@ function Questionnaire({ mode = "profile" }) {
       <CategoryNav category={currentCategory} categories={visibleCategories} />
 
       <ProgressBar
-        current={currentQuestion + 1}
+        current={currentQuestionIndex + 1}
         total={visibleQuestions.length}
       />
 
       <QuestionCard
-        key={currentQuestion}
-        question={visibleQuestions[currentQuestion]}
+        key={currentQuestionIndex}
+        question={visibleQuestions[currentQuestionIndex]}
         selectAnswer={selectAnswer}
-        selectedAnswerText={answers[visibleQuestions[currentQuestion]?.id]?.text}
+        selectedAnswerText={answers[visibleQuestions[currentQuestionIndex]?.id]?.text}
       />
 
-      {currentQuestion > 0 && (
+      {currentQuestionIndex > 0 && (
         <button className="back-btn" onClick={previousQuestion}>
           Terug
         </button>
