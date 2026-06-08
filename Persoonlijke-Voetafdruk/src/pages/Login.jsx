@@ -18,7 +18,13 @@ function Login() {
     setLoading(true);
 
     try {
-      await loginMetEmail(email, password);
+      const user = await loginMetEmail(email, password);
+
+      if (!user.emailVerified) {
+        navigate("/verify-email");
+        return;
+      }
+
       navigate("/home");
     } catch (err) {
       setError("Inloggen mislukt. Controleer je e-mail en wachtwoord.");

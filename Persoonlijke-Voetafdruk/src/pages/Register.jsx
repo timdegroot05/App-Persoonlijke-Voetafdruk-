@@ -55,7 +55,7 @@ function Register() {
       };
 
       await saveQuestionnaire(user.uid, weeklyAnswers, footprint, profileAnswers);
-      navigate("/home");
+      navigate("/verify-email");
     } catch (err) {
       setError("Registratie mislukt. Probeer een ander e-mailadres.");
     } finally {

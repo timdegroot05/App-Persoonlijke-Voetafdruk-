@@ -26,6 +26,7 @@ import Profile from "./pages/Profile";
 import AccountGegevens from "./pages/AccountGegevens";
 import QuestionnaireEditor from "./pages/QuestionnaireEditor";
 import ScrollToTop from "./components/ScrollToTop";
+import VerifyEmail from "./pages/VerifyEmail";
 
 import { loginAnoniem } from "./auth";
 import { createUserDocument } from "./userService";
@@ -86,6 +87,7 @@ function App() {
         <Route path="/account-gegevens" element={<AccountGegevens />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
       </Routes>
     </>
   );

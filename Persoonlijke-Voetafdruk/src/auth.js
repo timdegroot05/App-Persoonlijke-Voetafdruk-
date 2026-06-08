@@ -9,6 +9,7 @@ import {
   linkWithCredential,
   signOut,
   updateProfile,
+  sendEmailVerification,
 } from "firebase/auth";
 
 /**
@@ -33,6 +34,13 @@ export async function registreerNaVragenlijst(email, password) {
 
   const credential = EmailAuthProvider.credential(email, password);
   const result = await linkWithCredential(user, credential);
+
+  await sendEmailVerification(result.user);
+
+  console.log(
+    "Verificatiemail verstuurd naar:",
+    result.user.email
+  );
 
   return result.user;
 }
