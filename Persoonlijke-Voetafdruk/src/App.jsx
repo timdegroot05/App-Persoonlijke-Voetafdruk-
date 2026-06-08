@@ -19,6 +19,7 @@ import TransportTasks from "./pages/tasks/Transporttasks";
 import EnergyTasks from "./pages/tasks/EnergyTasks";
 import Home from "./pages/Home";
 import Calculator from "./pages/Calculator";
+import Bos from "./pages/Bos";
 import BosVisualisatie from "./pages/BosVisualisatie";
 import BosMiniGame from "./pages/BosMiniGame";
 import Tips from "./pages/Tips";
@@ -80,7 +81,8 @@ function App() {
         <Route path="/energyTasks" element={<EnergyTasks />} />
         <Route path="/home" element={<Home />} />
         <Route path="/calculator" element={<Calculator />} />
-        <Route path="/bos" element={<BosVisualisatie />} />
+        <Route path="/bos" element={<Bos />} />
+        <Route path="/bos-oud" element={<BosVisualisatie />} />
         <Route path="/bos-game" element={<BosMiniGame />} />
         <Route path="/tips" element={<Tips />} />
         <Route path="/profile" element={<Profile />} />
