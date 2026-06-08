@@ -13,6 +13,7 @@ import GrootsteCategorie from "./pages/overzichtpages/GrootsteCategorie";
 import AchtergrondimpactInfo from "./pages/overzichtpages/AchtergrondimpactInfo"
 import WekelijkseActiviteitGeschiedenis from "./pages/overzichtpages/WekelijkseActiviteitGeschiedenis"
 import Activiteiten from "./pages/Activiteiten";
+import ActiviteitToevoegen from "./pages/ActiviteitToevoegen";
 import FoodTasks from "./pages/tasks/Foodtasks";
 import TransportTasks from "./pages/tasks/Transporttasks";
 import EnergyTasks from "./pages/tasks/EnergyTasks";
@@ -72,6 +73,7 @@ function App() {
         <Route path="/achtergrondimpact-info" element={<AchtergrondimpactInfo />} />
         <Route path="/wekelijkse-activiteit-geschiedenis" element={<WekelijkseActiviteitGeschiedenis />} />
         <Route path="/activiteiten" element={<Activiteiten />} />
+        <Route path="/activiteit-toevoegen" element={<ActiviteitToevoegen />} />
         <Route path="/foodTasks" element={<FoodTasks />} />
         <Route path="/transportTasks" element={<TransportTasks />} />
         <Route path="/energyTasks" element={<EnergyTasks />} />

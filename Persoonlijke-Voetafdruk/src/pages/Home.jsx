@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { FiArrowRight, FiCheckCircle, FiEdit3, FiPlus } from "react-icons/fi"
 import { HiOutlineCalculator } from "react-icons/hi"
 import { LuLeaf } from "react-icons/lu"
-import BottomNav from "../components/BottomNav"
-import AppHeader from "../components/AppHeader"
+import MobilePageShell from "../components/MobilePageShell"
 import {
   buildImpactSnapshot,
   getFocusLabel,
@@ -28,6 +27,11 @@ import {
   maybeShowWeeklyCheckinNotification,
 } from "../utils/notifications"
 import { factsList, tipsList } from "../data/tips"
+import {
+  applyCustomActivitiesToWeeklyResult,
+  getCustomActivityTotals,
+  getAugmentedWeeklyResults,
+} from "../utils/customActivities"
 import "../App.css"
 import handFoto from "../assets/HandHandfoto.png"
 
@@ -56,8 +60,21 @@ function Home() {
   const profileAnswers = getProfileAnswers()
   const weeklyAnswers = getLatestWeeklyAnswers()
   const weeklyResults = useMemo(() => getStoredWeeklyResults(), [])
+  const allWeeklyResultsWithExtras = useMemo(() => getAugmentedWeeklyResults(), [])
   const latestWeeklyResult = weeklyResults[0] ?? null
   const activeCheckinWeek = useMemo(() => getWeeklyCheckinWeekInfo(), [])
+  const displayWeekKey = latestWeeklyResult?.weekStart ?? activeCheckinWeek.weekStart
+  const customActivityTotals = useMemo(
+    () => getCustomActivityTotals(displayWeekKey),
+    [displayWeekKey]
+  )
+  const latestWeeklyResultWithExtras = useMemo(
+    () =>
+      latestWeeklyResult
+        ? applyCustomActivitiesToWeeklyResult(latestWeeklyResult, customActivityTotals)
+        : null,
+    [customActivityTotals, latestWeeklyResult]
+  )
   const weeklyQuestionnaireDone = useMemo(
     () => hasWeeklyResultForWeek(weeklyResults, activeCheckinWeek),
     [activeCheckinWeek, weeklyResults]
@@ -81,13 +98,13 @@ function Home() {
       }
     }
 
-    const resolvedCategories = latestWeeklyResult
+    const resolvedCategories = latestWeeklyResultWithExtras
       ? {
-          wonen: latestWeeklyResult.homeEmission,
-          transport: latestWeeklyResult.transportEmission,
-          voeding: latestWeeklyResult.foodEmission,
-          consumptie: latestWeeklyResult.consumptionEmission,
-          achtergrondimpact: latestWeeklyResult.backgroundImpact,
+          wonen: latestWeeklyResultWithExtras.homeEmission,
+          transport: latestWeeklyResultWithExtras.transportEmission,
+          voeding: latestWeeklyResultWithExtras.foodEmission,
+          consumptie: latestWeeklyResultWithExtras.consumptionEmission,
+          achtergrondimpact: latestWeeklyResultWithExtras.backgroundImpact,
         }
       : currentSnapshot.categories
     const dominantCategory =
@@ -97,14 +114,15 @@ function Home() {
       currentSnapshot.dominantCategory
 
     return {
-      dailyEmission: latestWeeklyResult
-        ? Number((latestWeeklyResult.totalEmission / 7).toFixed(1))
+      dailyEmission: latestWeeklyResultWithExtras
+        ? Number((latestWeeklyResultWithExtras.totalEmission / 7).toFixed(1))
         : currentSnapshot.dailyEmission,
-      weeklyEmission: latestWeeklyResult?.totalEmission ?? currentSnapshot.weeklyEmission,
+      weeklyEmission:
+        latestWeeklyResultWithExtras?.totalEmission ?? currentSnapshot.weeklyEmission,
       score: currentSnapshot.totalScore,
       dominantCategory,
     }
-  }, [currentSnapshot, latestWeeklyResult])
+  }, [currentSnapshot, latestWeeklyResultWithExtras])
 
   const history = useMemo(() => getImpactHistory(), [])
   const latestHistoryEntry = history[0] ?? null
@@ -148,13 +166,13 @@ function Home() {
       achtergrondimpact: "#cfd9c7",
     }
 
-    const categories = latestWeeklyResult
+    const categories = latestWeeklyResultWithExtras
       ? {
-          wonen: latestWeeklyResult.homeEmission,
-          transport: latestWeeklyResult.transportEmission,
-          voeding: latestWeeklyResult.foodEmission,
-          consumptie: latestWeeklyResult.consumptionEmission,
-          achtergrondimpact: latestWeeklyResult.backgroundImpact,
+          wonen: latestWeeklyResultWithExtras.homeEmission,
+          transport: latestWeeklyResultWithExtras.transportEmission,
+          voeding: latestWeeklyResultWithExtras.foodEmission,
+          consumptie: latestWeeklyResultWithExtras.consumptionEmission,
+          achtergrondimpact: latestWeeklyResultWithExtras.backgroundImpact,
         }
       : currentSnapshot?.categories
     const visibleCategories = categories
@@ -200,7 +218,7 @@ function Home() {
         }
       })
       .sort((a, b) => b.rawValue - a.rawValue)
-  }, [currentSnapshot, emissionData.dailyEmission, latestWeeklyResult])
+  }, [currentSnapshot, emissionData.dailyEmission, latestWeeklyResultWithExtras])
 
   const dailyCategoryChartBreakdown = useMemo(() => {
     const categoryColors = {
@@ -212,13 +230,13 @@ function Home() {
       achtergrondimpact: "#cfd9c7",
     }
 
-    const categories = latestWeeklyResult
+    const categories = latestWeeklyResultWithExtras
       ? {
-          wonen: latestWeeklyResult.homeEmission,
-          transport: latestWeeklyResult.transportEmission,
-          voeding: latestWeeklyResult.foodEmission,
-          consumptie: latestWeeklyResult.consumptionEmission,
-          achtergrondimpact: latestWeeklyResult.backgroundImpact,
+          wonen: latestWeeklyResultWithExtras.homeEmission,
+          transport: latestWeeklyResultWithExtras.transportEmission,
+          voeding: latestWeeklyResultWithExtras.foodEmission,
+          consumptie: latestWeeklyResultWithExtras.consumptionEmission,
+          achtergrondimpact: latestWeeklyResultWithExtras.backgroundImpact,
         }
       : currentSnapshot?.categories
     const totalCategoryValue = categories
@@ -282,34 +300,34 @@ function Home() {
         share: Math.max(4, Math.round(category.share)),
       }))
       .sort((a, b) => b.share - a.share)
-  }, [currentSnapshot, dailyCategoryBreakdown, latestWeeklyResult])
+  }, [currentSnapshot, dailyCategoryBreakdown, latestWeeklyResultWithExtras])
 
   const weeklyCategoryBreakdown = useMemo(
     () => {
-      if (latestWeeklyResult) {
+      if (latestWeeklyResultWithExtras) {
         return [
           {
             key: "transport",
             label: "Transport",
-            value: latestWeeklyResult.transportEmission,
+            value: latestWeeklyResultWithExtras.transportEmission,
             color: "#3e8f55",
           },
           {
             key: "wonen",
             label: "Wonen",
-            value: latestWeeklyResult.homeEmission,
+            value: latestWeeklyResultWithExtras.homeEmission,
             color: "#6fb8a0",
           },
           {
             key: "voeding",
             label: "Voeding",
-            value: latestWeeklyResult.foodEmission,
+            value: latestWeeklyResultWithExtras.foodEmission,
             color: "#8bcf91",
           },
           {
             key: "consumptie",
             label: "Consumptie",
-            value: latestWeeklyResult.consumptionEmission,
+            value: latestWeeklyResultWithExtras.consumptionEmission,
             color: "#d2c1a3",
           },
         ]
@@ -322,7 +340,7 @@ function Home() {
         value: Number((category.value * 7).toFixed(1)),
       }))
     },
-    [dailyCategoryBreakdown, latestWeeklyResult]
+    [dailyCategoryBreakdown, latestWeeklyResultWithExtras]
   )
   const monthInfo = useMemo(() => {
     const formatter = new Intl.DateTimeFormat("en-CA", {
@@ -450,6 +468,67 @@ function Home() {
     }
   }, [dailyCategoryChartBreakdown, weeklyResults])
 
+  const totalInfo = useMemo(() => {
+    const totalCategoryTemplate = [
+      { key: "transport", label: "Transport", value: 0, color: "#3e8f55" },
+      { key: "wonen", label: "Wonen", value: 0, color: "#6fb8a0" },
+      { key: "voeding", label: "Voeding", value: 0, color: "#8bcf91" },
+      { key: "consumptie", label: "Consumptie", value: 0, color: "#d2c1a3" },
+    ]
+
+    const totals = allWeeklyResultsWithExtras.reduce(
+      (currentTotals, week) => ({
+        totalEmission: currentTotals.totalEmission + (week.totalEmission || 0),
+        categoryBreakdown: totalCategoryTemplate.map((category, index) => ({
+          ...category,
+          value:
+            currentTotals.categoryBreakdown[index].value +
+            ((category.key === "transport"
+              ? week.transportEmission
+              : category.key === "wonen"
+                ? week.homeEmission
+                : category.key === "voeding"
+                  ? week.foodEmission
+                  : week.consumptionEmission) || 0),
+        })),
+      }),
+      {
+        totalEmission: 0,
+        categoryBreakdown: totalCategoryTemplate.map((category) => ({
+          ...category,
+          value: 0,
+        })),
+      }
+    )
+
+    const roundedCategoryBreakdown = totals.categoryBreakdown
+      .map((category) => ({
+        ...category,
+        value: Number(category.value.toFixed(1)),
+      }))
+      .filter((category) => category.value > 0)
+      .sort((first, second) => second.value - first.value)
+
+    const chartTotal = roundedCategoryBreakdown.reduce(
+      (sum, category) => sum + category.value,
+      0
+    )
+
+    return {
+      totalEmission: Number(totals.totalEmission.toFixed(1)),
+      rangeLabel: "Alle opgeslagen weken",
+      categoryBreakdown: roundedCategoryBreakdown,
+      chartBreakdown:
+        chartTotal > 0
+          ? roundedCategoryBreakdown.map((category) => ({
+              key: category.key,
+              color: category.color,
+              share: Math.max(4, Math.round((category.value / chartTotal) * 100)),
+            }))
+          : dailyCategoryChartBreakdown,
+    }
+  }, [allWeeklyResultsWithExtras, dailyCategoryChartBreakdown])
+
   const weeklyTargetLeft = Math.max(
     0,
     Number((weeklyGoal - emissionData.weeklyEmission).toFixed(1))
@@ -476,7 +555,7 @@ function Home() {
             ? "Koop deze maand alleen wat je echt nodig hebt."
             : "Vul je weekcheck-in in om je maandfocus te zien."
 
-  const emissionCardsCount = 3
+  const emissionCardsCount = 4
   const quickActionCardsCount = 3
   const focusCardsCount = 2
   const updateActiveIndex = (element, setter) => {
@@ -563,10 +642,12 @@ function Home() {
   }
 
   return (
-  <div className="home-page">
-    <AppHeader title="Impact" icon={<LuLeaf />} />
-
-    <div className="home-content">
+  <MobilePageShell
+    title="Impact"
+    icon={<LuLeaf />}
+    className="home-page"
+    contentClassName="home-content"
+  >
       {showWeeklyReminder ? (
         <section className="home-reminder-card">
           <p className="section-label dark">Wekelijkse reminder</p>
@@ -770,6 +851,46 @@ function Home() {
               </div>
             </div>
           </section>
+
+          <section className="info-card daily-widget-card home-widget-rail-card home-emission-card">
+            <div className="daily-widget-top">
+              <div>
+                <p className="section-label dark">Totale uitstoot</p>
+                <p className="compact-number">{totalInfo.totalEmission} kg CO₂e</p>
+                <p className="daily-widget-subtitle">{totalInfo.rangeLabel}</p>
+              </div>
+            </div>
+
+            <div className="daily-widget-bottom">
+              <div className="daily-widget-chart" aria-hidden="true">
+                {totalInfo.chartBreakdown.map((category) => (
+                  <span
+                    key={category.key}
+                    className="daily-widget-segment"
+                    style={{
+                      width: `${category.share}%`,
+                      background: category.color,
+                    }}
+                  />
+                ))}
+              </div>
+
+              <div className="daily-widget-legend">
+                {totalInfo.categoryBreakdown.slice(0, 3).map((category) => (
+                  <div key={category.key} className="daily-widget-legend-item">
+                    <span
+                      className="daily-widget-legend-dot"
+                      style={{ background: category.color }}
+                    />
+                    <span className="daily-widget-legend-label">{category.label}</span>
+                    <strong className="daily-widget-legend-value">
+                      {category.value} kg
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
         </div>
       </section>
 
@@ -809,6 +930,20 @@ function Home() {
                 <FiPlus />
               </span>
             </div>
+
+            <p className="calculator-text home-quick-text">
+              {customActivityTotals.entries.length > 0
+                ? `${customActivityTotals.entries.length} extra activiteiten deze week`
+                : "Voeg extra uitstoot of duurzame acties toe"}
+            </p>
+
+            <button
+              type="button"
+              className="goal-edit-button home-quick-button"
+              onClick={() => navigate("/activiteit-toevoegen")}
+            >
+              Open
+            </button>
           </section>
 
           <section className="calculator-card home-questionnaire-card home-quick-card home-widget-rail-card">
@@ -1135,10 +1270,7 @@ function Home() {
         <p className="home-fact-text">{facts[activeFactIndex]}</p>
       </section>
 
-    </div>
-
-      <BottomNav />
-    </div>
+  </MobilePageShell>
   )
 }
 

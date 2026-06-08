@@ -1,21 +1,36 @@
 import "./overzicht.css"
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { FiClock } from "react-icons/fi"
 import BottomNav from "../../components/BottomNav"
 import AppHeader from "../../components/AppHeader"
 import {
   buildWeeklyOverviewItems,
   formatWeekRangeLabel,
-  getStoredWeeklyResults,
 } from "../../utils/weeklyResults"
+import { getAugmentedWeeklyResults } from "../../utils/customActivities"
 
 function WekelijkseActiviteitGeschiedenis() {
   const railRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
   const weeklyHistory = useMemo(
-    () => buildWeeklyOverviewItems(getStoredWeeklyResults()).slice(1).reverse(),
+    () => buildWeeklyOverviewItems(getAugmentedWeeklyResults()).slice(1).reverse(),
     []
   )
+
+  useEffect(() => {
+    const rail = railRef.current
+    if (!rail || weeklyHistory.length === 0) {
+      return
+    }
+
+    const scrollToLatestWeek = () => {
+      rail.scrollLeft = rail.scrollWidth
+      setActiveIndex(Math.max(weeklyHistory.length - 1, 0))
+    }
+
+    scrollToLatestWeek()
+    window.requestAnimationFrame(scrollToLatestWeek)
+  }, [weeklyHistory.length])
 
   const updateActiveIndex = (element) => {
     if (!element) {
