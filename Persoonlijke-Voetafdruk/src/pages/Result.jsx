@@ -23,19 +23,27 @@ function Result() {
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
   const [accountSaveState, setAccountSaveState] = useState("idle");
+  const weekKey = location.state?.weekKey ?? null;
+  const isProfileResult = Boolean(location.state?.profileResult);
 
   const activeWeekInfo = useMemo(() => {
-    if (!location.state?.weekKey) return null;
-    return getWeekInfoFromKey(location.state.weekKey);
-  }, [location.state?.weekKey]);
+    if (!weekKey) return null;
+    return getWeekInfoFromKey(weekKey);
+  }, [weekKey]);
+  const isWeeklyResult = Boolean(activeWeekInfo);
+  const activeWeekStart = activeWeekInfo?.weekStart ?? null;
 
   const weeklyAnswers = useMemo(() => {
-    if (activeWeekInfo?.weekStart) {
-      return getWeeklyEntry(activeWeekInfo.weekStart)?.answers || {};
+    if (activeWeekStart) {
+      return getWeeklyEntry(activeWeekStart)?.answers || {};
+    }
+
+    if (isProfileResult) {
+      return {};
     }
 
     return getLatestWeeklyAnswers() || {};
-  }, [activeWeekInfo?.weekStart]);
+  }, [activeWeekStart, isProfileResult]);
 
   const profileAnswers = useMemo(() => {
     return getProfileAnswers() || {};
@@ -50,9 +58,12 @@ function Result() {
   }, [profileAnswers, weeklyAnswers]);
 
   useEffect(() => {
-    if (Object.keys(weeklyAnswers).length === 0) return;
+    if (
+      Object.keys(profileAnswers).length === 0 &&
+      Object.keys(weeklyAnswers).length === 0
+    ) return;
     saveImpactSnapshot(snapshot);
-  }, [snapshot, weeklyAnswers]);
+  }, [profileAnswers, snapshot, weeklyAnswers]);
 
   useEffect(() => {
     return watchAuthState((user) => {
@@ -76,7 +87,10 @@ function Result() {
         return;
       }
 
-      if (Object.keys(weeklyAnswers).length === 0) {
+      if (
+        Object.keys(profileAnswers).length === 0 &&
+        Object.keys(weeklyAnswers).length === 0
+      ) {
         return;
       }
 
@@ -133,7 +147,9 @@ function Result() {
 
       <div className="page-section result-content">
         <p className="section-label dark">Jouw persoonlijke uitslag</p>
-        <h1 className="result-title">Jouw weekuitstoot</h1>
+        <h1 className="result-title">
+          {isProfileResult ? "Jouw basisuitstoot" : "Jouw weekuitstoot"}
+        </h1>
 
         {activeWeekInfo ? (
           <p className="result-text">
@@ -152,8 +168,9 @@ function Result() {
           </div>
 
           <p className="result-hero-text">
-            Geschatte uitstoot in kg CO2e per week, berekend uit je basisprofiel
-            en je antwoorden van deze week.
+            {isProfileResult
+              ? "Geschatte uitstoot op basis van je eerste test."
+              : "Geschatte uitstoot in kg CO2e per week, berekend uit je profiel en weekantwoorden."}
           </p>
         </div>
 
@@ -195,14 +212,20 @@ function Result() {
 
           <button
             className="secondary-button"
-            onClick={() => navigate("/questionnaire")}
+            onClick={() =>
+              isWeeklyResult
+                ? navigate("/weekly-questionnaire", {
+                    state: { weekKey: activeWeekInfo.weekStart },
+                  })
+                : navigate("/questionnaire")
+            }
           >
             <FiRefreshCcw />
             Opnieuw invullen
           </button>
         </div>
 
-        {hasLinkedAccount ? null : (
+        {hasLinkedAccount || isWeeklyResult ? null : (
           <div className="auth-block">
             <h3>Wil je je resultaat opslaan?</h3>
             <p style={{ color: "#666", marginBottom: "10px" }}>

@@ -678,18 +678,7 @@ function Home() {
         </section>
       ) : null}
 
-      <section
-        className="home-feature-card action-card"
-        onClick={() => navigate("/bos")}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault()
-            navigate("/bos")
-          }
-        }}
-      >
+      <section className="home-feature-card action-card">
         <p className="section-label dark">Jouw Persoonlijke Bos</p>
 
         <div className="home-feature-visual" aria-hidden="true">
@@ -699,6 +688,15 @@ function Home() {
             alt={forestHeroPhoto.alt}
           />
         </div>
+
+        <button
+          type="button"
+          className="home-forest-card-button"
+          onClick={() => navigate("/bos")}
+        >
+          Bekijk bosvisualisatie
+          <FiArrowRight aria-hidden="true" />
+        </button>
       </section>
 
       <section className="home-widget-rail-section home-emission-rail-section">
@@ -1060,6 +1058,15 @@ function Home() {
                 style={{ width: `${goalProgress}%` }}
               />
             </div>
+
+            <button
+              type="button"
+              className="home-forest-link-button"
+              onClick={() => navigate("/bos")}
+            >
+              Bekijk bosvisualisatie
+              <FiArrowRight aria-hidden="true" />
+            </button>
           </section>
 
           {false ? (
