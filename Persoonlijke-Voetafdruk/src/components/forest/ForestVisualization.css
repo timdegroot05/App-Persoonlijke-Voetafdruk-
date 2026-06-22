@@ -2,12 +2,13 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  width: min(430px, calc(100vw - 24px));
-  height: calc(100dvh - 28px);
+  width: var(--app-shell-width);
+  height: var(--app-shell-height);
+  max-height: var(--app-shell-height);
   min-height: 640px;
   overflow: hidden;
   overflow-x: hidden;
-  border-radius: 30px;
+  border-radius: var(--app-shell-radius);
   background: #eef9f1;
   color: #1f2d20;
   box-shadow: 0 20px 62px rgba(0, 0, 0, 0.18);
@@ -16,13 +17,36 @@
   gap: 0;
 }
 
+.forest-page {
+  background: #eef9f1;
+  color: #1f2d20;
+  width: var(--app-shell-width);
+  height: var(--app-shell-height);
+  max-height: var(--app-shell-height);
+  min-height: 640px;
+  overflow: hidden;
+  border-radius: var(--app-shell-radius);
+  box-shadow: 0 20px 62px rgba(0, 0, 0, 0.18);
+}
+
+.forest-page .forest-card {
+  flex: initial;
+  min-height: auto;
+  overflow: visible;
+  padding: 16px;
+}
+
 .forest-clean-page {
   flex: 1 1 auto;
   display: grid;
   gap: 18px;
+  width: 100%;
+  max-width: 100%;
   min-height: 0;
   overflow-y: auto;
-  padding: 18px 14px 24px;
+  overflow-x: hidden;
+  padding: 18px 14px 96px;
+  box-sizing: border-box;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -30,11 +54,30 @@
   flex-shrink: 0;
 }
 
+.forest-shell-content {
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.forest-shell-content > .forest-clean-page {
+  width: 100%;
+  min-width: 0;
+}
+
 .forest-progress-card,
+.forest-weekly-card,
+.forest-mission-hero,
 .forest-card,
 .forest-actions-card,
 .forest-scenarios-card,
-.forest-game-stats-card {
+.forest-game-stats-card,
+.forest-hub-card,
+.forest-overview-actions-card,
+.forest-auth-card {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid rgba(42, 106, 48, 0.1);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.96);
@@ -48,10 +91,369 @@
   padding: 16px;
 }
 
+.forest-weekly-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 15px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(139, 214, 79, 0.18), transparent 34%),
+    rgba(255, 255, 255, 0.97);
+}
+
+.forest-weekly-card h2 {
+  margin: 2px 0 4px;
+  color: #17251a;
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1.05;
+}
+
+.forest-weekly-card p {
+  margin: 0;
+  color: #657363;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.forest-weekly-card a {
+  display: inline-grid;
+  place-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: #1f8d3d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+  text-decoration: none;
+  box-shadow: 0 10px 18px rgba(31, 141, 61, 0.16);
+}
+
+.forest-mission-hero {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(139, 214, 79, 0.2), transparent 35%),
+    linear-gradient(180deg, #ffffff 0%, #eef8ec 100%);
+}
+
+.forest-mission-hero h1 {
+  margin: 0;
+  color: #17251a;
+  font-size: 25px;
+  line-height: 1.05;
+  font-family: var(--font-display);
+}
+
+.forest-mission-hero p {
+  margin: 8px 0 0;
+  color: #657363;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.forest-mission-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #1f8d3d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.forest-auth-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.forest-auth-card strong {
+  display: block;
+  color: #17251a;
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.1;
+}
+
+.forest-auth-card p {
+  margin: 6px 0 0;
+  color: #657363;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.forest-auth-card a {
+  display: inline-grid;
+  place-items: center;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 14px;
+  background: #edf8e8;
+  color: #1f6b2a;
+  font-size: 12px;
+  font-weight: 950;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.forest-auth-card.is-anonymous {
+  border-color: rgba(214, 154, 48, 0.22);
+  background: linear-gradient(180deg, #fffdf4, #fff7dc);
+}
+
 .forest-scenarios-card {
   display: grid;
   gap: 12px;
   padding: 15px;
+}
+
+.forest-panel-section.is-hidden {
+  display: none;
+}
+
+.forest-hub-card {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+}
+
+.forest-hub-card--top {
+  border-color: rgba(31, 141, 61, 0.18);
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+}
+
+.forest-hub-card h2 {
+  margin: 0;
+  color: #17251a;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.05;
+}
+
+.forest-mission-guide {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+
+.forest-mission-guide button {
+  display: grid;
+  gap: 4px;
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid #dce8d7;
+  border-radius: 17px;
+  background: #f8fcf5;
+  color: #243427;
+  text-align: left;
+  box-shadow: none;
+}
+
+.forest-mission-guide button.is-active {
+  border-color: rgba(31, 141, 61, 0.34);
+  background: linear-gradient(180deg, #eaf8e4, #ffffff);
+  box-shadow: 0 12px 22px rgba(31, 141, 61, 0.12);
+}
+
+.forest-mission-guide strong,
+.forest-mission-guide span {
+  display: block;
+}
+
+.forest-mission-guide strong {
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.forest-mission-guide span {
+  margin-top: 5px;
+  color: #657363;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.forest-overview-actions-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.forest-overview-actions-card h2 {
+  margin: 0;
+  color: #17251a;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.08;
+}
+
+.forest-overview-actions-card p {
+  margin: 8px 0 0;
+  color: #657363;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.forest-overview-action-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+}
+
+.forest-overview-action-list a {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  border-radius: 15px;
+  background: #edf8e8;
+  color: #1f6b2a;
+  font-size: 13px;
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.forest-overview-action-list a:first-child {
+  background: linear-gradient(180deg, #1f8d3d, #176b2e);
+  color: #ffffff;
+  box-shadow: 0 12px 22px rgba(31, 141, 61, 0.18);
+}
+
+.forest-simple-action-list {
+  display: grid;
+  gap: 9px;
+}
+
+.forest-simple-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e4eedf;
+  border-radius: 16px;
+  background: #fbfef8;
+}
+
+.forest-simple-action.is-done {
+  background: #edf8e8;
+  border-color: #cfe8c4;
+}
+
+.forest-simple-action strong,
+.forest-simple-action span {
+  display: block;
+}
+
+.forest-simple-action strong {
+  color: #17251a;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.forest-simple-action span {
+  margin-top: 4px;
+  color: #657363;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.forest-simple-action button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 13px;
+  padding: 0 12px;
+  background: #1f8d3d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.forest-simple-action.is-done button {
+  background: #ffffff;
+  color: #1f6b2a;
+  border: 1px solid #cfe8c4;
+}
+
+.forest-hub-buttons,
+.forest-theme-buttons {
+  display: flex;
+  max-width: 100%;
+  overflow-x: auto;
+  gap: 8px;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.forest-hub-buttons::-webkit-scrollbar,
+.forest-theme-buttons::-webkit-scrollbar {
+  display: none;
+}
+
+.forest-hub-buttons button,
+.forest-theme-buttons button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  border: 1px solid #dce8d7;
+  border-radius: 14px;
+  background: #f8fcf5;
+  color: #657363;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.forest-hub-buttons .is-active,
+.forest-theme-buttons .is-active {
+  border-color: #1f8d3d;
+  background: #1f8d3d;
+  color: #ffffff;
+}
+
+.forest-tutorial-list {
+  display: grid;
+  gap: 9px;
+}
+
+.forest-tutorial-list div {
+  padding: 12px;
+  border: 1px solid #e4eedf;
+  border-radius: 16px;
+  background: #fbfef8;
+}
+
+.forest-tutorial-list strong,
+.forest-tutorial-list span {
+  display: block;
+}
+
+.forest-tutorial-list strong {
+  color: #17251a;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.forest-tutorial-list span {
+  margin-top: 4px;
+  color: #657363;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
 }
 
 .forest-game-stats-card {
@@ -199,6 +601,9 @@
 }
 
 .forest-token-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   align-self: start;
   border-radius: 999px;
   padding: 9px 11px;
@@ -207,6 +612,23 @@
   font-size: 13px;
   font-weight: 950;
   white-space: nowrap;
+}
+
+.app-logo-token {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #1f8d3d, #176b2e);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+.app-logo-token svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
 }
 
 .forest-progress-track {
@@ -258,12 +680,13 @@
 
 .simple-forest-scene {
   position: relative;
-  min-height: 330px;
+  min-height: clamp(280px, 46dvh, 390px);
   overflow: hidden;
   border-radius: 18px;
   background:
     linear-gradient(180deg, #6dccf3 0%, #c8eff8 61%, #08aa45 62%, #008a37 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26);
+  cursor: pointer;
 }
 
 .scene--vulnerable {
@@ -292,6 +715,24 @@
   background:
     radial-gradient(circle at 78% 18%, rgba(131, 72, 42, 0.32) 0 58px, transparent 59px),
     linear-gradient(180deg, #5f6664 0%, #83775f 61%, #5b4535 62%, #231b19 100%);
+}
+
+.time--morning:not(.scene--bad):not(.scene--critical) {
+  background:
+    radial-gradient(circle at 22% 20%, rgba(255, 226, 120, 0.24) 0 76px, transparent 77px),
+    linear-gradient(180deg, #86d8ff 0%, #d8f4e7 61%, #21b85a 62%, #05883c 100%);
+}
+
+.time--evening:not(.scene--bad):not(.scene--critical) {
+  background:
+    radial-gradient(circle at 78% 20%, rgba(255, 172, 92, 0.28) 0 70px, transparent 71px),
+    linear-gradient(180deg, #89b8e6 0%, #f1caa4 61%, #3da45a 62%, #17713b 100%);
+}
+
+.time--night:not(.scene--bad):not(.scene--critical) {
+  background:
+    radial-gradient(circle at 78% 18%, rgba(255, 255, 255, 0.18) 0 58px, transparent 59px),
+    linear-gradient(180deg, #223858 0%, #47627a 61%, #235a3c 62%, #153f2b 100%);
 }
 
 .season--summer {
@@ -328,6 +769,96 @@
     radial-gradient(circle at 26% 42%, rgba(214, 133, 42, 0.72) 0 3px, transparent 4px),
     radial-gradient(circle at 66% 52%, rgba(176, 91, 32, 0.62) 0 3px, transparent 4px),
     radial-gradient(circle at 46% 34%, rgba(227, 169, 58, 0.58) 0 3px, transparent 4px);
+}
+
+.forest-time-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 9;
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #174f20;
+  font-size: 12px;
+  font-weight: 950;
+  box-shadow: 0 8px 18px rgba(31, 45, 32, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.time--night .forest-time-badge {
+  background: rgba(16, 29, 44, 0.62);
+  color: #f8fbff;
+}
+
+.time--night .simple-sun {
+  background: #f7f2d7;
+  box-shadow:
+    inset -12px 0 0 rgba(214, 212, 196, 0.64),
+    0 0 28px rgba(245, 247, 225, 0.32);
+}
+
+.time--evening .simple-sun {
+  background: #ffb25d;
+  box-shadow: 0 0 34px rgba(255, 178, 93, 0.36);
+}
+
+.season-weather {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.season-weather span {
+  position: absolute;
+  top: -24px;
+  opacity: 0;
+}
+
+.weather--spring span {
+  width: 3px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(115, 199, 255, 0.62);
+  animation-name: seasonRainFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.weather--summer span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 245, 162, 0.72);
+  box-shadow: 0 0 12px rgba(255, 230, 111, 0.42);
+  animation-name: seasonLightFloat;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.weather--autumn span {
+  width: 12px;
+  height: 8px;
+  border-radius: 999px 999px 999px 2px;
+  background: #d9902d;
+  animation-name: seasonLeafWind;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.weather--winter span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.86);
+  animation-name: seasonSnowFall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
 .scene--bad::before,
@@ -384,6 +915,46 @@
   z-index: 6;
   pointer-events: none;
   animation: wildlifePop 0.35s ease both, wildlifeIdle 3.2s ease-in-out infinite alternate;
+}
+
+.forest-collectible-deco {
+  position: absolute;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 8px 18px rgba(31, 45, 32, 0.12);
+  font-size: 18px;
+  pointer-events: none;
+  animation: wildlifePop 0.35s ease both, collectibleFloat 3.4s ease-in-out infinite alternate;
+}
+
+.forest-collectible-deco.deco-1 {
+  left: 13%;
+  bottom: 24%;
+}
+
+.forest-collectible-deco.deco-2 {
+  left: 45%;
+  bottom: 18%;
+}
+
+.forest-collectible-deco.deco-3 {
+  right: 18%;
+  bottom: 28%;
+}
+
+.forest-collectible-deco.deco-4 {
+  left: 29%;
+  bottom: 38%;
+}
+
+.forest-collectible-deco.deco-5 {
+  right: 34%;
+  bottom: 41%;
 }
 
 .wildlife-butterfly {
@@ -518,6 +1089,107 @@
     linear-gradient(180deg, transparent 0 9px, #895a2e 10px 15px, transparent 16px),
     linear-gradient(90deg, transparent 0 8px, #6b492c 9px 13px, transparent 14px 48px, #6b492c 49px 53px, transparent 54px);
   box-shadow: 0 10px 0 -5px rgba(31, 45, 32, 0.2);
+}
+
+.cosmetic-forest-lanterns {
+  left: 34%;
+  bottom: 32%;
+  width: 112px;
+  height: 50px;
+  background:
+    radial-gradient(circle at 8% 60%, #ffe18a 0 5px, transparent 6px),
+    radial-gradient(circle at 32% 46%, #ffe18a 0 5px, transparent 6px),
+    radial-gradient(circle at 58% 54%, #ffe18a 0 5px, transparent 6px),
+    radial-gradient(circle at 84% 42%, #ffe18a 0 5px, transparent 6px);
+  filter: drop-shadow(0 0 12px rgba(255, 212, 100, 0.36));
+  animation: lanternGlow 2.2s ease-in-out infinite alternate;
+}
+
+.cosmetic-water-fountain {
+  left: 42%;
+  bottom: 13%;
+  width: 74px;
+  height: 32px;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(180, 235, 255, 0.9) 0 13px, transparent 14px),
+    linear-gradient(180deg, #78d3f3, #2397c7);
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.32);
+  animation: waterShimmer 2.4s ease-in-out infinite alternate;
+}
+
+.cosmetic-windmill {
+  left: 8%;
+  bottom: 28%;
+  width: 46px;
+  height: 72px;
+  background:
+    linear-gradient(90deg, transparent 0 20px, #f6f1df 21px 26px, transparent 27px),
+    linear-gradient(180deg, transparent 0 45px, #8a6339 46px 72px);
+}
+
+.cosmetic-windmill::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background:
+    linear-gradient(90deg, transparent 0 18px, #ffffff 19px 23px, transparent 24px),
+    linear-gradient(180deg, transparent 0 18px, #ffffff 19px 23px, transparent 24px);
+  transform: translateX(-50%);
+  animation: windmillSpin 3.4s linear infinite;
+}
+
+.cosmetic-bee-hotel {
+  right: 7%;
+  bottom: 34%;
+  width: 38px;
+  height: 48px;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 30% 34%, #53391d 0 3px, transparent 4px),
+    radial-gradient(circle at 65% 36%, #53391d 0 3px, transparent 4px),
+    radial-gradient(circle at 50% 62%, #53391d 0 3px, transparent 4px),
+    linear-gradient(180deg, #e5b457, #b9792f);
+  box-shadow: 0 -9px 0 -2px #8f4c2c;
+}
+
+.cosmetic-battle-banner {
+  left: 50%;
+  bottom: 40%;
+  width: 38px;
+  height: 78px;
+  background:
+    linear-gradient(90deg, transparent 0 16px, #744426 17px 21px, transparent 22px),
+    linear-gradient(180deg, #1f8d3d 0 32px, transparent 33px);
+  transform: translateX(-50%);
+}
+
+.cosmetic-battle-banner::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 0;
+  width: 38px;
+  height: 28px;
+  border-radius: 0 8px 8px 0;
+  background: linear-gradient(180deg, #8bd64f, #1f8d3d);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.32);
+}
+
+.cosmetic-moon-stone {
+  right: 36%;
+  bottom: 18%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 64% 38%, rgba(255, 255, 255, 0.65) 0 5px, transparent 6px),
+    linear-gradient(180deg, #e9eef5, #99a8b5);
+  box-shadow: 0 0 18px rgba(230, 238, 255, 0.48);
 }
 
 .battle-recovery-glow {
@@ -682,6 +1354,23 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.forest-click-burst {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  z-index: 9;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow:
+    0 0 0 0 rgba(139, 214, 79, 0.48),
+    0 0 34px rgba(255, 255, 255, 0.85);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: forestClickBurst 0.72s ease-out both;
+}
+
 .simple-tree::before {
   content: "";
   position: absolute;
@@ -701,12 +1390,25 @@
   left: 50%;
   border-radius: 50%;
   transform: translateX(-50%);
+  animation: treeCanopySway 3.8s ease-in-out infinite alternate;
 }
 
 .scene--bad .simple-tree,
 .scene--critical .simple-tree {
   filter: grayscale(0.75) sepia(0.35) brightness(0.72);
   opacity: 0.72;
+}
+
+.season--autumn .simple-tree::after,
+.season--autumn .simple-tree span {
+  background: linear-gradient(180deg, #c18e35, #8a712d);
+}
+
+.season--winter .simple-tree::after,
+.season--winter .simple-tree span {
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.8) 0 7px, transparent 8px),
+    linear-gradient(180deg, #7fb393, #326f4d);
 }
 
 .dead-tree {
@@ -861,6 +1563,18 @@
   background: #1f8d3d;
 }
 
+.season--autumn .simple-tree::after,
+.season--autumn .simple-tree span {
+  background: linear-gradient(180deg, #c18e35, #8a712d);
+}
+
+.season--winter .simple-tree::after,
+.season--winter .simple-tree span {
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.8) 0 7px, transparent 8px),
+    linear-gradient(180deg, #7fb393, #326f4d);
+}
+
 .simple-tree:hover {
   transform: translateX(-50%) scale(1.08);
 }
@@ -947,6 +1661,9 @@
 
 .forest-actions-card {
   padding: 16px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .danger-actions-card {
@@ -1002,6 +1719,19 @@
   gap: 10px;
 }
 
+.forest-page-link {
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  margin-top: 12px;
+  border-radius: 14px;
+  background: #edf8e8;
+  color: #1f6b2a;
+  font-size: 13px;
+  font-weight: 950;
+  text-decoration: none;
+}
+
 .forest-action-card {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -1012,6 +1742,7 @@
   border-radius: 17px;
   background: #fbfef8;
   animation: cleanCardIn 0.22s ease both;
+  min-width: 0;
 }
 
 .forest-action-card h3 {
@@ -1076,6 +1807,9 @@
 }
 
 .forest-shop-card .forest-actions-heading strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: #fff3c8;
   color: #875b07;
 }
@@ -1113,9 +1847,19 @@
 }
 
 .forest-shop-item span {
+  display: block;
   color: #875b07;
   font-size: 12px;
   font-weight: 950;
+}
+
+.forest-shop-item small {
+  display: block;
+  margin: 6px 0 0;
+  color: #1f6b2a;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.3;
 }
 
 .forest-shop-item button {
@@ -1146,6 +1890,13 @@
   border-color: rgba(31, 141, 61, 0.18);
 }
 
+.forest-battle-card.is-locked {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 244, 241, 0.96)),
+    #ffffff;
+  border-color: rgba(95, 112, 95, 0.14);
+}
+
 .forest-battle-start {
   width: 100%;
   min-height: 46px;
@@ -1158,6 +1909,13 @@
   box-shadow: 0 12px 22px rgba(31, 141, 61, 0.18);
 }
 
+.forest-battle-start:disabled {
+  background: #e3e9df;
+  color: #748271;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
 .forest-battle-note {
   margin: 10px 0 0;
   color: #657363;
@@ -1166,24 +1924,115 @@
   line-height: 1.35;
 }
 
+.forest-rpg-card {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(139, 214, 79, 0.2), transparent 30%),
+    linear-gradient(180deg, #ffffff 0%, #eef8ec 100%);
+}
+
+.forest-rpg-boss-card {
+  padding: 14px;
+  border-radius: 18px;
+  background: #17251a;
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(23, 37, 26, 0.16);
+}
+
+.forest-rpg-boss-card span,
+.forest-rpg-boss-card small {
+  display: block;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.forest-rpg-boss-card strong {
+  display: block;
+  margin: 5px 0;
+  font-size: 22px;
+  font-family: var(--font-display);
+}
+
+.forest-rpg-boss-card p {
+  margin: 0 0 8px;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.forest-rpg-levels {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  overflow: visible;
+}
+
+.forest-rpg-levels article {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid #dce8d7;
+  border-radius: 16px;
+  background: #f8fcf5;
+}
+
+.forest-rpg-levels article.is-unlocked {
+  border-color: #cfe8c4;
+  background: #edf8e8;
+}
+
+.forest-rpg-levels span,
+.forest-rpg-levels small {
+  display: block;
+  color: #657363;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.forest-rpg-levels strong {
+  display: block;
+  margin: 5px 0;
+  color: #17251a;
+  font-size: 14px;
+  line-height: 1.15;
+}
+
+.forest-rpg-levels button {
+  min-height: 36px;
+  border: 0;
+  border-radius: 12px;
+  background: #1f8d3d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.forest-rpg-levels button:disabled {
+  background: #e3e9df;
+  color: #748271;
+}
+
 .battle-modal-backdrop {
   position: fixed;
   inset: 0;
   z-index: 90;
   display: grid;
   place-items: center;
-  padding: 18px;
+  padding: 16px;
   background: rgba(20, 32, 22, 0.42);
   backdrop-filter: blur(6px);
 }
 
 .battle-modal {
-  width: min(390px, calc(100vw - 32px));
-  max-height: min(760px, calc(100dvh - 48px));
+  width: min(334px, calc(100vw - 44px));
+  max-width: 100%;
+  box-sizing: border-box;
+  max-height: min(760px, calc(100dvh - 44px));
   overflow-y: auto;
   border: 1px solid rgba(42, 106, 48, 0.16);
-  border-radius: 24px;
-  padding: 16px;
+  border-radius: 22px;
+  padding: 15px;
   background:
     linear-gradient(180deg, #ffffff 0%, #f3faf0 100%),
     #ffffff;
@@ -1220,13 +2069,17 @@
 
 .battle-enemy {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 1fr;
   align-items: center;
   gap: 12px;
-  padding: 12px;
+  padding: 14px;
   border-radius: 18px;
   background: #fff7f2;
   border: 1px solid #efd8ca;
+}
+
+.battle-enemy.is-hit {
+  animation: enemyHit 0.42s ease both;
 }
 
 .battle-enemy-sprite {
@@ -1236,6 +2089,24 @@
   height: 58px;
   border-radius: 18px;
   background: #f0d2bd;
+}
+
+.battle-enemy-sprite.boss-smoke {
+  background: #d5d7d0;
+}
+
+.battle-enemy-sprite.boss-smoke span {
+  border-radius: 50% 50% 14px 14px;
+  background: #5f6664;
+}
+
+.battle-enemy-sprite.boss-plastic {
+  background: #dceaf5;
+}
+
+.battle-enemy-sprite.boss-plastic span {
+  border-radius: 16px 16px 8px 8px;
+  background: #77a5c9;
 }
 
 .battle-enemy-sprite span {
@@ -1263,7 +2134,7 @@
 .battle-enemy strong {
   display: block;
   color: #17251a;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 950;
 }
 
@@ -1271,13 +2142,14 @@
 .battle-timer-label {
   display: block;
   color: #657363;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 850;
 }
 
 .battle-hp-track,
-.battle-timer {
-  height: 10px;
+.battle-timer,
+.battle-player-hp {
+  height: 12px;
   overflow: hidden;
   border-radius: 999px;
   background: #e5ebe2;
@@ -1312,27 +2184,112 @@
   text-align: right;
 }
 
+.battle-player {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: #edf8e8;
+  border: 1px solid #cfe8c4;
+}
+
+.battle-player.is-hit {
+  animation: playerHit 0.42s ease both;
+}
+
+.battle-player span {
+  color: #657363;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.battle-player strong {
+  color: #1f6b2a;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.battle-player-hp {
+  grid-column: 1 / -1;
+}
+
+.battle-player-hp span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #8bd64f, #1f8d3d);
+  transition: width 0.25s ease;
+}
+
+.battle-combo-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 15px;
+  background: #fff8d8;
+  border: 1px solid #f0df9a;
+}
+
+.battle-combo-row span,
+.battle-combo-row small {
+  color: #80610b;
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.battle-combo-row strong {
+  color: #6f4d00;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.battle-combo-row small {
+  grid-column: 1 / -1;
+}
+
+.battle-bonus-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.battle-bonus-row span {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: #fff3c8;
+  color: #875b07;
+  font-size: 11px;
+  font-weight: 900;
+}
+
 .battle-modal h3 {
-  margin: 14px 0 12px;
+  margin: 16px 0 14px;
   color: #17251a;
-  font-size: 17px;
-  line-height: 1.25;
+  font-size: 18px;
+  line-height: 1.22;
 }
 
 .battle-options {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .battle-options button {
-  min-height: 44px;
+  min-height: 48px;
   border: 1px solid #dce8d7;
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 13px 14px;
   background: #ffffff;
   color: #1f2d20;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 850;
+  line-height: 1.25;
   text-align: left;
 }
 
@@ -1357,7 +2314,7 @@
 .battle-win-panel p {
   margin: 0;
   color: #657363;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 750;
   line-height: 1.35;
 }
@@ -1370,6 +2327,138 @@
   color: #ffffff;
   font-size: 13px;
   font-weight: 950;
+}
+
+.battle-lose-panel {
+  background: #fff7f2;
+  border-color: #efd8ca;
+}
+
+.battle-lose-panel strong {
+  color: #8c3f21;
+}
+
+.forest-gacha-card {
+  background:
+    radial-gradient(circle at 15% 12%, rgba(255, 223, 32, 0.26), transparent 32%),
+    linear-gradient(180deg, #ffffff, #f5fbef);
+}
+
+.forest-gacha-button {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #ffdf62, #d8a72e);
+  color: #4d3506;
+  font-size: 14px;
+  font-weight: 950;
+  box-shadow: 0 12px 22px rgba(216, 167, 46, 0.18);
+}
+
+.forest-dice-panel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(216, 167, 46, 0.22);
+}
+
+.forest-dice {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff, #fff0bd);
+  color: #4d3506;
+  font-size: 34px;
+  font-weight: 950;
+  font-family: var(--font-display);
+  box-shadow:
+    inset 0 0 0 2px rgba(216, 167, 46, 0.18),
+    0 12px 22px rgba(216, 167, 46, 0.12);
+}
+
+.forest-dice.has-result {
+  animation: dicePop 0.5s ease both;
+}
+
+.forest-dice-panel strong {
+  display: block;
+  color: #17251a;
+  font-size: 16px;
+  font-family: var(--font-display);
+}
+
+.forest-dice-panel p {
+  margin: 5px 0 0;
+  color: #657363;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.forest-dice-rewards {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  margin-top: 10px;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.forest-dice-rewards::-webkit-scrollbar {
+  display: none;
+}
+
+.forest-dice-rewards span {
+  flex: 0 0 auto;
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: #fff3c8;
+  color: #875b07;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.forest-collectible-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 12px;
+}
+
+.forest-collectible-card {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  min-height: 96px;
+  padding: 12px;
+  border: 1px solid #e4eedf;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.forest-collectible-card strong {
+  font-size: 26px;
+}
+
+.forest-collectible-card span {
+  color: #17251a;
+  font-size: 13px;
+  font-weight: 950;
+  text-align: center;
+}
+
+.forest-collectible-card small {
+  color: #657363;
+  font-size: 11px;
+  font-weight: 850;
 }
 
 .forest-quests-card,
@@ -1427,9 +2516,19 @@
 }
 
 .forest-season-panel {
+  display: grid;
+  gap: 10px;
   margin-top: 14px;
   padding-top: 14px;
   border-top: 1px solid #e4eedf;
+}
+
+.forest-season-panel strong {
+  display: block;
+  margin-top: 3px;
+  color: #1c2b1d;
+  font-size: 14px;
+  font-family: var(--font-display);
 }
 
 .forest-season-buttons {
@@ -1454,6 +2553,53 @@
   border-color: #1f8d3d;
   background: #1f8d3d;
   color: #ffffff;
+}
+
+.forest-settings-card {
+  background: #fbfef8;
+}
+
+.forest-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px;
+  border: 1px solid #e4eedf;
+  border-radius: 17px;
+  background: #ffffff;
+}
+
+.forest-toggle-row strong,
+.forest-toggle-row small {
+  display: block;
+}
+
+.forest-toggle-row strong {
+  color: #17251a;
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.forest-toggle-row small {
+  margin-top: 4px;
+  color: #657363;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.forest-toggle-row input {
+  width: 42px;
+  height: 24px;
+  accent-color: #1f8d3d;
+}
+
+.forest-theme-panel {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e4eedf;
 }
 
 .forest-action-card.is-done {
@@ -1491,6 +2637,18 @@
   box-shadow: 0 18px 34px rgba(35, 73, 39, 0.18);
   transform: translateX(-50%);
   animation: cleanToastIn 0.22s ease both;
+}
+
+.forest-toast::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 8px;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(31, 141, 61, 0.28);
+  animation: toastTimer 3.6s linear both;
 }
 
 .forest-toast strong {
@@ -1576,6 +2734,114 @@
   }
 }
 
+@keyframes treeCanopySway {
+  from {
+    translate: -2px 0;
+  }
+
+  to {
+    translate: 3px -1px;
+  }
+}
+
+@keyframes seasonRainFall {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) rotate(8deg);
+  }
+
+  18% {
+    opacity: 0.75;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(360px) rotate(8deg);
+  }
+}
+
+@keyframes seasonSnowFall {
+  from {
+    opacity: 0;
+    transform: translate(0, -20px);
+  }
+
+  18% {
+    opacity: 0.9;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(18px, 360px);
+  }
+}
+
+@keyframes seasonLeafWind {
+  from {
+    opacity: 0;
+    transform: translate(-24px, 20px) rotate(0deg);
+  }
+
+  20% {
+    opacity: 0.85;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(120px, 340px) rotate(220deg);
+  }
+}
+
+@keyframes seasonLightFloat {
+  from {
+    opacity: 0;
+    transform: translateY(250px) scale(0.7);
+  }
+
+  45% {
+    opacity: 0.85;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(60px) scale(1.12);
+  }
+}
+
+@keyframes lanternGlow {
+  from {
+    opacity: 0.72;
+    filter: drop-shadow(0 0 7px rgba(255, 212, 100, 0.22));
+  }
+
+  to {
+    opacity: 1;
+    filter: drop-shadow(0 0 16px rgba(255, 212, 100, 0.48));
+  }
+}
+
+@keyframes waterShimmer {
+  from {
+    transform: scaleX(0.96);
+    filter: brightness(0.98);
+  }
+
+  to {
+    transform: scaleX(1.04);
+    filter: brightness(1.12);
+  }
+}
+
+@keyframes windmillSpin {
+  from {
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  to {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
 @keyframes cleanTreeGrow {
   from {
     opacity: 0;
@@ -1601,6 +2867,84 @@
   to {
     opacity: 0;
     transform: translateY(270px) rotate(220deg);
+  }
+}
+
+@keyframes dicePop {
+  0% {
+    transform: rotate(-10deg) scale(0.82);
+  }
+
+  55% {
+    transform: rotate(8deg) scale(1.08);
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes forestClickBurst {
+  0% {
+    opacity: 0.95;
+    transform: translate(-50%, -50%) scale(0.45);
+    box-shadow:
+      0 0 0 0 rgba(139, 214, 79, 0.5),
+      0 0 24px rgba(255, 255, 255, 0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3.4);
+    box-shadow:
+      0 0 0 24px rgba(139, 214, 79, 0),
+      0 0 64px rgba(255, 255, 255, 0);
+  }
+}
+
+@keyframes enemyHit {
+  0% {
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    transform: translateX(8px) scale(0.98);
+    filter: brightness(1.25);
+  }
+  70% {
+    transform: translateX(-4px) scale(1.02);
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes playerHit {
+  0% {
+    transform: translateX(0);
+    background: #edf8e8;
+  }
+  35% {
+    transform: translateX(-7px);
+    background: #fff0df;
+  }
+  70% {
+    transform: translateX(4px);
+  }
+  100% {
+    transform: translateX(0);
+    background: #edf8e8;
+  }
+}
+
+@keyframes toastTimer {
+  from {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  to {
+    transform: scaleX(0);
+    transform-origin: left;
   }
 }
 
@@ -1663,6 +3007,16 @@
   }
 }
 
+@keyframes collectibleFloat {
+  from {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  to {
+    transform: translateY(-7px) rotate(3deg);
+  }
+}
+
 @keyframes battleGlowFade {
   0% {
     opacity: 0;
@@ -1716,8 +3070,14 @@
 }
 
 @media (max-width: 390px) {
+  .forest-page,
   .forest-game-page {
-    width: calc(100vw - 20px);
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    min-height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .forest-clean-page {
@@ -1756,8 +3116,37 @@
   }
 
   .battle-modal {
-    width: calc(100vw - 26px);
-    padding: 14px;
+    width: min(326px, calc(100vw - 34px));
+    max-height: calc(100dvh - 34px);
+    padding: 13px;
+    border-radius: 20px;
+  }
+
+  .battle-enemy {
+    grid-template-columns: 1fr;
+  }
+
+  .battle-enemy-sprite {
+    width: 58px;
+    height: 58px;
+  }
+
+  .battle-modal h3 {
+    font-size: 19px;
+  }
+
+  .battle-options button {
+    min-height: 52px;
+    font-size: 14px;
+  }
+
+  .forest-dice-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .forest-dice {
+    width: 62px;
+    height: 62px;
   }
 }
 

@@ -204,9 +204,9 @@ function Result() {
         <div className="result-actions">
           <button
             className="primary-button result-button"
-            onClick={() => navigate("/home")}
+            onClick={() => navigate("/bos")}
           >
-            Naar Home
+            Bekijk mijn bos
             <FiArrowRight />
           </button>
 

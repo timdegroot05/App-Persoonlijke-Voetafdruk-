@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 
 import Welcome from "./pages/Welcome";
 import Questionnaire from "./pages/Questionnaire";
@@ -21,6 +21,7 @@ import Home from "./pages/Home";
 import Calculator from "./pages/Calculator";
 import Bos from "./pages/Bos";
 import BosVisualisatie from "./pages/BosVisualisatie";
+import BosGame from "./pages/BosGame";
 import BosMiniGame from "./pages/BosMiniGame";
 import Tips from "./pages/Tips";
 import Profile from "./pages/Profile";
@@ -28,6 +29,7 @@ import AccountGegevens from "./pages/AccountGegevens";
 import QuestionnaireEditor from "./pages/QuestionnaireEditor";
 import ScrollToTop from "./components/ScrollToTop";
 import VerifyEmail from "./pages/VerifyEmail";
+import { hasCompletedProfileQuestionnaire } from "./utils/questionnaireStorage";
 
 import { loginAnoniem } from "./auth";
 import { createUserDocument } from "./userService";
@@ -36,6 +38,23 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 
 import "./App.css";
+
+function RootRedirect() {
+  return (
+    <Navigate
+      to={hasCompletedProfileQuestionnaire() ? "/bos" : "/welcome"}
+      replace
+    />
+  );
+}
+
+function RequireProfileQuestionnaire({ children }) {
+  if (!hasCompletedProfileQuestionnaire()) {
+    return <Navigate to="/welcome" replace />;
+  }
+
+  return children;
+}
 
 function App() {
   useEffect(() => {
@@ -60,33 +79,36 @@ function App() {
     <>
       <ScrollToTop />
       <Routes>
-        <Route path="/" element={<Welcome />} />
+        <Route path="/" element={<RootRedirect />} />
+        <Route path="/welcome" element={<Welcome />} />
         <Route path="/questionnaire" element={<Questionnaire mode="profile" />} />
         <Route path="/weekly-questionnaire" element={<Questionnaire mode="weekly" />} />
         <Route path="/profile-edit" element={<QuestionnaireEditor mode="profile" />} />
         <Route path="/weekly-edit" element={<QuestionnaireEditor mode="weekly" />} />
         <Route path="/result" element={<Result />} />
-        <Route path="/overzicht" element={<Overzicht />} />
-        <Route path="/dagelijkse-uitstoot" element={<DagelijkseUitstoot />} />
-        <Route path="/wekelijkse-uitstoot" element={<WekelijkseUitstoot />} />
-        <Route path="/gemiddelde-week" element={<GemiddeldeWeek />} />
-        <Route path="/gemiddelde-jaar" element={<GemiddeldeJaar />} />
-        <Route path="/grootste-categorie" element={<GrootsteCategorie />} />
-        <Route path="/achtergrondimpact-info" element={<AchtergrondimpactInfo />} />
-        <Route path="/wekelijkse-activiteit-geschiedenis" element={<WekelijkseActiviteitGeschiedenis />} />
-        <Route path="/activiteiten" element={<Activiteiten />} />
-        <Route path="/activiteit-toevoegen" element={<ActiviteitToevoegen />} />
+        <Route path="/overzicht" element={<RequireProfileQuestionnaire><Overzicht /></RequireProfileQuestionnaire>} />
+        <Route path="/dagelijkse-uitstoot" element={<RequireProfileQuestionnaire><DagelijkseUitstoot /></RequireProfileQuestionnaire>} />
+        <Route path="/wekelijkse-uitstoot" element={<RequireProfileQuestionnaire><WekelijkseUitstoot /></RequireProfileQuestionnaire>} />
+        <Route path="/gemiddelde-week" element={<RequireProfileQuestionnaire><GemiddeldeWeek /></RequireProfileQuestionnaire>} />
+        <Route path="/gemiddelde-jaar" element={<RequireProfileQuestionnaire><GemiddeldeJaar /></RequireProfileQuestionnaire>} />
+        <Route path="/grootste-categorie" element={<RequireProfileQuestionnaire><GrootsteCategorie /></RequireProfileQuestionnaire>} />
+        <Route path="/achtergrondimpact-info" element={<RequireProfileQuestionnaire><AchtergrondimpactInfo /></RequireProfileQuestionnaire>} />
+        <Route path="/wekelijkse-activiteit-geschiedenis" element={<RequireProfileQuestionnaire><WekelijkseActiviteitGeschiedenis /></RequireProfileQuestionnaire>} />
+        <Route path="/activiteiten" element={<RequireProfileQuestionnaire><Activiteiten /></RequireProfileQuestionnaire>} />
+        <Route path="/activiteit-toevoegen" element={<RequireProfileQuestionnaire><ActiviteitToevoegen /></RequireProfileQuestionnaire>} />
         <Route path="/foodTasks" element={<FoodTasks />} />
         <Route path="/transportTasks" element={<TransportTasks />} />
         <Route path="/energyTasks" element={<EnergyTasks />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/calculator" element={<Calculator />} />
-        <Route path="/bos" element={<Bos />} />
+        <Route path="/home" element={<RequireProfileQuestionnaire><Home /></RequireProfileQuestionnaire>} />
+        <Route path="/calculator" element={<RequireProfileQuestionnaire><Calculator /></RequireProfileQuestionnaire>} />
+        <Route path="/bos" element={<RequireProfileQuestionnaire><Bos /></RequireProfileQuestionnaire>} />
         <Route path="/bos-oud" element={<BosVisualisatie />} />
-        <Route path="/bos-game" element={<BosMiniGame />} />
-        <Route path="/tips" element={<Tips />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/account-gegevens" element={<AccountGegevens />} />
+        <Route path="/missies" element={<RequireProfileQuestionnaire><BosGame /></RequireProfileQuestionnaire>} />
+        <Route path="/bos-game" element={<Navigate to="/missies" replace />} />
+        <Route path="/red-het-bos" element={<BosMiniGame />} />
+        <Route path="/tips" element={<RequireProfileQuestionnaire><Tips /></RequireProfileQuestionnaire>} />
+        <Route path="/profile" element={<RequireProfileQuestionnaire><Profile /></RequireProfileQuestionnaire>} />
+        <Route path="/account-gegevens" element={<RequireProfileQuestionnaire><AccountGegevens /></RequireProfileQuestionnaire>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />

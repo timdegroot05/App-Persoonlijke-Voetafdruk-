@@ -151,7 +151,7 @@ function Profile() {
               className="goal-edit-button profile-account-button"
               onClick={() => navigate("/account-gegevens")}
             >
-              Bewerk accountgegevens
+              Snelle instellingen
             </button>
           </div>
         </section>

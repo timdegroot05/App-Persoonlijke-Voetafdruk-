@@ -96,6 +96,58 @@
   color: white;
 }
 
+.activity-add-entry-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border: 1px solid var(--activity-border-strong);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(139, 214, 79, 0.18), transparent 32%),
+    linear-gradient(180deg, #ffffff 0%, #eef8ec 100%);
+  box-shadow: var(--activity-shadow);
+}
+
+.activity-add-entry-card h2 {
+  margin: 2px 0 6px;
+  color: var(--text-main);
+  font-family: var(--font-display);
+  font-size: 21px;
+  line-height: 1.08;
+}
+
+.activity-add-entry-card p:not(.section-label) {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.activity-add-entry-card button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 13px;
+  background: #1f8d3d;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 950;
+  box-shadow: 0 10px 18px rgba(31, 141, 61, 0.16);
+}
+
+.activity-add-entry-card button svg {
+  width: 16px;
+  height: 16px;
+}
+
 .actie-focus-card {
   margin-top: 18px;
   padding: 16px;
@@ -321,6 +373,15 @@
   border-color: rgba(31, 107, 42, 0.14);
 }
 
+.activity-action-card.bad-impact {
+  background: linear-gradient(180deg, #fff8f2 0%, #f6eadf 100%);
+  border-color: rgba(150, 74, 32, 0.18);
+}
+
+.activity-action-card.bad-impact.completed {
+  background: linear-gradient(180deg, #f3dfd5 0%, #ead1c4 100%);
+}
+
 .activity-check-button,
 .activity-open-button,
 .activity-forest-link button {
@@ -395,6 +456,15 @@
   font-weight: 900;
 }
 
+.activity-action-card.bad-impact .activity-action-copy small {
+  color: #8c3f21;
+}
+
+.activity-action-card.bad-impact .activity-action-icon {
+  background: #f2dfd2;
+  color: #8c3f21;
+}
+
 .activity-open-button {
   width: 34px;
   height: 34px;
@@ -442,6 +512,53 @@
   border-radius: 14px;
   background: linear-gradient(180deg, #e4f0df 0%, #d2e5ce 100%);
   color: var(--brand-dark);
+}
+
+.activity-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 92px;
+  z-index: 80;
+  display: grid;
+  gap: 4px;
+  width: min(360px, calc(100vw - 36px));
+  padding: 13px 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(31, 107, 42, 0.16);
+  box-shadow: 0 18px 42px rgba(31, 45, 32, 0.18);
+  transform: translateX(-50%);
+  animation: activityToastIn 0.22s ease both;
+}
+
+.activity-toast.bad {
+  border-color: rgba(150, 74, 32, 0.22);
+  background: #fff8f2;
+}
+
+.activity-toast strong {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.activity-toast span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+@keyframes activityToastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 .cards {

@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { FiArrowRight, FiCheckCircle, FiEdit3, FiPlus } from "react-icons/fi"
+import { FiArrowRight, FiCheckCircle, FiEdit3, FiPlus, FiSettings } from "react-icons/fi"
 import { HiOutlineCalculator } from "react-icons/hi"
 import { LuLeaf } from "react-icons/lu"
 import MobilePageShell from "../components/MobilePageShell"
 import {
   buildImpactSnapshot,
   getFocusLabel,
-  getImpactHistory,
-  getPersonalInsight,
 } from "../utils/impactInsights"
 import {
   getLatestWeeklyAnswers,         
@@ -33,12 +31,6 @@ import {
   getAugmentedWeeklyResults,
 } from "../utils/customActivities"
 import "../App.css"
-import handFoto from "../assets/HandHandfoto.png"
-
-const forestHeroPhoto = {
-  src: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=900&q=80",
-  alt: "Groen bos als visualisatie van natuurlijke groei",
-}
 
 function Home() {
   const navigate = useNavigate()
@@ -51,12 +43,10 @@ function Home() {
   const [activeFactIndex, setActiveFactIndex] = useState(0)
   const [factTimerProgress, setFactTimerProgress] = useState(100)
   const [showWeeklyReminder, setShowWeeklyReminder] = useState(false)
-  const [isGoalEditorOpen, setIsGoalEditorOpen] = useState(false)
-  const [weeklyGoal, setWeeklyGoal] = useState(() => {
+  const weeklyGoal = useMemo(() => {
     const savedGoal = Number(localStorage.getItem("weekly-goal"))
     return Number.isFinite(savedGoal) && savedGoal >= 0 ? savedGoal : 0
-  })
-  const [goalDraft, setGoalDraft] = useState(() => String(weeklyGoal))
+  }, [])
   const profileAnswers = getProfileAnswers()
   const weeklyAnswers = getLatestWeeklyAnswers()
   const weeklyResults = useMemo(() => getStoredWeeklyResults(), [])
@@ -124,28 +114,9 @@ function Home() {
     }
   }, [currentSnapshot, latestWeeklyResultWithExtras])
 
-  const history = useMemo(() => getImpactHistory(), [])
-  const latestHistoryEntry = history[0] ?? null
-
   const tipOfTheDay = tipsList[new Date().getDate() % tipsList.length]
   const facts = factsList
-  const personalInsight = getPersonalInsight(currentSnapshot)
   const focusLabel = getFocusLabel(emissionData.dominantCategory)
-  const savedKg = Math.max(
-    0,
-    Number((weeklyGoal - emissionData.weeklyEmission).toFixed(1))
-  )
-  const excessKg = Math.max(
-    0,
-    Number((emissionData.weeklyEmission - weeklyGoal).toFixed(1))
-  )
-  const goalProgress = Math.min(
-    100,
-    Math.max(
-      0,
-      weeklyGoal > 0 ? Math.round((savedKg / weeklyGoal) * 100) : 0
-    )
-  )
 
   const dailyCategoryBreakdown = useMemo(() => {
     const categoryLabels = {
@@ -354,11 +325,6 @@ function Home() {
     const month = Number(map.month)
     const monthStart = new Date(Date.UTC(year, month - 1, 1))
     const monthEnd = new Date(Date.UTC(year, month, 0))
-    const monthLabelFormatter = new Intl.DateTimeFormat("nl-NL", {
-      timeZone: "UTC",
-      day: "numeric",
-      month: "long",
-    })
     const monthNameFormatter = new Intl.DateTimeFormat("nl-NL", {
       timeZone: "UTC",
       month: "long",
@@ -529,19 +495,10 @@ function Home() {
     }
   }, [allWeeklyResultsWithExtras, dailyCategoryChartBreakdown])
 
-  const weeklyTargetLeft = Math.max(
-    0,
-    Number((weeklyGoal - emissionData.weeklyEmission).toFixed(1))
-  )
   const goalStatus =
     emissionData.weeklyEmission <= weeklyGoal
       ? "Op schema"
       : "Boven je doel"
-  const historyDelta = latestHistoryEntry
-    ? Number((emissionData.weeklyEmission - latestHistoryEntry.weeklyEmission).toFixed(1))
-    : null
-  const dailyGoal = Number((weeklyGoal / 7).toFixed(1))
-  const stretchGoal = Math.max(40, weeklyGoal - 20)
   const monthlyFocusCategory = monthInfo.categoryBreakdown[0] ?? null
   const monthlyFocusLabel = monthlyFocusCategory?.label ?? "Nog geen maanddata"
   const monthlyFocusAction =
@@ -617,40 +574,31 @@ function Home() {
     }
   }, [activeFactIndex, facts.length])
 
-  useEffect(() => {
-    localStorage.setItem("weekly-goal", String(weeklyGoal))
-  }, [weeklyGoal])
-
-  useEffect(() => {
-    setGoalDraft(String(weeklyGoal))
-  }, [weeklyGoal])
-
-  const applyGoal = (value) => {
-    const nextGoal = Math.min(300, Math.max(0, Number(value)))
-    if (!Number.isFinite(nextGoal)) {
-      return
-    }
-
-    setWeeklyGoal(nextGoal)
-    setIsGoalEditorOpen(false)
-  }
-
-  const resetGoal = () => {
-    setWeeklyGoal(0)
-    setGoalDraft("0")
-    setIsGoalEditorOpen(false)
-  }
-
   return (
   <MobilePageShell
-    title="Impact"
+    title="Mijn impact"
     icon={<LuLeaf />}
     className="home-page"
     contentClassName="home-content"
+    rightContent={
+      <button
+        type="button"
+        className="header-profile-link header-icon-button"
+        aria-label="Open snelle instellingen"
+        onClick={() => navigate("/account-gegevens")}
+      >
+        <FiSettings />
+      </button>
+    }
   >
       {showWeeklyReminder ? (
         <section className="home-reminder-card">
-          <p className="section-label dark">Wekelijkse reminder</p>
+          <div className="home-reminder-top">
+            <span className="app-logo-mark" aria-hidden="true">
+              <LuLeaf />
+            </span>
+            <p className="section-label dark">Wekelijkse reminder</p>
+          </div>
           <h2 className="home-reminder-title">Vul je activiteit van afgelopen week in</h2>
           <p className="home-reminder-text">
             Week van {formatWeekRangeLabel(activeCheckinWeek.weekStart, activeCheckinWeek.weekEnd)} staat klaar om in te vullen.
@@ -678,15 +626,36 @@ function Home() {
         </section>
       ) : null}
 
-      <section className="home-feature-card action-card">
-        <p className="section-label dark">Jouw Persoonlijke Bos</p>
+      <section className="home-feature-card home-forest-hero-card">
+        <div className="home-forest-hero-top">
+          <div>
+            <p className="section-label dark">Bosstatus</p>
+            <h2 className="home-feature-title">Jouw CO₂-bos</h2>
+          </div>
+          <span className="app-logo-mark" aria-hidden="true">
+            <LuLeaf />
+          </span>
+        </div>
 
-        <div className="home-feature-visual" aria-hidden="true">
-          <img
-            className="home-feature-photo"
-            src={forestHeroPhoto.src}
-            alt={forestHeroPhoto.alt}
-          />
+        <div className="home-forest-mini-scene" aria-hidden="true">
+          <span className="home-mini-sun" />
+          <span className="home-mini-cloud cloud-one" />
+          <span className="home-mini-cloud cloud-two" />
+          <span className="home-mini-tree tree-one" />
+          <span className="home-mini-tree tree-two" />
+          <span className="home-mini-tree tree-three" />
+          <span className="home-mini-grass" />
+        </div>
+
+        <div className="home-feature-stats">
+          <div className="home-feature-stat">
+            <span>Week</span>
+            <strong>{emissionData.weeklyEmission} kg</strong>
+          </div>
+          <div className="home-feature-stat">
+            <span>Status</span>
+            <strong>{goalStatus}</strong>
+          </div>
         </div>
 
         <button
@@ -694,14 +663,22 @@ function Home() {
           className="home-forest-card-button"
           onClick={() => navigate("/bos")}
         >
-          Bekijk bosvisualisatie
+          Open mijn bos
+          <FiArrowRight aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className="home-forest-card-button secondary"
+          onClick={() => navigate("/missies")}
+        >
+          Bosmissies
           <FiArrowRight aria-hidden="true" />
         </button>
       </section>
 
       <section className="home-widget-rail-section home-emission-rail-section">
         <div className="home-rail-header">
-          <p className="section-label dark">Uitstootoverzicht</p>
+          <p className="section-label dark">Impact in cijfers</p>
           <span className="home-rail-hint">Swipe</span>
         </div>
 
@@ -896,7 +873,7 @@ function Home() {
 
       <section className="home-widget-rail-section">
         <div className="home-rail-header">
-          <p className="section-label dark">Snelle acties</p>
+          <p className="section-label dark">Snel doen</p>
           <span className="home-rail-hint">Swipe</span>
         </div>
 
@@ -1000,177 +977,9 @@ function Home() {
         </div>
       </section>
 
-      {false ? (
       <section className="home-widget-rail-section">
         <div className="home-rail-header">
-          <p className="section-label dark">Jouw dashboard</p>
-          <span className="home-rail-hint">Swipe</span>
-        </div>
-
-        <div className="home-rail-dots" aria-hidden="true">
-          {Array.from({ length: dashboardCardsCount }).map((_, index) => (
-            <span
-              key={index}
-              className={`home-rail-dot${index === activeDashboardIndex ? " active" : ""}`}
-            />
-          ))}
-        </div>
-
-        <div
-          ref={dashboardRailRef}
-          className="home-widget-rail"
-          aria-label="Horizontaal scrollbare widgets"
-          onScroll={(event) =>
-            updateActiveIndex(event.currentTarget, setActiveDashboardIndex)
-          }
-        >
-          <button
-            className="info-card action-card home-action-card activity-quick-card home-widget-rail-card"
-            onClick={() => navigate("/activiteiten")}
-          >
-            <p className="section-label dark">Activiteit</p>
-            <p className="action-title">Kies je actie</p>
-            <div className="activity-quick-button">
-              <img
-                className="activity-quick-thumb"
-                src="https://images.unsplash.com/photo-1498925008800-019c7d59d903?auto=format&fit=crop&w=400&q=80"
-                alt="Duurzame buitenactiviteit"
-              />
-            </div>
-          </button>
-
-          <section className="impact-widget home-progress-card home-widget-rail-card">
-            <div className="impact-widget-top">
-              <div>
-                <p className="section-label dark">Voortgang</p>
-                <h2 className="impact-widget-title">{emissionData.score}/100</h2>
-              </div>
-              <div className="impact-badge">Groene week</div>
-            </div>
-
-            <p className="impact-widget-text">
-              Bespaard ten opzichte van je weekdoel: <strong>{savedKg} kg</strong>
-            </p>
-
-            <div className="goal-progress">
-              <div
-                className="goal-progress-fill"
-                style={{ width: `${goalProgress}%` }}
-              />
-            </div>
-
-            <button
-              type="button"
-              className="home-forest-link-button"
-              onClick={() => navigate("/bos")}
-            >
-              Bekijk bosvisualisatie
-              <FiArrowRight aria-hidden="true" />
-            </button>
-          </section>
-
-          {false ? (
-            <section className="info-card co2-widget-card home-widget-rail-card home-goal-card">
-            <p className="section-label dark">Doel van deze week</p>
-            <h3 className="co2-widget-value">{weeklyGoal} kg doel</h3>
-            <p className="co2-widget-copy">
-              {goalStatus === "Op schema"
-                ? `${weeklyTargetLeft} kg ruimte over tot je persoonlijke weekdoel.`
-                : `${excessKg} kg boven je doel. Tijd om bij te sturen.`}
-            </p>
-            <div className="goal-status-row">
-              <span className={`goal-status-chip${goalStatus === "Op schema" ? " success" : ""}`}>
-                {goalStatus}
-              </span>
-              <span className="goal-status-meta">
-                {Math.round(goalProgress)}% richting weekbuffer
-              </span>
-            </div>
-            <div className="goal-metrics-grid">
-              <div className="goal-metric-card">
-                <span>Dagdoel</span>
-                <strong>{dailyGoal} kg</strong>
-              </div>
-              <div className="goal-metric-card">
-                <span>Stretch</span>
-                <strong>{stretchGoal} kg</strong>
-              </div>
-            </div>
-            <button
-              type="button"
-              className="goal-edit-button"
-              onClick={() => setIsGoalEditorOpen((current) => !current)}
-            >
-              {isGoalEditorOpen ? "Sluit doelen" : "Stel doel in"}
-            </button>
-
-            {isGoalEditorOpen ? (
-              <div className="goal-editor">
-                <label className="goal-editor-label">
-                  <span>Nieuw weekdoel (kg CO₂e)</span>
-                  <input
-                    type="number"
-                    min="40"
-                    max="300"
-                    step="5"
-                    value={goalDraft}
-                    onChange={(event) => setGoalDraft(event.target.value)}
-                  />
-                </label>
-
-                <div className="goal-preset-row">
-                  {[90, 120, 150].map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      className="goal-preset-chip"
-                      onClick={() => applyGoal(preset)}
-                    >
-                      {preset} kg
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  className="goal-save-button"
-                  onClick={() => applyGoal(goalDraft)}
-                >
-                  Doel opslaan
-                </button>
-                <button
-                  type="button"
-                  className="goal-reset-button"
-                  onClick={resetGoal}
-                >
-                  Reset naar standaard
-                </button>
-              </div>
-            ) : null}
-            </section>
-          ) : null}
-
-          <button
-            className="info-card co2-widget-card co2-widget-link home-widget-rail-card"
-            onClick={() => navigate("/overzicht")}
-          >
-            <div>
-              <p className="section-label dark">Grootste categorie</p>
-              <h3 className="co2-widget-value">{focusLabel}</h3>
-              <p className="co2-widget-copy">
-                Dit is nu de categorie waar je de meeste winst kunt pakken.
-              </p>
-            </div>
-            <FiArrowRight className="co2-widget-arrow" />
-          </button>
-        </div>
-
-      </section>
-      ) : null}
-
-      <section className="home-widget-rail-section">
-        <div className="home-rail-header">
-          <p className="section-label dark">Grootste categorieën</p>
+          <p className="section-label dark">Waar kun je winnen?</p>
           <span className="home-rail-hint">Swipe</span>
         </div>
 
@@ -1217,7 +1026,7 @@ function Home() {
               <p className="section-label dark">Deze maand</p>
               <h3 className="co2-widget-value">{monthlyFocusLabel}</h3>
               <p className="co2-widget-copy">
-                Hier moet je verandering in brengen.
+                {monthlyFocusAction}
               </p>
             </div>
             <button
@@ -1236,21 +1045,39 @@ function Home() {
       </section>
 
       <section className="tip-card home-tip-card">
-        <p className="section-label dark">Tips</p>
+        <div className="home-tip-header">
+          <div>
+            <p className="section-label dark">Tips</p>
+            <h2>Kleine keuze, groot effect</h2>
+          </div>
+          <span className="app-logo-mark" aria-hidden="true">
+            <LuLeaf />
+          </span>
+        </div>
         <button
           type="button"
           className="home-tip-image-button"
           onClick={() => navigate("/tips")}
           aria-label="Open tips pagina"
         >
-          <img
-            className="home-tip-image"
-            src="https://images.unsplash.com/photo-1473448912268-2022ce9509d8?auto=format&fit=crop&w=1200&q=80"
-            alt="Groen landschap als visuele tip voor minder CO2 uitstoot"
-          />
-          <span className="home-tip-image-badge">Bekijk tips</span>
+          <span className="home-tip-illustration" aria-hidden="true">
+            <span className="tip-sun" />
+            <span className="tip-cloud" />
+            <span className="tip-road" />
+            <span className="tip-bike" />
+            <span className="tip-tree tree-a" />
+            <span className="tip-tree tree-b" />
+          </span>
         </button>
         <p className="tip-text">{tipOfTheDay.body}</p>
+        <button
+          type="button"
+          className="home-forest-card-button home-tip-action"
+          onClick={() => navigate("/tips")}
+        >
+          Bekijk tips
+          <FiArrowRight aria-hidden="true" />
+        </button>
       </section>
 
       <section className="home-fact-card">

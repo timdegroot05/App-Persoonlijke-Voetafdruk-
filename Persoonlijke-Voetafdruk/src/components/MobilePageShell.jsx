@@ -8,10 +8,11 @@ function MobilePageShell({
   contentClassName = "",
   children,
   showBottomNav = true,
+  rightContent,
 }) {
   return (
     <div className={`mobile-page-shell ${className}`.trim()}>
-      <AppHeader title={title} icon={icon} />
+      <AppHeader title={title} icon={icon} rightContent={rightContent} />
       <div className={`mobile-page-shell-content ${contentClassName}`.trim()}>
         {children}
       </div>

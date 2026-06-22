@@ -11,6 +11,7 @@ import ProgressBar from "../components/ProgressBar"
 import CategoryNav from "../components/CategoryNav"
 import AppHeader from "../components/AppHeader"
 import { calculateImpact } from "../utils/calculateImpact"
+import { buildImpactSnapshot, saveImpactSnapshot } from "../utils/impactInsights"
 import {
   getProfileAnswers,
   getWeeklyEntry,
@@ -97,6 +98,7 @@ function Questionnaire({ mode = "profile" }) {
     } else {
       if (mode === "weekly") {
         saveWeeklyAnswers(newAnswers, activeWeekInfo.weekStart)
+        saveImpactSnapshot(buildImpactSnapshot(getProfileAnswers(), newAnswers))
         saveWeeklyResult(
           calculateImpact(getProfileAnswers(), newAnswers),
           activeWeekInfo
@@ -108,6 +110,7 @@ function Questionnaire({ mode = "profile" }) {
       }
 
       saveProfileAnswers(newAnswers)
+      saveImpactSnapshot(buildImpactSnapshot(newAnswers, {}))
 
       if (location.state?.returnTo) {
         navigate(location.state.returnTo)

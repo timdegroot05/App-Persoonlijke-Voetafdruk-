@@ -1,18 +1,18 @@
-import { LuTreePine } from "react-icons/lu"
+import { FiTarget } from "react-icons/fi"
 import MobilePageShell from "../components/MobilePageShell"
 import ForestVisualization from "../components/forest/ForestVisualization"
 
-function Bos() {
+function BosGame() {
   return (
     <MobilePageShell
-      title="Bos"
-      icon={<LuTreePine />}
+      title="Missies"
+      icon={<FiTarget />}
       className="forest-page"
       contentClassName="forest-shell-content"
     >
-      <ForestVisualization mode="overview" />
+      <ForestVisualization mode="game" />
     </MobilePageShell>
   )
 }
 
-export default Bos
+export default BosGame

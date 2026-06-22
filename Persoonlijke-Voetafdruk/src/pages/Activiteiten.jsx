@@ -6,6 +6,7 @@ import {
   FiArrowRight,
   FiCheckCircle,
   FiMap,
+  FiPlus,
   FiShoppingBag,
   FiZap,
 } from "react-icons/fi"
@@ -15,8 +16,9 @@ import { buildImpactSnapshot } from "../utils/impactInsights"
 import { getLatestWeeklyAnswers, getProfileAnswers } from "../utils/questionnaireStorage"
 
 const ACTIVITY_PROGRESS_KEY = "activity-progress"
+const FOREST_GAME_KEY = "forest-clean-game"
 
-const CATEGORY_ORDER = ["voeding", "consumptie", "transport", "energie"]
+const CATEGORY_ORDER = ["voeding", "consumptie", "transport", "energie", "hoge-uitstoot"]
 
 const ACTION_GROUPS = [
   {
@@ -29,6 +31,9 @@ const ACTION_GROUPS = [
         body: "Vervang vandaag 1 maaltijd door een plantaardige keuze.",
         route: "/tips",
         estimateKg: 2.4,
+        forestId: "vegetarian",
+        forestTokens: 14,
+        forestType: "good",
         icon: LuLeaf,
       },
       {
@@ -37,6 +42,9 @@ const ACTION_GROUPS = [
         body: "Koop vandaag groente of fruit van het seizoen.",
         route: "/tips",
         estimateKg: 1.6,
+        forestId: "local-food",
+        forestTokens: 11,
+        forestType: "good",
         icon: LuLeaf,
       },
       {
@@ -45,6 +53,9 @@ const ACTION_GROUPS = [
         body: "Gebruik wat je al in huis hebt en voorkom voedselverspilling.",
         route: "/tips",
         estimateKg: 1.9,
+        forestId: "reusable-bottle",
+        forestTokens: 7,
+        forestType: "good",
         icon: LuLeaf,
       },
     ],
@@ -59,6 +70,9 @@ const ACTION_GROUPS = [
         body: "Stel 1 niet-noodzakelijke aankoop uit.",
         route: "/tips",
         estimateKg: 4.5,
+        forestId: "repair-item",
+        forestTokens: 20,
+        forestType: "good",
         icon: FiShoppingBag,
       },
       {
@@ -67,6 +81,9 @@ const ACTION_GROUPS = [
         body: "Check eerst of je iets tweedehands kunt vinden.",
         route: "/tips",
         estimateKg: 3.2,
+        forestId: "repair-item",
+        forestTokens: 20,
+        forestType: "good",
         icon: FiShoppingBag,
       },
       {
@@ -75,6 +92,9 @@ const ACTION_GROUPS = [
         body: "Maak iets bruikbaars weer heel in plaats van iets nieuws te kopen.",
         route: "/tips",
         estimateKg: 2.7,
+        forestId: "repair-item",
+        forestTokens: 20,
+        forestType: "good",
         icon: FiShoppingBag,
       },
     ],
@@ -89,6 +109,9 @@ const ACTION_GROUPS = [
         body: "Pak fiets, lopen of OV voor 1 korte rit.",
         route: "/tips",
         estimateKg: 3.1,
+        forestId: "bike-school",
+        forestTokens: 18,
+        forestType: "good",
         icon: FiMap,
       },
       {
@@ -97,6 +120,9 @@ const ACTION_GROUPS = [
         body: "Deel vandaag een autorit met iemand anders.",
         route: "/tips",
         estimateKg: 2.2,
+        forestId: "public-transport",
+        forestTokens: 22,
+        forestType: "good",
         icon: FiMap,
       },
       {
@@ -105,6 +131,9 @@ const ACTION_GROUPS = [
         body: "Voorkom een extra rit door je stops te bundelen.",
         route: "/tips",
         estimateKg: 1.8,
+        forestId: "public-transport",
+        forestTokens: 22,
+        forestType: "good",
         icon: FiMap,
       },
     ],
@@ -119,6 +148,9 @@ const ACTION_GROUPS = [
         body: "Zet apparaten uit stand-by en douche korter.",
         route: "/tips",
         estimateKg: 1.7,
+        forestId: "short-shower",
+        forestTokens: 10,
+        forestType: "good",
         icon: FiZap,
       },
       {
@@ -127,6 +159,9 @@ const ACTION_GROUPS = [
         body: "Laat vandaag nergens onnodig lampen branden.",
         route: "/tips",
         estimateKg: 1.1,
+        forestId: "led-lamps",
+        forestTokens: 16,
+        forestType: "good",
         icon: FiZap,
       },
       {
@@ -135,7 +170,46 @@ const ACTION_GROUPS = [
         body: "Zet de verwarming vandaag een graadje lager.",
         route: "/tips",
         estimateKg: 2.0,
+        forestId: "devices-off",
+        forestTokens: 8,
+        forestType: "good",
         icon: FiZap,
+      },
+    ],
+  },
+  {
+    category: "hoge-uitstoot",
+    title: "Hoge uitstoot",
+    actions: [
+      {
+        id: "bad-flight",
+        title: "Vliegtuig pakken",
+        body: "Voorbeeld van een grote uitstootpiek die je bos zichtbaar beschadigt.",
+        route: "/missies",
+        estimateKg: 180,
+        forestId: "flight",
+        forestType: "bad",
+        icon: FiMap,
+      },
+      {
+        id: "bad-car-long",
+        title: "Lange autorit",
+        body: "Veel kilometers alleen met de auto maken je bos droger.",
+        route: "/missies",
+        estimateKg: 28,
+        forestId: "car-long",
+        forestType: "bad",
+        icon: FiMap,
+      },
+      {
+        id: "bad-meat-week",
+        title: "Veel vlees eten",
+        body: "Een week met veel vlees verhoogt je visuele bosdruk.",
+        route: "/missies",
+        estimateKg: 18,
+        forestId: "meat-week",
+        forestType: "bad",
+        icon: LuLeaf,
       },
     ],
   },
@@ -148,15 +222,6 @@ function getCurrentWeekKey(date = new Date()) {
   currentDate.setHours(0, 0, 0, 0)
   currentDate.setDate(currentDate.getDate() + diff)
   return currentDate.toISOString().slice(0, 10)
-}
-
-function getStartOfWeek(date = new Date()) {
-  const currentDate = new Date(date)
-  const day = currentDate.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  currentDate.setHours(0, 0, 0, 0)
-  currentDate.setDate(currentDate.getDate() + diff)
-  return currentDate
 }
 
 function getStoredActivityProgress() {
@@ -176,6 +241,52 @@ function saveActivityProgress(progress) {
   }
 }
 
+function getStoredForestGame() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(FOREST_GAME_KEY))
+    return saved && typeof saved === "object" ? saved : {}
+  } catch {
+    return {}
+  }
+}
+
+function saveForestGame(game) {
+  try {
+    localStorage.setItem(FOREST_GAME_KEY, JSON.stringify(game))
+  } catch {
+    // Acties blijven bruikbaar zonder localStorage.
+  }
+}
+
+function syncForestFromActivity(action, shouldAdd) {
+  const current = getStoredForestGame()
+  const completedIds = Array.isArray(current.completedIds) ? current.completedIds : []
+  const badIds = Array.isArray(current.badIds) ? current.badIds : []
+  const forestId = action.forestId || action.id
+
+  if (action.forestType === "bad") {
+    saveForestGame({
+      ...current,
+      badIds: shouldAdd
+        ? Array.from(new Set([...badIds, forestId]))
+        : badIds.filter((id) => id !== forestId),
+    })
+    return
+  }
+
+  const tokenReward = Number(action.forestTokens) || 10
+  const xpReward = Math.round(tokenReward + (Number(action.estimateKg) || 0) * 10)
+
+  saveForestGame({
+    ...current,
+    completedIds: shouldAdd
+      ? Array.from(new Set([...completedIds, forestId]))
+      : completedIds.filter((id) => id !== forestId),
+    tokens: Math.max(0, (Number(current.tokens) || 0) + (shouldAdd ? tokenReward : -tokenReward)),
+    xp: Math.max(0, (Number(current.xp) || 0) + (shouldAdd ? xpReward : -xpReward)),
+  })
+}
+
 function Activiteiten() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -186,6 +297,7 @@ function Activiteiten() {
   const [activeStatsIndex, setActiveStatsIndex] = useState(0)
   const [isGoalEditorOpen, setIsGoalEditorOpen] = useState(false)
   const [activityProgress, setActivityProgress] = useState(getStoredActivityProgress)
+  const [activityToast, setActivityToast] = useState(null)
   const [weeklyGoal, setWeeklyGoal] = useState(() => {
     const savedGoal = Number(localStorage.getItem("weekly-goal"))
     return Number.isFinite(savedGoal) && savedGoal >= 0 ? savedGoal : 150
@@ -226,7 +338,9 @@ function Activiteiten() {
     groups.sort((a, b) => {
       if (a.category === focusCategory) return -1
       if (b.category === focusCategory) return 1
-      return CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category)
+      const firstIndex = CATEGORY_ORDER.indexOf(a.category)
+      const secondIndex = CATEGORY_ORDER.indexOf(b.category)
+      return (firstIndex === -1 ? 99 : firstIndex) - (secondIndex === -1 ? 99 : secondIndex)
     })
 
     return groups
@@ -263,12 +377,14 @@ function Activiteiten() {
     setIsGoalEditorOpen(false)
   }
 
-  const toggleAction = (actionId) => {
+  const toggleAction = (action) => {
+    const isCompleted = completedThisWeek.includes(action.id)
+
     setActivityProgress((current) => {
       const weeklyActions = current[currentWeekKey] || []
-      const nextWeek = weeklyActions.includes(actionId)
-        ? weeklyActions.filter((id) => id !== actionId)
-        : [...weeklyActions, actionId]
+      const nextWeek = isCompleted
+        ? weeklyActions.filter((id) => id !== action.id)
+        : [...weeklyActions, action.id]
       const nextProgress = {
         ...current,
         [currentWeekKey]: nextWeek,
@@ -277,6 +393,18 @@ function Activiteiten() {
       saveActivityProgress(nextProgress)
       return nextProgress
     })
+
+    syncForestFromActivity(action, !isCompleted)
+    setActivityToast({
+      type: action.forestType === "bad" ? "bad" : "good",
+      title: isCompleted ? "Actie teruggedraaid" : action.forestType === "bad" ? "Uitstoot toegevoegd" : "Bosactie toegevoegd",
+      message: isCompleted
+        ? `${action.title} telt niet meer mee.`
+        : action.forestType === "bad"
+          ? `${action.title} beschadigt je bosvoorbeeld met +${action.estimateKg} kg.`
+          : `${action.title} geeft je bos groei en tokens.`,
+    })
+    window.setTimeout(() => setActivityToast(null), 3200)
   }
 
   const updateActiveCategoryIndex = (category, element) => {
@@ -321,6 +449,21 @@ function Activiteiten() {
       className="activiteiten-page"
       contentClassName="activiteiten-content"
     >
+        <section className="activity-add-entry-card">
+          <div>
+            <p className="section-label dark">Eigen activiteit</p>
+            <h2>Activiteit toevoegen</h2>
+            <p>
+              Log iets wat niet tussen de standaard acties staat, zoals een rit,
+              aankoop of vlucht. Dit telt mee in je weekoverzicht en bos.
+            </p>
+          </div>
+          <button type="button" onClick={() => navigate("/activiteit-toevoegen")}>
+            <FiPlus />
+            Toevoegen
+          </button>
+        </section>
+
         <section className="activity-category-rail-section">
           <div className="activity-category-header">
             <p className="section-label dark">Verbeteracties</p>
@@ -363,12 +506,12 @@ function Activiteiten() {
                         key={action.id}
                         className={`activity-action-card activity-category-card${
                           completed ? " completed" : ""
-                        }`}
+                        }${action.forestType === "bad" ? " bad-impact" : ""}`}
                       >
                         <button
                           type="button"
                           className="activity-check-button"
-                          onClick={() => toggleAction(action.id)}
+                          onClick={() => toggleAction(action)}
                           aria-label={`${action.title} ${completed ? "ongedaan maken" : "afvinken"}`}
                         >
                           <FiCheckCircle />
@@ -380,7 +523,10 @@ function Activiteiten() {
                           <span>{group.category}</span>
                           <strong>{action.title}</strong>
                           <p>{action.body}</p>
-                          <small>-{action.estimateKg} kg CO2e geschat</small>
+                          <small>
+                            {action.forestType === "bad" ? "+" : "-"}
+                            {action.estimateKg} kg CO2e geschat
+                          </small>
                         </div>
                         <button
                           type="button"
@@ -518,6 +664,13 @@ function Activiteiten() {
             <LuTrees />
           </button>
         </section>
+
+        {activityToast ? (
+          <div className={`activity-toast ${activityToast.type}`} role="status">
+            <strong>{activityToast.title}</strong>
+            <span>{activityToast.message}</span>
+          </div>
+        ) : null}
     </MobilePageShell>
   )
 }
