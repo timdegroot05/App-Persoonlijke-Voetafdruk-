@@ -2,12 +2,13 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  width: min(430px, calc(100vw - 24px));
-  height: calc(100dvh - 28px);
+  width: var(--app-shell-width);
+  height: var(--app-shell-height);
+  max-height: var(--app-shell-height);
   min-height: 640px;
   overflow: hidden;
   overflow-x: hidden;
-  border-radius: 30px;
+  border-radius: var(--app-shell-radius);
   background: #eef9f1;
   color: #1f2d20;
   box-shadow: 0 20px 62px rgba(0, 0, 0, 0.18);
@@ -1715,9 +1716,19 @@
   }
 }
 
+@media (max-width: 480px) {
+  .forest-game-page {
+    width: 100vw;
+    min-height: 100dvh;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+}
+
 @media (max-width: 390px) {
   .forest-game-page {
-    width: calc(100vw - 20px);
+    width: 100vw;
   }
 
   .forest-clean-page {

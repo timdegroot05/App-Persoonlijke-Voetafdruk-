@@ -152,7 +152,17 @@ function ActiviteitToevoegen() {
       <AppHeader title="Activiteit toevoegen" icon={<FiPlusCircle />} />
 
       <div className="tips-content activity-entry-content">
-        <section className="calculator-card">
+        <section className="activity-entry-note-card">
+          <p className="section-label dark">Let op</p>
+          <p className="activity-entry-note-text">
+            Eigen activiteiten toevoegen zorgt voor accuratere uitstoot dan alleen de
+            wekelijkse vragenlijst. Als je eigen activiteiten zoals vlees kopen zelf
+            toevoegd, vergeet dan niet om die in de wekelijkse vragenlijst op nul te
+            zetten.
+          </p>
+        </section>
+
+        <section className="calculator-card activity-entry-card">
           <p className="section-label dark">Invullen</p>
           <h1 className="calculator-title">Voeg iets extra's toe</h1>
           <p className="calculator-text">
@@ -160,9 +170,10 @@ function ActiviteitToevoegen() {
           </p>
 
           <div className="activity-form-grid">
-            <label className="goal-editor-label" htmlFor="activity-section">
+            <label className="goal-editor-label activity-entry-field" htmlFor="activity-section">
               <span>Categorie</span>
               <select
+                className="activity-entry-select"
                 id="activity-section"
                 value={activeSectionId}
                 onChange={(event) => handleSectionChange(event.target.value)}
@@ -176,9 +187,10 @@ function ActiviteitToevoegen() {
             </label>
 
             {!isFlightSection ? (
-              <label className="goal-editor-label" htmlFor="activity-item">
+              <label className="goal-editor-label activity-entry-field" htmlFor="activity-item">
                 <span>Activiteit</span>
                 <select
+                  className="activity-entry-select"
                   id="activity-item"
                   value={selectedItemId}
                   onChange={(event) => {
@@ -197,9 +209,10 @@ function ActiviteitToevoegen() {
           </div>
 
           {isFlightSection ? (
-            <label className="goal-editor-label" htmlFor="flight-destination">
+            <label className="goal-editor-label activity-entry-field" htmlFor="flight-destination">
               <span>Populaire bestemmingen</span>
               <select
+                className="activity-entry-select"
                 id="flight-destination"
                 value={selectedDestination}
                 onChange={(event) => {
@@ -224,9 +237,10 @@ function ActiviteitToevoegen() {
             </label>
           ) : null}
 
-          <label className="goal-editor-label" htmlFor="activity-quantity">
+          <label className="goal-editor-label activity-entry-field" htmlFor="activity-quantity">
             <span>Hoeveelheid in {selectedItem.unit}</span>
             <input
+              className="activity-entry-input"
               id="activity-quantity"
               type="number"
               min="0"
@@ -242,9 +256,10 @@ function ActiviteitToevoegen() {
           </label>
 
           {isFlightSection ? (
-            <label className="goal-editor-label" htmlFor="flight-trip-type">
+            <label className="goal-editor-label activity-entry-field" htmlFor="flight-trip-type">
               <span>Type vlucht</span>
               <select
+                className="activity-entry-select"
                 id="flight-trip-type"
                 value={flightTripType}
                 onChange={(event) => {
@@ -280,7 +295,7 @@ function ActiviteitToevoegen() {
           ) : null}
         </section>
 
-        <section className="calculator-card">
+        <section className="calculator-card activity-entry-card activity-entry-history-section">
           <p className="section-label dark">Deze week toegevoegd</p>
 
           {activityEntries.length > 0 ? (
